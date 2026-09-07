@@ -1,0 +1,46 @@
+;; Auto-generated PRISM Benchmark Transitive Chain
+;; Depth: 5 | Distractors: 10 | Guided: False
+!(import! &self (library lib_import))
+!(git-import! "https://github.com/trueagi-io/PLN.git")
+!(import! &self (library PLN lib_pln))
+
+;; STV Declarations for concepts
+(= (STV A) (stv 0.1667 0.9))
+(= (STV B) (stv 0.1667 0.9))
+(= (STV C) (stv 0.1667 0.9))
+(= (STV D) (stv 0.1667 0.9))
+(= (STV E) (stv 0.1667 0.9))
+(= (STV F) (stv 0.1667 0.9))
+(= (STV D0) (stv 0.1 0.9))
+(= (STV D1) (stv 0.1 0.9))
+(= (STV D2) (stv 0.1 0.9))
+(= (STV D3) (stv 0.1 0.9))
+(= (STV D4) (stv 0.1 0.9))
+(= (STV D5) (stv 0.1 0.9))
+(= (STV D6) (stv 0.1 0.9))
+(= (STV D7) (stv 0.1 0.9))
+(= (STV D8) (stv 0.1 0.9))
+(= (STV D9) (stv 0.1 0.9))
+
+;; Knowledge Base
+(= (kb) (
+    (Sentence ((Inheritance A B) (stv 0.9 0.9)) (1))
+    (Sentence ((Inheritance B C) (stv 0.9 0.9)) (2))
+    (Sentence ((Inheritance C D) (stv 0.9 0.9)) (3))
+    (Sentence ((Inheritance D E) (stv 0.9 0.9)) (4))
+    (Sentence ((Inheritance E F) (stv 0.9 0.9)) (5))
+    (Sentence ((Inheritance D1 D0) (stv 0.76 0.53)) (100))
+    (Sentence ((Inheritance D2 D1) (stv 0.71 0.89)) (101))
+    (Sentence ((Inheritance D1 D9) (stv 0.52 0.42)) (102))
+    (Sentence ((Inheritance D3 D8) (stv 0.65 0.71)) (103))
+    (Sentence ((Inheritance D8 D6) (stv 0.37 0.72)) (104))
+    (Sentence ((Inheritance D0 D2) (stv 0.72 0.59)) (105))
+    (Sentence ((Inheritance D2 D3) (stv 0.92 0.59)) (106))
+    (Sentence ((Inheritance D1 D6) (stv 0.27 0.87)) (107))
+    (Sentence ((Inheritance D9 D4) (stv 0.81 0.8)) (108))
+    (Sentence ((Inheritance D8 D1) (stv 0.93 0.61)) (109))
+))
+
+;; Target Goal: (Inheritance A F)
+!(println! (BENCHMARK_TARGET_GOAL: (Inheritance A F)))
+!(println! (BENCHMARK_RESULT: (BestConfidenceCandidate (collapse (let ($TasksRet $BeliefsRet) (PLN.Derive (kb) (kb) 1 50 30 100 ()) (case (superpose $BeliefsRet) (((Sentence ($Term $TV) $Ev) (case (== $Term (Inheritance A F)) ((True ($TV $Ev))))))))))))

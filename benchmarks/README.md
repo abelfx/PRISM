@@ -4,68 +4,85 @@ This directory contains the profiling, latency benchmarking, and search-efficien
 
 ---
 
-## 1. Directory Contents
+## 1. Directory Structure
 
-| File | Purpose | Language |
-|---|---|:---:|
-| `benchmark_pycall.metta` | Measures cached round-trip FFI latency across 1,000 derivation iterations via PeTTa's Janus bridge | MeTTa |
-| `benchmark_uncached.metta` | Measures worst-case uncached FFI round-trip latency across 1,000 distinct terms (100% cache misses) | MeTTa |
-| `pycall_bench.py` | Python-side profiling helper providing timing routines, argument inspection, and failure testing | Python |
-| *(Upcoming Week 2)* `transitive_chain.py` | Synthetic transitive chain generator ($D \in [5, 20]$) with controllable distractor branching factors | Python |
-| *(Upcoming Week 2)* `metrics.py` | Metrics collector tracking search steps, node expansion, waste ratio, and wall-clock times | Python |
+```
+prism/benchmarks/
+├── run_benchmark.py               # Main CLI benchmark driver & parameter sweep runner
+├── domains/                       # Benchmark domain generators
+│   ├── __init__.py
+│   └── transitive_chain.py        # Synthetic transitive chain generator (D in [5, 20])
+├── utils/                         # Measurement & profiling utilities
+│   ├── __init__.py
+│   ├── metrics.py                 # MetricsCollector and PeTTa log parser
+│   └── pycall_bench.py            # FFI timing & argument inspection helper
+├── metta/                         # Raw MeTTa benchmark scripts
+│   ├── benchmark_pycall.metta     # Cached FFI round-trip latency test
+│   └── benchmark_uncached.metta   # Uncached FFI latency test
+└── results/                       # Empirical benchmark datasets
+    ├── baseline_unguided.json     # Recorded unguided PLN baseline numbers
+    └── baseline_guided_v1.json    # Recorded PRISM Tier 1 v1 guided numbers
+```
 
 ---
 
-## 2. Empirical Results (Week 1 / GATE-1.1)
+## 2. Empirical Benchmark Results
 
-The Python-MeTTa FFI performance was benchmarked directly on the host machine using PeTTa's SWI-Prolog Janus bridge over 1,000 iterations:
+### 2.1 Week 1: FFI Latency & Throughput (GATE-1.1)
 
 | Metric | Target / Gate | Measured (Cached) | Measured (Uncached) | Status |
 |---|:---:|:---:|:---:|:---:|
-| **Mean Latency per Call** | $< 1.0\text{ms}$ (ideal $< 0.1\text{ms}$) | **0.0150 ms** (15 µs) | **0.0214 ms** (21 µs) | **PASSED** (47× to 66× faster than gate) |
-| **Call Throughput** | $> 1,000$ calls/sec | **66,731** calls/sec | **46,825** calls/sec | **PASSED** |
-| **Total Time (1,000 calls)** | $< 1.0\text{s}$ | **0.0149 s** | **0.0214 s** | **PASSED** |
+| **Mean Latency per Call** | $< 1.0\text{ms}$ (ideal $< 0.1\text{ms}$) | **0.0124 ms** (12 µs) | **0.0214 ms** (21 µs) | **PASSED** (47× to 80× faster than gate) |
+| **Call Throughput** | $> 1,000$ calls/sec | **80,893** calls/sec | **46,825** calls/sec | **PASSED** |
+| **Total Time (1,000 calls)** | $< 1.0\text{s}$ | **0.0124 s** | **0.0214 s** | **PASSED** |
 | **Cache Hit Ratio** | — | **99.9%** (999/1000) | **0.0%** (1000 misses) | **VERIFIED** |
 
-### Key Takeaways
-1. **Sub-Millisecond Verification:** The hypothesis that FFI calls between MeTTa and Python would introduce prohibitive latency is conclusively disproven. Even with 100% cache misses, a full Python call round-trip takes only **21 microseconds**.
-2. **Memoization Impact:** In derivations where the same sentence is re-evaluated, `ScoreCache` resolves queries in **15 microseconds**, bypassing re-tokenization and scoring overhead.
+---
+
+### 2.2 Week 2: Unguided PLN vs PRISM-Guided (GATE-2.3 & GATE-2.4)
+
+Benchmark runs across synthetic transitive chains ($D \in [5, 10]$) with varying distractor counts:
+
+| Configuration | Metric | Unguided Baseline | PRISM Guided (v1) | Delta / Improvement |
+|---|---|:---:|:---:|:---:|
+| **D=5, 0 Distractors** | Success Rate | 100% | 100% | Parity |
+| | Waste Ratio | 35.0% | 47.5% | — |
+| | Wall Clock | 0.75s | 0.14s | **5.3× faster** |
+| **D=5, 10 Distractors** | Success Rate | **0% (FAILED)** | **100% (SOLVED)** | **+100% success** |
+| | Waste Ratio | 75.6% | 47.5% | **-28.1% waste** |
+| | Distractor Picks | 49.5 / 80 steps | 0.0 / 80 steps | **100% eliminated** |
+| | Wall Clock | 0.65s | 0.16s | **4.1× faster** |
+| **D=5, 25 Distractors** | Success Rate | **0% (FAILED)** | **100% (SOLVED)** | **+100% success** |
+| | Waste Ratio | 83.8% | 45.0% | **-38.8% waste (46.3% rel. reduction)** |
+| | Distractor Picks | 62.5 / 80 steps | 2.0 / 80 steps | **96.8% eliminated** |
+| | Wall Clock | 0.98s | 0.23s | **4.2× faster** |
+| **D=5, 50 Distractors** | Success Rate | **0% (FAILED)** | **50% (SOLVED)** | **+50% success** |
+| | Waste Ratio | 84.4% | 47.5% | **-36.9% waste** |
+| | Distractor Picks | 65.0 / 80 steps | 4.5 / 80 steps | **93.1% eliminated** |
+| | Wall Clock | 0.67s | 0.24s | **2.8× faster** |
+| **D=8, 10 Distractors** | Distractor Picks | 37.5 / 80 steps | 0.5 / 80 steps | **98.7% eliminated** |
+| | Wall Clock | 0.70s | 0.43s | **1.6× faster** |
+| **D=10, 10 Distractors** | Distractor Picks | 34.0 / 80 steps | 0.5 / 80 steps | **98.5% eliminated** |
+| | Wall Clock | 0.73s | 0.29s | **2.5× faster** |
 
 ---
 
 ## 3. How to Run the Benchmarks
 
-All benchmarks are invoked from the `PeTTa/` directory using `run.sh`:
-
-### 1. Run the Cached FFI Benchmark
+### 1. Run FFI Latency Benchmarks
 ```bash
 cd /home/abel/Desktop/icog_labs/pln/PeTTa
-sh run.sh ../prism/benchmarks/benchmark_pycall.metta
-```
-**Expected Output:**
-```
-(BENCHMARK_RESULTS: (iterations: 1000) (total_seconds: 0.0149...) (avg_latency_ms: 0.0149...) (throughput_calls_per_sec: 66731...))
-(CACHE_STATS: (dict py 1 size 999 hits 1 misses 99.90% hit_ratio))
-(EXCEPTION_HANDLING: 0.15)
+sh run.sh ../prism/benchmarks/metta/benchmark_pycall.metta
+sh run.sh ../prism/benchmarks/metta/benchmark_uncached.metta
 ```
 
-### 2. Run the Uncached FFI Benchmark
+### 2. Run Synthetic Chain Parameter Sweeps
 ```bash
-cd /home/abel/Desktop/icog_labs/pln/PeTTa
-sh run.sh ../prism/benchmarks/benchmark_uncached.metta
-```
-**Expected Output:**
-```
-(UNCACHED_BENCHMARK_RESULTS: (iterations: 1000) (total_seconds: 0.0213...) (avg_latency_ms: 0.0213...) (throughput_calls_per_sec: 46824...))
-(UNCACHED_CACHE_STATS: (dict py 1000 size 0 hits 1000 misses 0.00% hit_ratio))
-```
+cd /home/abel/Desktop/icog_labs/pln
 
----
+# Run unguided baseline sweep
+python3 -m prism.benchmarks.run_benchmark --depths 5 8 10 --distractors 0 10 25 50 --repeats 2 --max-steps 80
 
-## 4. Upcoming Week 2 Benchmark Specifications
-
-In Week 2, this directory will be expanded to host:
-- **Synthetic Transitive Chains (`transitive_chain.py`):** Generates clean chains of form $A \to B \to C \to \dots \to Z$ at depths $D \in [5, 20]$ with optimal proof paths known a priori, parameterized by distractor facts to test branching resistance.
-- **Waste Ratio Metric:**
-  $$\text{Waste Ratio} = 1.0 - \frac{\text{Rules on Proof Path}}{\text{Total Rules Fired}}$$
-  Comparing unguided PLN vs. PRISM-guided search to quantify search pruning efficiency.
+# Run PRISM-guided sweep
+python3 -m prism.benchmarks.run_benchmark --guided --depths 5 8 10 --distractors 0 10 25 50 --repeats 2 --max-steps 80
+```
