@@ -131,17 +131,29 @@ prism/
 | **GATE-2.4** | Guided vs Unguided Delta | PRISM-guided search eliminates distractors by up to 100%, reducing waste by 38.8% absolute (46.3% relative) on D=5. | **PASSED** |
 | **GATE-2.5** | Soundness Preservation | PRISM-guided runs produce the exact same final truth-value conclusions as unguided runs (`[0.60645, 0.16888]`). | **PASSED** |
 
-#### Week 2 Key Findings Summary:
+#### Week 2 Comparative Performance Table (Unguided PLN vs PRISM Tier 1 v1):
 
-| Configuration | Metric | Unguided Baseline | PRISM Guided (Tier 1 v1) | Impact |
+| Problem Configuration | Metric | Unguided Baseline | PRISM Guided (Tier 1 v1) | Performance Delta / Impact |
 |---|---|:---:|:---:|:---:|
-| **D=5, 10 Distractors** | Success Rate | **0% (FAILED)** | **100% (SOLVED)** | **+100% success** |
-| | Distractor Picks | 49.5 / 80 steps | 0.0 / 80 steps | **100% eliminated** |
+| **D=5, 0 Distractors** | Success Rate | 100% | 100% | Parity |
+| | Waste Ratio | 35.0% | 47.5% | +12.5% (heuristic explores goal neighborhood) |
+| | Wall Clock | 0.75s | 0.14s | **5.3× faster end-to-end** |
+| **D=5, 10 Distractors** | Success Rate | **0% (FAILED)** | **100% (SOLVED)** | **+100% success (Rescued from failure)** |
+| | Waste Ratio | 75.6% | 47.5% | **-28.1% absolute waste** |
+| | Distractor Picks | 49.5 / 80 steps | 0.0 / 80 steps | **100% distractors eliminated** |
 | | Wall Clock | 0.65s | 0.16s | **4.1× faster** |
-| **D=5, 25 Distractors** | Success Rate | **0% (FAILED)** | **100% (SOLVED)** | **+100% success** |
-| | Waste Ratio | 83.8% | 45.0% | **-38.8% waste (46.3% rel. reduction)** |
-| | Distractor Picks | 62.5 / 80 steps | 2.0 / 80 steps | **96.8% eliminated** |
+| **D=5, 25 Distractors** | Success Rate | **0% (FAILED)** | **100% (SOLVED)** | **+100% success (Rescued from failure)** |
+| | Waste Ratio | 83.8% | 45.0% | **-38.8% absolute waste (46.3% rel. reduction)** |
+| | Distractor Picks | 62.5 / 80 steps | 2.0 / 80 steps | **96.8% distractors eliminated** |
 | | Wall Clock | 0.98s | 0.23s | **4.2× faster** |
+| **D=5, 50 Distractors** | Success Rate | **0% (FAILED)** | **50% (SOLVED)** | **+50% success** |
+| | Waste Ratio | 84.4% | 47.5% | **-36.9% absolute waste** |
+| | Distractor Picks | 65.0 / 80 steps | 4.5 / 80 steps | **93.1% distractors eliminated** |
+| | Wall Clock | 0.67s | 0.24s | **2.8× faster** |
+| **D=8, 10 Distractors** | Distractor Picks | 37.5 / 80 steps | 0.5 / 80 steps | **98.7% distractors eliminated** |
+| | Wall Clock | 0.70s | 0.43s | **1.6× faster** |
+| **D=10, 10 Distractors** | Distractor Picks | 34.0 / 80 steps | 0.5 / 80 steps | **98.5% distractors eliminated** |
+| | Wall Clock | 0.73s | 0.29s | **2.5× faster** |
 
 For detailed weekly reports, consult [`milestones/milestone_week1.md`](../milestones/milestone_week1.md) and [`milestones/milestone_week2.md`](../milestones/milestone_week2.md).
 
