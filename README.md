@@ -1,7 +1,6 @@
 # PRISM: Programmable Reduction & Inference Search Manager
 
 > **Learned Inference Control Layer for Probabilistic Logic Networks (PLN) in OpenCog Hyperon**  
-> **Target:** iCog Labs AGI Engineering Competition — Track A: Hybrid AGI  
 > **Host Environment:** PeTTa (SWI-Prolog + Janus Python FFI) & `trueagi-io/PLN` (`lib_pln.metta`)  
 > **Status:** Week 1 Completed — FFI Foundation & Goal-Directed Hook De-risked (All 4 Acceptance Gates Passed)
 
@@ -82,12 +81,6 @@ PRISM is grounded directly in the live `trueagi-io/PLN` implementation located i
 
 ```
 .
-├── README.md                              # This document
-├── milestone.md                           # Week-by-week execution plan and pass/fail gate tracker
-├── PRISM_Implementation_Specification.md  # Comprehensive technical implementation companion
-├── PRISM_Implementation_Specification.pdf # Formatted PDF implementation specification
-├── PRISM_PLN_Inference_Control_Proposal_final.pdf # Competition project proposal (rev. 5)
-│
 ├── PeTTa/                                 # PeTTa interpreter environment
 │   ├── run.sh                             # Main runner (exports PRISM PYTHONPATH)
 │   ├── src/metta.pl                       # Prolog interpreter core (hardened py-call FFI)
@@ -110,8 +103,6 @@ PRISM is grounded directly in the live `trueagi-io/PLN` implementation located i
 │       ├── README.md                      # Documentation of test suite
 │       ├── test_fallback.metta            # Exception containment & empty-goal fallback test
 │       └── test_prism_hook.metta          # Live goal-directed prioritization verification test
-│
-└── pln-experimental/                      # Legacy experimental predecessor repo
 ```
 
 ---
@@ -156,17 +147,16 @@ sh run.sh ../prism/tests/test_prism_hook.metta
 ```bash
 cd PeTTa
 # Run all 7 rule tests
-for f in ./repos/PLN/ruletests/*.metta; do sh run.sh "$f" | grep "✅"; done
+for f in ./repos/PLN/ruletests/*.metta; do sh run.sh "$f" | grep "success"; done
 
 # Run standard examples
 for f in DeductionRevision.metta FlyingRaven.metta RavenInduction.metta Robot.metta Smokes.metta Toothbrush.metta; do
-    sh run.sh "./repos/PLN/examples/$f" | grep "✅"
+    sh run.sh "./repos/PLN/examples/$f" | grep "success"
 done
 ```
 
 ---
 
 ## 7. Primary Documentation References
-- **[PRISM Proposal (rev. 5)](PRISM_PLN_Inference_Control_Proposal_final.pdf)** — Core motivation, gap analysis, and competition presentation document.
-- **[PRISM Implementation Specification](PRISM_Implementation_Specification.md)** — In-depth architectural companion detailing equations, pseudo-code, and system constraints.
-- **[Milestone Tracker](milestone.md)** — Weekly sprint gates and deliverables.
+- **[PRISM Proposal (rev. 5)](https://docs.google.com/document/d/1-xqp9HK9RSVpcdMUAas79gD-n0VRl2uwBDy1a5ueSb4/edit?usp=sharing)** — Core motivation, gap analysis, and competition presentation document.
+- **[PRISM Implementation Specification](https://docs.google.com/document/d/1vTCytnvsdjlguaFCh9tLzPl8h26d609kxiINFR5bpJc/edit?usp=sharing)** — In-depth architectural companion detailing equations, pseudo-code, and system constraints.
