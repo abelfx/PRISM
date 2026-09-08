@@ -2,7 +2,7 @@
 ;; Uses prism-score (our Prolog FFI bridge) instead of raw py-call
 
 !(import! &self (library lib_import))
-!(import_prolog_functions_from_file "prism/prism_ffi.pl" (prism-score))
+!(import_prolog_functions_from_file "prism/ffi/prism_ffi.pl" (prism-score))
 
 (= (PriorityRankGoal $Goal ()) -99999.0)
 (= (PriorityRankGoal $Goal (Sentence ($x (stv $f $c)) $Ev1))

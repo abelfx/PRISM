@@ -19,7 +19,7 @@
             strip_attrs(SGoal),
             numbervars(SSentence, 0, N),
             numbervars(SGoal, N, _),
-            py_call(scorer:score_candidate(SSentence, SGoal), R0),
+            py_call('prism.core.scorer':score_candidate(SSentence, SGoal), R0),
             Result = R0
         ),
         _,
@@ -33,3 +33,26 @@
 strip_attrs(Term) :-
     term_attvars(Term, Vars),
     maplist([V]>>del_attrs(V), Vars).
+
+
+%% prism-filter-beliefs(+Candidate, +Goal, +Beliefs, -Result)
+%%   Calls scorer.filter_beliefs(Candidate, Goal, Beliefs) via Janus.
+%%   Returns the filtered list of beliefs on success, or the original Beliefs on failure.
+'prism-filter-beliefs'(Candidate, Goal, Beliefs, Result) :-
+    catch(
+        (   copy_term([Candidate, Goal, Beliefs], [SCand, SGoal, SBeliefs]),
+            strip_attrs(SCand),
+            strip_attrs(SGoal),
+            strip_attrs(SBeliefs),
+            numbervars(SCand, 0, N1),
+            numbervars(SGoal, N1, N2),
+            numbervars(SBeliefs, N2, _),
+            py_call('prism.core.scorer':filter_beliefs(SCand, SGoal, SBeliefs), R0),
+            (   is_list(R0)
+            ->  Result = R0
+            ;   Result = Beliefs
+            )
+        ),
+        _,
+        Result = Beliefs
+    ).
