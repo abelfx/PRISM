@@ -1,0 +1,91 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "prism-pln"
+version = "0.1.0"
+description = "PRISM: Programmable Reduction & Inference Search Manager for Probabilistic Logic Networks (PLN)"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+authors = [
+    { name = "PRISM Contributors" }
+]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+dependencies = []
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.4.0",
+    "pytest-cov>=4.1.0",
+    "ruff>=0.4.0",
+    "mypy>=1.8.0",
+]
+test = [
+    "pytest>=7.4.0",
+    "pytest-cov>=4.1.0",
+]
+
+[tool.setuptools.package-dir]
+"prism" = "."
+"prism.core" = "core"
+"prism.stage0" = "stage0"
+"prism.tier1" = "tier1"
+"prism.ffi" = "ffi"
+"prism.benchmarks" = "benchmarks"
+"prism.benchmarks.domains" = "benchmarks/domains"
+"prism.benchmarks.utils" = "benchmarks/utils"
+
+[tool.setuptools.package-data]
+"prism.ffi" = ["*.pl"]
+
+[tool.pytest.ini_options]
+minversion = "7.0"
+addopts = "-ra -q --strict-markers"
+testpaths = ["tests/unit"]
+pythonpath = ["..", "."]
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+
+[tool.ruff.lint]
+select = [
+    "E",   # pycodestyle errors
+    "W",   # pycodestyle warnings
+    "F",   # pyflakes
+    "I",   # isort
+    "B",   # flake8-bugbear
+]
+ignore = [
+    "E501", # line length handled by formatter
+    "B008", # do not perform function calls in argument defaults
+]
+
+[tool.ruff.lint.isort]
+known-first-party = ["prism"]
+
+[tool.mypy]
+python_version = "3.10"
+warn_return_any = true
+warn_unused_configs = true
+ignore_missing_imports = true
+check_untyped_defs = true
+files = ["core", "stage0", "tier1", "benchmarks"]
+
+[tool.coverage.run]
+source = ["core", "stage0", "tier1", "benchmarks"]
+omit = ["tests/*"]
+
+[tool.coverage.report]
+show_missing = true
