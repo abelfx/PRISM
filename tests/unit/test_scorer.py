@@ -3,12 +3,11 @@ Unit tests for PRISM Scorer Coordinator.
 Verifies caching, fallback logic, error handling, and Stage 0 belief filtering.
 """
 
-import pytest
 from prism.core.scorer import (
-    score_candidate,
-    filter_beliefs,
-    clear_cache,
     cache_stats,
+    clear_cache,
+    filter_beliefs,
+    score_candidate,
 )
 
 

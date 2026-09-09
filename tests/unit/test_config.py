@@ -3,8 +3,10 @@ Unit tests for PRISM configuration module.
 Verifies defaults, immutability, and parameter boundaries.
 """
 
+from dataclasses import FrozenInstanceError
+
 import pytest
-from prism.core.config import PrismConfig, Tier1Config, Stage0Config, DEFAULT_CONFIG
+from prism.core.config import DEFAULT_CONFIG, PrismConfig, Stage0Config, Tier1Config
 
 
 def test_tier1_config_defaults():
@@ -21,7 +23,7 @@ def test_tier1_config_defaults():
 def test_tier1_config_immutability():
     """Ensure configuration is immutable to prevent accidental logic mutations."""
     t1 = Tier1Config()
-    with pytest.raises(Exception):
+    with pytest.raises((FrozenInstanceError, AttributeError)):
         t1.alpha = 0.8  # type: ignore
 
 
@@ -36,5 +38,8 @@ def test_master_config_structure():
     """Verify master PrismConfig integrates sub-configs."""
     assert DEFAULT_CONFIG.tier1.alpha == 0.65
     assert DEFAULT_CONFIG.stage0.enabled is True
+    custom_cfg = PrismConfig()
+    assert custom_cfg.tier1 is not None
+    assert custom_cfg.stage0 is not None
 
 

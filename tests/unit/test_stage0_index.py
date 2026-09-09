@@ -3,7 +3,6 @@ Unit tests for PRISM Stage 0 Indexed Premise Pre-Filter.
 Verifies concept indexing, candidate/goal lookup, and sound filtering of beliefs.
 """
 
-import pytest
 from prism.stage0.index import PremiseIndex, extract_statement_components
 
 
@@ -15,7 +14,7 @@ def test_extract_statement_components():
     assert concepts == {'A', 'B'}
 
     # Nested or malformed
-    link2, concepts2 = extract_statement_components(['Sentence', ['A', ['stv', 1, 1]], [1]])
+    _link2, concepts2 = extract_statement_components(['Sentence', ['A', ['stv', 1, 1]], [1]])
     assert 'A' in concepts2
 
 

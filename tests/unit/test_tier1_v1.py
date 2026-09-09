@@ -6,12 +6,12 @@ Verifies atomization, confidence extraction, depth extraction, and score computa
 import pytest
 from prism.core.config import Tier1Config
 from prism.tier1.heuristic_v1 import (
+    compute_depth_discount,
+    compute_overlap,
+    compute_v1_score,
     extract_atoms,
     extract_confidence,
     extract_depth,
-    compute_overlap,
-    compute_depth_discount,
-    compute_v1_score,
 )
 
 
