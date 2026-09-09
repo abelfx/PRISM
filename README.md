@@ -1,4 +1,4 @@
-# PRISM: Programmable Reduction & Inference Search Manager
+# Programmable Reduction & Inference Search Manager
 
 > **Learned Inference Control Layer for Probabilistic Logic Networks (PLN) in OpenCog Hyperon**  
 > **Host Environment:** PeTTa (SWI-Prolog + Janus Python FFI) & `trueagi-io/PLN` (`lib_pln.metta`)  
