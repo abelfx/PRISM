@@ -1,0 +1,59 @@
+{
+  "domain": "diamond",
+  "guided": true,
+  "depths": [
+    [
+      2,
+      5
+    ]
+  ],
+  "distractor_counts": [
+    0
+  ],
+  "repeats": 1,
+  "max_steps": 80,
+  "runs": [
+    {
+      "domain_type": "diamond_dag",
+      "depth": 2,
+      "n_distractors": 0,
+      "guided": true,
+      "goal_reached": true,
+      "steps_taken": 80,
+      "rules_fired": 80,
+      "rules_on_proof_path": 40,
+      "off_path_selections": 40,
+      "distractor_selections": 0,
+      "waste_ratio": 0.5,
+      "waste_ratio_pct": "50.00%",
+      "wall_clock_seconds": 0.3921,
+      "final_stv": [
+        0.8116672500291682,
+        0.6561000000000001
+      ],
+      "evidence_stamp": [
+        "1",
+        "2"
+      ],
+      "solution_path": "SHORTCUT",
+      "seed": 100,
+      "exit_code": 0
+    }
+  ],
+  "aggregated": {
+    "D2_5_dist0": {
+      "depth_param": [
+        2,
+        5
+      ],
+      "n_distractors": 0,
+      "success_rate": 1.0,
+      "avg_waste_ratio": 0.5,
+      "avg_waste_ratio_pct": "50.00%",
+      "avg_wall_clock_seconds": 0.3921,
+      "avg_steps": 80.0,
+      "avg_distractor_selections": 0.0,
+      "shortcut_rate": 1.0
+    }
+  }
+}
