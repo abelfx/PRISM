@@ -1,0 +1,61 @@
+{
+  "domain": "tree",
+  "guided": true,
+  "depths": [
+    [
+      2,
+      2
+    ]
+  ],
+  "distractor_counts": [
+    0
+  ],
+  "repeats": 1,
+  "max_steps": 80,
+  "runs": [
+    {
+      "domain_type": "tree_conjunction",
+      "depth": 2,
+      "n_distractors": 0,
+      "guided": true,
+      "goal_reached": true,
+      "steps_taken": 80,
+      "rules_fired": 80,
+      "rules_on_proof_path": 41,
+      "off_path_selections": 39,
+      "distractor_selections": 0,
+      "waste_ratio": 0.4875,
+      "waste_ratio_pct": "48.75%",
+      "wall_clock_seconds": 0.2142,
+      "final_stv": [
+        0.6689453125,
+        0.2841756191015626
+      ],
+      "evidence_stamp": [
+        "1",
+        "2",
+        "3",
+        "4"
+      ],
+      "conjunction_verified": true,
+      "seed": 100,
+      "exit_code": 0
+    }
+  ],
+  "aggregated": {
+    "Tree_L2_R2_dist0": {
+      "depth_param": [
+        2,
+        2
+      ],
+      "n_distractors": 0,
+      "success_rate": 1.0,
+      "avg_waste_ratio": 0.4875,
+      "avg_waste_ratio_pct": "48.75%",
+      "avg_wall_clock_seconds": 0.2142,
+      "avg_steps": 80.0,
+      "avg_distractor_selections": 0.0,
+      "conjunction_rate": 1.0
+    }
+  }
+}

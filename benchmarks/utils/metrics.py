@@ -28,6 +28,9 @@ class MetricsCollector:
 
         self.wall_clock_seconds: Optional[float] = None
         self.selected_history: List[Dict[str, Any]] = []
+        self.domain_type: str = "transitive_chain"
+        self.solution_path: Optional[str] = None
+        self.conjunction_verified: Optional[bool] = None
 
     @property
     def waste_ratio(self) -> float:
@@ -70,7 +73,8 @@ class MetricsCollector:
 
     def summary(self) -> Dict[str, Any]:
         """Return a serializable dictionary summarizing the run."""
-        return {
+        res: Dict[str, Any] = {
+            "domain_type": self.domain_type,
             "depth": self.depth,
             "n_distractors": self.n_distractors,
             "guided": self.guided,
@@ -90,6 +94,11 @@ class MetricsCollector:
             "final_stv": self.final_stv,
             "evidence_stamp": self.evidence_stamp,
         }
+        if self.solution_path is not None:
+            res["solution_path"] = self.solution_path
+        if self.conjunction_verified is not None:
+            res["conjunction_verified"] = self.conjunction_verified
+        return res
 
 
 def _extract_atoms(expr: str) -> List[str]:
@@ -138,16 +147,19 @@ def parse_selected_log(
     """
     Parse the stdout/stderr from PeTTa running a transitive chain benchmark.
     """
+    domain_type = spec.get("domain_type", "transitive_chain")
+    depth = spec.get("depth", spec.get("depth_short", spec.get("depth_left", 0)))
     collector = MetricsCollector(
-        depth=spec["depth"],
+        depth=depth,
         n_distractors=len(spec.get("distractor_facts", [])),
         guided=guided,
     )
+    collector.domain_type = domain_type
     collector.wall_clock_seconds = wall_clock_s
 
-    proof_nodes = spec["nodes"]
-    start_node = spec["start_node"]
-    end_node = spec["end_node"]
+    proof_nodes = spec.get("nodes", [])
+    start_node = spec.get("start_node", "A")
+    end_node = spec.get("end_node", spec.get("goal_node", "Z"))
 
     # 1. Parse all SELECTED lines
     # Format: (SELECTED (Sentence (<stmt>) (stv <s> <c>)) (<ev>)))
@@ -183,6 +195,19 @@ def parse_selected_log(
         ev_res = res_match.group(3).strip().split()
         collector.final_stv = (s_res, c_res)
         collector.evidence_stamp = ev_res
+
+        if domain_type == "diamond_dag":
+            from prism.benchmarks.domains.multipath_dag import classify_diamond_solution
+
+            collector.solution_path = classify_diamond_solution(ev_res, spec)
+        elif domain_type == "tree_conjunction":
+            from prism.benchmarks.domains.tree_dag import (
+                verify_tree_conjunction_solution,
+            )
+
+            collector.conjunction_verified = verify_tree_conjunction_solution(
+                ev_res, spec
+            )
     else:
         # Check if result was empty ()
         collector.goal_reached = False
