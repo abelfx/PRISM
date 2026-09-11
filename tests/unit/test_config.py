@@ -4,7 +4,7 @@ Verifies defaults, immutability, and parameter boundaries.
 """
 
 import pytest
-from prism.core.config import PrismConfig, Tier1Config, Stage0Config, DEFAULT_CONFIG
+from prism.core.config import DEFAULT_CONFIG, PrismConfig, SearchConfig, Stage0Config, Tier1Config
 
 
 def test_tier1_config_defaults():
@@ -32,9 +32,29 @@ def test_stage0_config_defaults():
     assert s0.max_beliefs == 100
 
 
+def test_search_config_defaults():
+    """Verify SearchConfig defaults per Week 5 specification."""
+    sc = SearchConfig()
+    assert sc.max_steps == 100
+    assert sc.beam_width == 5
+    assert sc.cost_confidence_weight == 1.0
+    assert sc.min_step_cost == 0.01
+    assert sc.stall_threshold == 0.15
+    assert sc.deduplicate_beliefs is True
+
+
+def test_search_config_immutability():
+    """Ensure SearchConfig is frozen immutable."""
+    sc = SearchConfig()
+    with pytest.raises(Exception):
+        sc.beam_width = 10  # type: ignore
+
+
 def test_master_config_structure():
     """Verify master PrismConfig integrates sub-configs."""
     assert DEFAULT_CONFIG.tier1.alpha == 0.65
     assert DEFAULT_CONFIG.stage0.enabled is True
+    assert DEFAULT_CONFIG.search.beam_width == 5
+
 
 
