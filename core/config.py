@@ -56,6 +56,35 @@ class Stage0Config:
 
 
 @dataclass(frozen=True)
+class SearchConfig:
+    """
+    Configuration parameters for Learned A* / Best-First Search Engine.
+
+    Inputs:
+        max_steps (int): Maximum derivation expansion steps before termination.
+        beam_width (int): Maximum number of top candidates expanded per node (top-k).
+        cost_confidence_weight (float): Multiplier for uncertainty cost (1.0 - confidence).
+        min_step_cost (float): Floor cost per deduction step to prevent 0-cost cycles.
+        stall_threshold (float): Tier 1 score threshold below which state is deemed stalled.
+        deduplicate_beliefs (bool): Whether to enforce closed-set state hashing.
+
+    Outputs:
+        Immutable configuration instance.
+
+    What it does NOT handle:
+        Does not maintain the open queue, does not fire inference rules,
+        and does not perform FFI conversions.
+    """
+    max_steps: int = 100
+    beam_width: int = 5
+    cost_confidence_weight: float = 1.0
+    min_step_cost: float = 0.01
+    stall_threshold: float = 0.15
+    deduplicate_beliefs: bool = True
+    guided: bool = True
+
+
+@dataclass(frozen=True)
 class PrismConfig:
     """
     Top-level master configuration container for PRISM.
@@ -63,6 +92,7 @@ class PrismConfig:
     Inputs:
         tier1 (Tier1Config): Configuration for Tier 1 fast scorer.
         stage0 (Stage0Config): Configuration for Stage 0 premise pre-filter.
+        search (SearchConfig): Configuration for Learned A* search engine.
 
     Outputs:
         Master configuration instance.
@@ -72,6 +102,7 @@ class PrismConfig:
     """
     tier1: Tier1Config = Tier1Config()
     stage0: Stage0Config = Stage0Config()
+    search: SearchConfig = SearchConfig()
 
 
 # Global default configuration instance
