@@ -228,3 +228,22 @@ class PremiseIndex:
             return list(beliefs)
 
         return filtered
+
+
+def filter_beliefs(
+    candidate: Any,
+    goal: Any,
+    beliefs: List[Any],
+) -> List[Any]:
+    """
+    Convenience function for filtering candidate premises using Stage 0.
+
+    Inputs:
+        candidate (Any): Selected task sentence or None.
+        goal (Any): Query goal expression or None.
+        beliefs (List[Any]): List of candidate beliefs to filter.
+
+    Outputs:
+        List[Any]: Filtered list of relevant beliefs.
+    """
+    return PremiseIndex().filter_beliefs(candidate, goal, beliefs)
