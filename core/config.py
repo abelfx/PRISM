@@ -67,6 +67,10 @@ class SearchConfig:
         min_step_cost (float): Floor cost per deduction step to prevent 0-cost cycles.
         stall_threshold (float): Tier 1 score threshold below which state is deemed stalled.
         deduplicate_beliefs (bool): Whether to enforce closed-set state hashing.
+        guided (bool): Whether to use Tier 1 heuristic guidance (A*) or uniform cost.
+        use_stage0_filter (bool): Whether to pre-filter candidate premises using Stage 0.
+        beam_threshold (float): Adaptive beam threshold; if > 0.0, expands candidates with score >= top_score - beam_threshold.
+        task_selection_k (int): Number of top-priority tasks to expand per state node.
 
     Outputs:
         Immutable configuration instance.
@@ -82,6 +86,9 @@ class SearchConfig:
     stall_threshold: float = 0.15
     deduplicate_beliefs: bool = True
     guided: bool = True
+    use_stage0_filter: bool = True
+    beam_threshold: float = 0.0
+    task_selection_k: int = 3
 
 
 @dataclass(frozen=True)
