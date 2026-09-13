@@ -241,3 +241,74 @@ def test_astar_search_stall_detection():
 
     assert result.stalled is True
 
+
+def test_generate_forward_candidates_stage0_filtering():
+    """GATE-6.1: Verify Stage 0 candidate generation reduces candidate count by >= 70%."""
+    from prism.benchmarks.domains.transitive_chain import generate_with_distractors
+    from prism.benchmarks.evaluate_search_comparison import format_spec_facts
+
+    spec = generate_with_distractors(depth=6, n_distractors=25, seed=42)
+    facts = format_spec_facts(spec)
+    goal = spec["goal"]
+
+    # Without Stage 0
+    cands_raw = generate_forward_candidates(facts, facts, goal=goal, use_stage0=False)
+    # With Stage 0
+    cands_s0 = generate_forward_candidates(facts, facts, goal=goal, use_stage0=True)
+
+    assert len(cands_raw) > 30
+    assert len(cands_s0) < len(cands_raw)
+    reduction = (len(cands_raw) - len(cands_s0)) / len(cands_raw)
+    assert reduction >= 0.70, f"Expected >= 70% candidate reduction, got {reduction:.2%}"
+
+
+def test_astar_search_high_noise_chain_rescue():
+    """GATE-6.2: Verify PRISM A* rescues D=6 chain with 25 distractors in < 35 steps."""
+    from prism.benchmarks.domains.transitive_chain import generate_with_distractors
+    from prism.benchmarks.evaluate_search_comparison import format_spec_facts
+
+    spec = generate_with_distractors(depth=6, n_distractors=25, seed=42)
+    facts = format_spec_facts(spec)
+    goal = spec["goal"]
+
+    cfg = SearchConfig(max_steps=35, beam_width=5, guided=True, use_stage0_filter=True)
+    engine = AStarSearchEngine(config=cfg)
+    result = engine.search(initial_tasks=facts, initial_beliefs=facts, goal=goal)
+
+    assert result.goal_found is True
+    assert result.steps_expanded < 35
+    assert len(result.proof_path) >= 5
+
+
+def test_astar_search_tree_conjunction_rescue():
+    """GATE-6.3: Verify PRISM A* rescues L(3,3) tree conjunction with 20 distractors in < 30 steps."""
+    from prism.benchmarks.domains.tree_dag import generate_tree_with_distractors
+    from prism.benchmarks.evaluate_search_comparison import format_spec_facts
+
+    spec = generate_tree_with_distractors(depth_left=3, depth_right=3, n_distractors=20, seed=42)
+    facts = format_spec_facts(spec)
+    goal = spec["goal"]
+
+    cfg = SearchConfig(max_steps=30, beam_width=5, guided=True, use_stage0_filter=True)
+    engine = AStarSearchEngine(config=cfg)
+    result = engine.search(initial_tasks=facts, initial_beliefs=facts, goal=goal)
+
+    assert result.goal_found is True
+    assert result.steps_expanded < 30
+    assert len(result.proof_path) >= 4
+
+
+def test_astar_adaptive_beam_threshold():
+    """Verify search functions with adaptive beam_threshold."""
+    f1 = ["Sentence", [["Inheritance", "A", "B"], ["stv", 0.9, 0.9]], ["1"]]
+    f2 = ["Sentence", [["Inheritance", "B", "Z"], ["stv", 0.9, 0.9]], ["2"]]
+    goal = ["Inheritance", "A", "Z"]
+
+    cfg = SearchConfig(max_steps=10, beam_threshold=0.2, guided=True)
+    engine = AStarSearchEngine(config=cfg)
+    result = engine.search(initial_tasks=[f1, f2], initial_beliefs=[f1, f2], goal=goal)
+
+    assert result.goal_found is True
+    assert len(result.proof_path) == 2
+
+
