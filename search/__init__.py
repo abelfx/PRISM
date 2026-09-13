@@ -5,6 +5,11 @@ Provides priority-queue agenda management, cumulative path cost tracking,
 heuristic distance estimation, and proof path reconstruction.
 """
 
+from prism.search.backward import (
+    BackwardCandidate,
+    backward_step,
+    check_connection,
+)
 from prism.search.engine import AStarSearchEngine, SearchResult
 from prism.search.rules import (
     ParsedSentence,
@@ -34,4 +39,7 @@ __all__ = [
     "apply_candidate",
     "AStarSearchEngine",
     "SearchResult",
+    "BackwardCandidate",
+    "backward_step",
+    "check_connection",
 ]

@@ -58,6 +58,19 @@ def parse_sentence(sentence: Any) -> Optional[ParsedSentence]:
     if sentence is None:
         return None
 
+    # Handle raw 3-element statement list: ['Inheritance', 'A', 'B']
+    if isinstance(sentence, (list, tuple)) and len(sentence) == 3 and isinstance(sentence[0], str):
+        if sentence[0] in {"Inheritance", "Similarity", "Implication", "Evaluation", "Member"}:
+            return ParsedSentence(
+                relation=str(sentence[0]),
+                subject=str(sentence[1]),
+                object_node=str(sentence[2]),
+                strength=1.0,
+                confidence=0.9,
+                evidence_stamp=(),
+                raw=sentence,
+            )
+
     # Handle Python list / tuple representation:
     # ['Sentence', [['Inheritance', 'A', 'B'], ['stv', 0.9, 0.9]], ['1']]
     if isinstance(sentence, (list, tuple)) and len(sentence) >= 2:
@@ -192,6 +205,9 @@ def deduce_pair(p1: ParsedSentence, p2: ParsedSentence) -> Optional[Any]:
 def generate_forward_candidates(
     tasks: Sequence[Any],
     beliefs: Sequence[Any],
+    goal: Any = None,
+    use_stage0: bool = False,
+    task_selection_k: int = 3,
 ) -> List[Any]:
     """
     Generate all valid 1-step forward deduction candidates between tasks and beliefs.
@@ -199,12 +215,15 @@ def generate_forward_candidates(
     Inputs:
         tasks (Sequence[Any]): Active task queue.
         beliefs (Sequence[Any]): Known beliefs.
+        goal (Any): Derivation goal term (optional).
+        use_stage0 (bool): Whether to pre-filter premises using Stage 0 concept indexing.
+        task_selection_k (int): Maximum active tasks to expand when Stage 0 is active.
 
     Outputs:
         List[Any]: List of newly derivable candidate sentences.
 
     What it does NOT handle:
-        Does not filter candidates against the goal or evaluate heuristic scores.
+        Does not evaluate heuristic scores or manage the global priority agenda.
     """
     parsed_tasks: List[ParsedSentence] = []
     for t in tasks:
@@ -227,28 +246,68 @@ def generate_forward_candidates(
         for b in parsed_beliefs
     }
 
-    # Deduce between active tasks and beliefs
-    for t in parsed_tasks:
-        for b in parsed_beliefs:
-            # Direction 1: task -> belief
-            res1 = deduce_pair(t, b)
-            if res1:
-                parsed_res1 = parse_sentence(res1)
-                if parsed_res1:
-                    sig1 = f"{parsed_res1.relation}:{parsed_res1.subject}:{parsed_res1.object_node}:{','.join(parsed_res1.evidence_stamp)}"
-                    if sig1 not in existing_sigs and sig1 not in seen_conclusions:
-                        seen_conclusions.add(sig1)
-                        candidates.append(res1)
+    if use_stage0 and goal is not None:
+        from prism.stage0 import extract_concepts, filter_beliefs
 
-            # Direction 2: belief -> task
-            res2 = deduce_pair(b, t)
-            if res2:
-                parsed_res2 = parse_sentence(res2)
-                if parsed_res2:
-                    sig2 = f"{parsed_res2.relation}:{parsed_res2.subject}:{parsed_res2.object_node}:{','.join(parsed_res2.evidence_stamp)}"
-                    if sig2 not in existing_sigs and sig2 not in seen_conclusions:
-                        seen_conclusions.add(sig2)
-                        candidates.append(res2)
+        goal_concepts = extract_concepts(goal)
+        # Select tasks that are either derived lemmas (depth >= 1) or share concepts with goal
+        connected_tasks = [
+            t
+            for t in parsed_tasks
+            if len(t.evidence_stamp) >= 2 or bool(extract_concepts(t.raw) & goal_concepts)
+        ]
+        if not connected_tasks:
+            connected_tasks = parsed_tasks
+
+        for t in connected_tasks:
+            filtered_raw = filter_beliefs(t.raw, goal, beliefs)
+            filtered_parsed = [
+                p for p in (parse_sentence(b) for b in filtered_raw if b) if p
+            ]
+
+            for b in filtered_parsed:
+                # Direction 1: task -> belief
+                res1 = deduce_pair(t, b)
+                if res1:
+                    parsed_res1 = parse_sentence(res1)
+                    if parsed_res1:
+                        sig1 = f"{parsed_res1.relation}:{parsed_res1.subject}:{parsed_res1.object_node}:{','.join(parsed_res1.evidence_stamp)}"
+                        if sig1 not in existing_sigs and sig1 not in seen_conclusions:
+                            seen_conclusions.add(sig1)
+                            candidates.append(res1)
+
+                # Direction 2: belief -> task
+                res2 = deduce_pair(b, t)
+                if res2:
+                    parsed_res2 = parse_sentence(res2)
+                    if parsed_res2:
+                        sig2 = f"{parsed_res2.relation}:{parsed_res2.subject}:{parsed_res2.object_node}:{','.join(parsed_res2.evidence_stamp)}"
+                        if sig2 not in existing_sigs and sig2 not in seen_conclusions:
+                            seen_conclusions.add(sig2)
+                            candidates.append(res2)
+    else:
+        # Standard unguided Cartesian pair deduction
+        for t in parsed_tasks:
+            for b in parsed_beliefs:
+                # Direction 1: task -> belief
+                res1 = deduce_pair(t, b)
+                if res1:
+                    parsed_res1 = parse_sentence(res1)
+                    if parsed_res1:
+                        sig1 = f"{parsed_res1.relation}:{parsed_res1.subject}:{parsed_res1.object_node}:{','.join(parsed_res1.evidence_stamp)}"
+                        if sig1 not in existing_sigs and sig1 not in seen_conclusions:
+                            seen_conclusions.add(sig1)
+                            candidates.append(res1)
+
+                # Direction 2: belief -> task
+                res2 = deduce_pair(b, t)
+                if res2:
+                    parsed_res2 = parse_sentence(res2)
+                    if parsed_res2:
+                        sig2 = f"{parsed_res2.relation}:{parsed_res2.subject}:{parsed_res2.object_node}:{','.join(parsed_res2.evidence_stamp)}"
+                        if sig2 not in existing_sigs and sig2 not in seen_conclusions:
+                            seen_conclusions.add(sig2)
+                            candidates.append(res2)
 
     return candidates
 

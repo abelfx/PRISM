@@ -41,6 +41,10 @@ def test_search_config_defaults():
     assert sc.min_step_cost == 0.01
     assert sc.stall_threshold == 0.15
     assert sc.deduplicate_beliefs is True
+    assert sc.guided is True
+    assert sc.use_stage0_filter is True
+    assert sc.beam_threshold == 0.0
+    assert sc.task_selection_k == 3
 
 
 def test_search_config_immutability():

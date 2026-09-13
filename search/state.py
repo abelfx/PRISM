@@ -144,11 +144,16 @@ def matches_goal(sentence: Any, goal: Any) -> bool:
         return False
 
     term_str = normalize_term_str(extract_statement_term(sentence))
+    goal_term = (
+        extract_statement_term(goal)
+        if (isinstance(goal, (list, tuple)) and len(goal) >= 2 and goal[0] == "Sentence")
+        else goal
+    )
 
-    if isinstance(goal, (list, tuple)):
-        goal_str = normalize_term_str(" ".join(str(x) for x in goal))
+    if isinstance(goal_term, (list, tuple)):
+        goal_str = normalize_term_str(" ".join(str(x) for x in goal_term))
     else:
-        goal_str = normalize_term_str(str(goal))
+        goal_str = normalize_term_str(str(goal_term))
 
     return term_str == goal_str
 

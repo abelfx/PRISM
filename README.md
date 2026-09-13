@@ -124,6 +124,13 @@ prism/
 │       ├── baseline_guided_v1.json    # Recorded PRISM Tier 1 v1 guided numbers (Week 2)
 │       └── baseline_guided_week3.json # Recorded PRISM Tier 1 v1 + Stage 0 numbers (Week 3)
 │
+├── search/                            # Autonomous A* search engine (Weeks 5-6)
+│   ├── __init__.py                    # Public API: AStarSearchEngine, BackwardCandidate, etc.
+│   ├── engine.py                      # AStarSearchEngine: global open-set, f(n)=g(n)+h(n), closed-set
+│   ├── state.py                       # SearchNode, BeliefState hashing, matches_goal
+│   ├── rules.py                       # generate_forward_candidates, parse_sentence, Stage 0 branch
+│   └── backward.py                    # BackwardCandidate, backward_step, check_connection
+│
 ├── tests/                             # Unit and integration test suites
 │   ├── conftest.py                    # Pytest environment & path configuration
 │   ├── README.md                      # Documentation of test suite
@@ -132,7 +139,11 @@ prism/
 │   │   ├── test_config.py             # Config immutability & validation
 │   │   ├── test_tier1_v1.py           # Overlap math & depth discount
 │   │   ├── test_stage0_index.py       # Premise indexing & filtering
-│   │   └── test_scorer.py             # Scorer coordinator & cache
+│   │   ├── test_scorer.py             # Scorer coordinator & cache
+│   │   ├── test_search.py             # A* engine gates (Weeks 5-6)
+│   │   ├── test_backward.py           # Backward primitive unit tests (Week 6)
+│   │   ├── test_trace_logger.py       # Trace logger & JSONL export
+│   │   └── test_tree_dag.py           # Tree/DAG topology generators
 │   └── integration/                   # MeTTa integration tests (PeTTa run.sh)
 │       ├── test_fallback.metta        # MeTTa exception containment test
 │       ├── test_prism_hook.metta      # MeTTa goal-directed task steering test
@@ -177,6 +188,33 @@ prism/
 | **D=10** | 50 | 0% (FAILED) | 0% (FAILED) | **100%** | 50.0 | 24.5 | **0.0** | **0.32s** |
 
 For detailed milestone reports, consult [`milestones/milestone_week1.md`](../milestones/milestone_week1.md), [`milestones/milestone_week2.md`](../milestones/milestone_week2.md), and [`milestones/milestone_week3.md`](../milestones/milestone_week3.md).
+
+### 5.4 Week 4: Complex Proof Topologies (ALL GATES PASSED)
+- **GATE-4.1:** Diamond DAG shortcut selection (short path 3 hops preferred over 7-hop alternative: 100% success).
+- **GATE-4.2:** Tree conjunction completion (L(3,3) requiring 6 independent derivation paths: 100% success).
+- **GATE-4.3:** Trace Logger operational (step-level JSONL trace streaming for future Tier 2 training).
+
+### 5.5 Week 5: Learned A* / Best-First Search Engine (ALL GATES PASSED)
+- **GATE-5.1:** Global open-set priority queue with `f(n) = g(n) + h(n)` implemented.
+- **GATE-5.2:** Closed-set visited state hashing prevents circular reasoning.
+- **GATE-5.3:** Diamond DAG solved in **6 steps** vs 12 unguided (**50% step reduction**, **2.70x faster**).
+- **GATE-5.4:** Linear chain D=4 solved in **7 steps** vs 9 unguided (**22.2% step reduction**).
+- **GATE-5.5:** Trace Logger hooked into search engine for training data streaming.
+
+### 5.6 Week 6: Stage 0 Candidate Pruning & Bidirectional Search Primitives (ALL GATES PASSED)
+- **GATE-6.1:** Stage 0 filtering reduces forward candidates by **>70%** on D=6 noisy chain (48 -> 4-11 per step).
+- **GATE-6.2:** D=6 chain (25 distractors) solved in **16 steps** (threshold: <35).
+- **GATE-6.3:** L(3,3) tree conjunction (20 distractors) solved in **16 steps** (threshold: <30).
+- **GATE-6.4:** Backward primitive unit tests (5/5 pass): `backward_step`, `check_connection`.
+
+#### Week 6 Full Benchmark Table (55 tests, 0 failed):
+
+| Scenario | Unguided Steps | Full PRISM A* Steps | Step Reduction | Wall Clock |
+|----------|---------------|---------------------|----------------|------------|
+| Linear Chain D=4 (10 distractors) | 9 | 7 | 22.2% | 0.0092s |
+| Linear Chain D=6 (25 distractors) | 19 | 16 | 15.8% | 0.0293s |
+| Diamond DAG D_short=3/D_long=7 (30 distractors) | 12 | 6 | **50.0%** | 0.0125s |
+| Tree Conjunction L(3,3) (20 distractors) | 19 | 16 | 15.8% | 0.0281s |
 
 ---
 
