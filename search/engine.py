@@ -194,7 +194,17 @@ class AStarSearchEngine:
                     )
 
             # 2. Candidate generation
-            candidates = generator(current_node.tasks, current_node.beliefs)
+            if generator == generate_forward_candidates:
+                candidates = generator(
+                    current_node.tasks,
+                    current_node.beliefs,
+                    goal=goal,
+                    use_stage0=self.config.use_stage0_filter,
+                    task_selection_k=self.config.task_selection_k,
+                )
+            else:
+                candidates = generator(current_node.tasks, current_node.beliefs)
+
             if not candidates:
                 continue
 
@@ -217,7 +227,13 @@ class AStarSearchEngine:
                 if top_score < self.config.stall_threshold:
                     search_stalled = True
 
-                top_k = scored_candidates[: self.config.beam_width]
+                if self.config.beam_threshold > 0.0 and scored_candidates:
+                    threshold = top_score - self.config.beam_threshold
+                    top_k = [p for p in scored_candidates if p[0] >= threshold][
+                        : self.config.beam_width
+                    ]
+                else:
+                    top_k = scored_candidates[: self.config.beam_width]
             else:
                 top_k = [(0.0, c) for c in candidates[: self.config.beam_width]]
 
