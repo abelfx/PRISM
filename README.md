@@ -1,14 +1,15 @@
-# Programmable Reduction & Inference Search Manager
+# PRISM — Programmable Reduction & Inference Search Manager
 
-> **Learned Inference Control Layer for Probabilistic Logic Networks (PLN) in OpenCog Hyperon**  
-> **Host Environment:** PeTTa (SWI-Prolog + Janus Python FFI) & `trueagi-io/PLN` (`lib_pln.metta`)  
-> **Status:** Week 1, Week 2 & Week 3 Completed — Tier 1 Heuristic, Stage 0 Premise Indexing & 0.0 Distractor Picks Verified
+> **Learned Inference Control Layer for Probabilistic Logic Networks (PLN) in OpenCog Hyperon**
+> **Host Environment:** PeTTa (SWI-Prolog + Janus Python FFI) & `trueagi-io/PLN` (`lib_pln.metta`)
+
+For current implementation progress and results, see [Documentation Map](#7-documentation-map) below — this README covers architecture and setup only.
 
 ---
 
 ## 1. Overview & Problem Statement
 
-In OpenCog Hyperon, **Probabilistic Logic Networks (PLN)** serves as the core logic engine responsible for deriving new knowledge from stored facts while propagating truth values (strength and confidence). 
+In OpenCog Hyperon, **Probabilistic Logic Networks (PLN)** serves as the core logic engine responsible for deriving new knowledge from stored facts while propagating truth values (strength and confidence).
 
 While PLN's inference rules (deduction, induction, abduction, revision) and truth-value formulas are mathematically well-specified, its **inference search** currently lacks guidance:
 - At each step in a derivation, PLN blindly enumerates eligible rule-premise combinations.
@@ -16,29 +17,29 @@ While PLN's inference rules (deduction, induction, abduction, revision) and trut
 - Task selection in [`PLN.Derive`](PeTTa/repos/PLN/lib_pln.metta) historically evaluated candidates solely on raw confidence (`$c`), remaining completely blind to the query goal until search concluded.
 - Consequently, search quickly stalls on shallow or low-value paths, making multi-hop reasoning over large knowledge graphs computationally intractable.
 
-**PRISM resolves this by introducing a staged, learned inference-control layer.** It acts as an intelligent advisor standing beside PLN: observing candidate moves, scoring them by estimated usefulness and goal relevance, and prioritizing the search frontier—without ever modifying PLN's inference rules or truth-value arithmetic. Soundness is guaranteed by construction.
+**PRISM resolves this by introducing a staged, learned inference-control layer.** It acts as an intelligent advisor standing beside PLN: observing candidate moves, scoring them by estimated usefulness and goal relevance, and prioritizing the search frontier — without ever modifying PLN's inference rules or truth-value arithmetic. Soundness is guaranteed by construction, not by testing alone: PRISM never touches the code path that computes a conclusion's truth value, only the order in which legal candidates are tried.
 
 ---
 
-## 2. Staged System Architecture
+## 2. System Architecture
 
-PRISM replaces naive per-candidate LLM calls with a defensive, three-stage / two-tier architecture:
+PRISM replaces naive per-candidate LLM calls with a staged, three-part architecture — a cheap pre-filter, a fast scorer that runs on every step, and an expensive strategic reasoner invoked only when the fast path stalls:
 
 ```
 AtomSpace Knowledge Base (Tasks & Beliefs)
    │
    ▼
-[ Stage 0: Indexed Premise Pre-Filter ] (stage0_index.py)
+[ Stage 0: Indexed Premise Pre-Filter ] (stage0/index.py)
    │ Unification & concept overlap filter against active candidate & goal
    ▼
 [ Candidate Frontier Generator ] (PLN.Derive, lib_pln.metta)
    │ Enumerates legally applicable (rule, premise) pairs
    ▼
-[ Tier 1: Fast Policy / Heuristic Scorer ] (tier1_v1.py, < 0.05ms)
+[ Tier 1: Fast Policy / Heuristic Scorer ] (tier1/heuristic_v1.py, < 0.05ms)
    │ v1: Symbolic structural overlap + confidence + depth geometric discount
    │ v2: Lightweight MLP / embedding ranker (trained on traces)
    ▼
-[ Score Memoization Cache ] (cache.py)
+[ Score Memoization Cache ] (core/cache.py)
    │ Prevents O(N²) FFI calls during queue pruning
    ▼
 [ Priority Queue Selection ] (BestCandidate PriorityRankGoal)
@@ -57,223 +58,136 @@ AtomSpace Knowledge Base (Tasks & Beliefs)
 ```
 
 1. **Stage 0 (Indexed Premise Pre-Filter):** Indexes beliefs by concept and link patterns to prevent combinatorial Cartesian products before MeTTa evaluation.
-2. **Tier 1 (Fast Policy / Heuristic Scorer):** Operates on every task selection step ($< 0.05\text{ms}$ latency). v1 uses structural concept overlap, confidence, and geometric derivation depth decay ($\delta \cdot \gamma^{depth}$); v2 employs a learned model trained on proof traces.
-3. **Tier 2 (Strategic LLM Reasoner):** Invoked sparingly only when search stalls ($\ge 5$ consecutive low-scoring steps) or reaches deep thresholds, proposing structured intermediate subgoals.
-4. **Score Memoization Cache:** Caches `(sentence, goal) -> score` mappings to eliminate redundant FFI crossings during queue pruning.
+2. **Tier 1 (Fast Policy / Heuristic Scorer):** Operates on every task selection step (< 0.05ms target latency). v1 uses structural concept overlap, confidence, and geometric derivation depth decay ($\delta \cdot \gamma^{depth}$); v2 employs a learned model trained on proof traces.
+3. **Tier 2 (Strategic LLM Reasoner):** Invoked sparingly, only when search stalls (≥5 consecutive low-scoring steps) or reaches deep thresholds, proposing structured intermediate subgoals.
+4. **Score Memoization Cache:** Caches `(sentence, goal) → score` mappings to eliminate redundant FFI crossings during queue pruning.
+
+The full mathematical specification (cost formulas, training objectives, stall-detection conditions) lives in the Implementation Specification — see §7.
 
 ---
 
 ## 3. Real Codebase Integration (`trueagi-io/PLN`)
 
-PRISM is grounded directly in the live `trueagi-io/PLN` implementation located in `PeTTa/repos/PLN/lib_pln.metta`:
+PRISM is grounded directly in the live `trueagi-io/PLN` implementation located in `PeTTa/repos/PLN/lib_pln.metta`. This table is the fast reference for exactly what PRISM touches — for the full reasoning behind each change, see the Implementation Specification:
 
 | Target Function | Location | Original Behavior | PRISM Modification |
 |---|---|---|---|
-| `PriorityRank` | `lib_pln.metta` | Returns raw confidence `$c$` | Replaced by `PriorityRankGoal` with goal-aware scoring via `prism-score` |
-| `PremiseFilter` | `lib_pln.metta` | Unconditional `(superpose $Beliefs)` | Filters candidate premises via Stage 0 `prism-filter-beliefs` |
-| `LimitSize` | `lib_pln.metta` | Repeatedly evicts lowest-priority item | Trims queues in pure MeTTa, bypassing FFI overhead |
-| `PLN.Derive` | `lib_pln.metta` | 6-argument recursive loop | 7-argument goal-aware recursive loop; legacy 6-arg and 5-arg overloads preserved |
-| `PLN.Query` | `lib_pln.metta` | Discarded `$term` during derivation | Forwards `$term` as `$Goal` directly into 7-arg `PLN.Derive` |
+| `PriorityRank` | `lib_pln.metta` | Returns raw confidence `$c` | Replaced by curried `PriorityRankGoal`, goal-aware scoring via `prism-score`, falls back to `$c` on missing goal or scorer failure |
+| `PriorityRankNeg` | `lib_pln.metta` | Negated raw confidence | Replaced by `PriorityRankNegGoal`, identical goal-aware/fallback treatment |
+| Belief filtering | `lib_pln.metta` | Unconditional `(superpose $Beliefs)` | Filters candidate premises via Stage 0 `prism-filter-beliefs` |
+| `LimitSize` | `lib_pln.metta` | Repeatedly evicts lowest-priority item | Goal-aware variant, trims queues in pure MeTTa, cached scores avoid repeated FFI crossings |
+| `PLN.Derive` | `lib_pln.metta` | 6-argument recursive loop | 7-argument goal-aware overload added; legacy 6-argument overload preserved unchanged |
+| `PLN.Query` | `lib_pln.metta` | Discarded `$term` during derivation | Forwards `$term` as `$Goal` directly into the 7-arg `PLN.Derive` |
+
+**Invariant this table exists to protect:** every row above is either a new addition or a drop-in-compatible replacement. No existing call site, rule, or truth-value formula in `lib_pln.metta` is modified in a way that changes behavior when `$Goal` is absent.
 
 ---
 
-## 4. PRISM Package Layout
-
-The PRISM repository follows a modular, layer-separated architecture. For detailed architectural guidelines, invariants, and implementation roadmap placement, see [`ARCHITECTURE.md`](ARCHITECTURE.md).
+## 4. Package Layout
 
 ```
 prism/
 ├── ARCHITECTURE.md                    # System architecture, layer ownership & invariants
 ├── AGENTS.md                          # Quick-reference context & checklist for AI agents
-├── README.md                          # Package documentation and milestone roadmap
+├── README.md                          # This file
 ├── __init__.py                        # Master public package API
 │
-├── core/                              # System-wide foundation (config, coordinator, cache)
-│   ├── __init__.py
+├── core/                              # System-wide foundation
 │   ├── config.py                      # Immutable hyperparameter dataclasses
-│   ├── cache.py                       # LRU / Dict memoization cache
+│   ├── cache.py                       # Score memoization cache
 │   └── scorer.py                      # System coordinator, fallback & FFI entry points
 │
 ├── stage0/                            # Low-cost premise pre-filtering
-│   ├── __init__.py
 │   └── index.py                       # Inverted index on sentence terms (PremiseIndex)
 │
 ├── tier1/                             # Fast policy heuristic scorers (<0.05ms)
-│   ├── __init__.py
 │   └── heuristic_v1.py                # Symbolic term overlap & geometric depth decay
 │
+├── search/                            # Global search engine
+│   ├── engine.py                      # AStarSearchEngine: f(n) = g(n) + h(n)
+│   ├── state.py                       # SearchNode, belief-state hashing, goal matching
+│   ├── rules.py                       # Forward candidate generation
+│   └── backward.py                    # Backward chaining, meet-in-the-middle detection
+│
+├── tier2/                             # Strategic LLM reasoner
+│   ├── stall_detector.py              # Plateau/depth/cooldown-based stall detection
+│   ├── prompt.py                      # Context-aware prompt builder
+│   ├── client.py                      # Multi-backend LLM client (OpenRouter, Ollama, Mock)
+│   ├── parser.py                      # Subgoal JSON parser & hallucination guard
+│   └── reasoner.py                    # Strategic reasoning coordinator
+│
 ├── ffi/                               # Safe Foreign Function Interface bridge
-│   ├── __init__.py
 │   └── prism_ffi.pl                   # Prolog/Janus FFI predicates and exception guards
 │
 ├── benchmarks/                        # Benchmark suite & parameter sweep runners
-│   ├── README.md                      # Documentation of benchmark suite
-│   ├── run_benchmark.py               # Main CLI benchmark driver & parameter sweep runner
-│   ├── domains/                       # Problem domain generators
-│   │   ├── __init__.py
-│   │   └── transitive_chain.py        # Synthetic transitive chain generator (D in [5, 20])
-│   ├── utils/                         # Metrics collection & profiling utilities
-│   │   ├── __init__.py
-│   │   ├── metrics.py                 # MetricsCollector and PeTTa log parser
-│   │   └── pycall_bench.py            # FFI timing & argument inspection helper
+│   ├── run_benchmark.py               # CLI benchmark driver
+│   ├── domains/                       # Problem domain generators (chains, diamonds, trees)
+│   ├── utils/                         # Metrics collection & FFI profiling
 │   ├── metta/                         # Raw MeTTa benchmark scripts
-│   │   ├── benchmark_pycall.metta     # Cached FFI latency test
-│   │   └── benchmark_uncached.metta   # Uncached FFI latency test
-│   └── results/                       # Empirical benchmark datasets
-│       ├── baseline_unguided.json     # Recorded unguided PLN baseline numbers
-│       ├── baseline_guided_v1.json    # Recorded PRISM Tier 1 v1 guided numbers (Week 2)
-│       └── baseline_guided_week3.json # Recorded PRISM Tier 1 v1 + Stage 0 numbers (Week 3)
+│   └── results/                       # Empirical benchmark datasets (JSON)
 │
-├── search/                            # Autonomous A* search engine (Weeks 5-6)
-│   ├── __init__.py                    # Public API: AStarSearchEngine, BackwardCandidate, etc.
-│   ├── engine.py                      # AStarSearchEngine: global open-set, f(n)=g(n)+h(n), closed-set
-│   ├── state.py                       # SearchNode, BeliefState hashing, matches_goal
-│   ├── rules.py                       # generate_forward_candidates, parse_sentence, Stage 0 branch
-│   └── backward.py                    # BackwardCandidate, backward_step, check_connection
-│
-├── tier2/                             # Strategic LLM Reasoner (Week 7)
-│   ├── __init__.py                    # Public API: Tier2Reasoner, SubgoalResult, etc.
-│   ├── stall_detector.py              # Dynamic stall detector (plateau, depth, cooldown)
-│   ├── prompt.py                      # Context-aware prompt builder
-│   ├── client.py                      # Multi-backend LLM client (OpenRouter, Ollama, Mock)
-│   ├── parser.py                      # Subgoal JSON parser & concept grounding guard
-│   └── reasoner.py                    # Strategic reasoning coordinator
-│
-├── tests/                             # Unit and integration test suites
-│   ├── conftest.py                    # Pytest environment & path configuration
-│   ├── README.md                      # Documentation of test suite
-│   ├── unit/                          # Python unit tests (pytest)
-│   │   ├── __init__.py
-│   │   ├── test_config.py             # Config immutability & validation
-│   │   ├── test_tier1_v1.py           # Overlap math & depth discount
-│   │   ├── test_stage0_index.py       # Premise indexing & filtering
-│   │   ├── test_scorer.py             # Scorer coordinator & cache
-│   │   ├── test_search.py             # A* engine gates (Weeks 5-6)
-│   │   ├── test_backward.py           # Backward primitive unit tests (Week 6)
-│   │   ├── test_tier2_stall.py        # Stall detector tests (Week 7)
-│   │   ├── test_tier2_parser.py       # Subgoal parser & hallucination guard (Week 7)
-│   │   ├── test_tier2_client.py       # LLM client & mock fallback (Week 7)
-│   │   ├── test_tier2_integration.py  # Semantic gap rescue tests (Week 7)
-│   │   ├── test_trace_logger.py       # Trace logger & JSONL export
-│   │   └── test_tree_dag.py           # Tree/DAG topology generators
-│   └── integration/                   # MeTTa integration tests (PeTTa run.sh)
-│       ├── test_fallback.metta        # MeTTa exception containment test
-│       ├── test_prism_hook.metta      # MeTTa goal-directed task steering test
-
+└── tests/
+    ├── unit/                          # Python unit tests (pytest)
+    └── integration/                   # MeTTa integration tests (run via PeTTa)
 ```
 
----
-
-## 5. Milestone & Gate Status
-
-### 5.1 Week 1: Foundation & De-risking (ALL GATES PASSED)
-- **GATE-1.1:** `py-call` Round-Trip Latency $< 1.0\text{ms}$ (**0.012 ms** cached, **0.021 ms** uncached).
-- **GATE-1.2:** Exception Safety & Fallback (empty goal and exceptions safely degrade to raw confidence `$c$`).
-- **GATE-1.3:** Backward Compatibility (**100% PASS** on all 7 `ruletests/*.metta` and all standard examples).
-- **GATE-1.4:** Goal-Directed Hook Steering demonstrated live in `test_prism_hook.metta`.
-
-### 5.2 Week 2: Synthetic Evaluation Domains & Baselines (ALL GATES PASSED)
-- **GATE-2.1:** Chain Generation for $D \in [5, 20]$.
-- **GATE-2.2:** Metrics Parsing (`parse_selected_log`).
-- **GATE-2.3:** Unguided Baseline Recorded in `baseline_unguided.json`.
-- **GATE-2.4:** Guided vs Unguided Delta (waste reduced by up to 38.8% absolute on $D=5$).
-- **GATE-2.5:** Soundness Preservation (`[0.60645, 0.16888]`).
-
-### 5.3 Week 3: Tier 1 v1 Completion & Stage 0 Indexing (ALL GATES PASSED)
-- **GATE-3.1:** Depth Penalty Active (shallow proof outscores deep proof: 0.7733 vs 0.7353).
-- **GATE-3.2:** Stage 0 Lookup Accuracy (preserves on-path beliefs, excludes distractors).
-- **GATE-3.3:** MeTTa Integration (clean execution via `prism_ffi.pl` without crashing Janus).
-- **GATE-3.4:** Soundness Preservation (100% STV and evidence stamp match with unguided baseline).
-- **GATE-3.5:** Efficiency Gain & Distractor Elimination (distractor picks reduced to **0.0 across all depths and distractor counts**).
-
-#### Week 3 Comparative Benchmark Table:
-
-| Depth | Distractors | Unguided Success | Week 2 Guided Success | Week 3 Guided Success | Unguided Distractor Picks | Week 2 Distractor Picks | **Week 3 Distractor Picks** | Week 3 Wall Clock |
-|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
-| **D=5** | 0 | 100% | 100% | **100%** | 0.0 | 0.0 | **0.0** | 0.20s |
-| **D=5** | 10 | 0% (FAILED) | 100% | **100%** | 49.5 | 0.0 | **0.0** | 0.24s |
-| **D=5** | 25 | 0% (FAILED) | 100% | **100%** | 62.5 | 2.0 | **0.0** | 0.30s |
-| **D=5** | 50 | 0% (FAILED) | 50% | **100%** | 65.0 | 4.5 | **0.0** | 0.29s |
-| **D=8** | 25 | 0% (FAILED) | 0% (FAILED) | **100%** | 57.0 | 24.0 | **0.0** | **0.32s** |
-| **D=8** | 50 | 0% (FAILED) | 0% (FAILED) | **100%** | 56.0 | 26.5 | **0.0** | **0.31s** |
-| **D=10** | 25 | 0% (FAILED) | 0% (FAILED) | **100%** | 50.5 | 23.5 | **0.0** | **0.34s** |
-| **D=10** | 50 | 0% (FAILED) | 0% (FAILED) | **100%** | 50.0 | 24.5 | **0.0** | **0.32s** |
-
-For detailed milestone reports, consult [`milestones/milestone_week1.md`](../milestones/milestone_week1.md), [`milestones/milestone_week2.md`](../milestones/milestone_week2.md), and [`milestones/milestone_week3.md`](../milestones/milestone_week3.md).
-
-### 5.4 Week 4: Complex Proof Topologies (ALL GATES PASSED)
-- **GATE-4.1:** Diamond DAG shortcut selection (short path 3 hops preferred over 7-hop alternative: 100% success).
-- **GATE-4.2:** Tree conjunction completion (L(3,3) requiring 6 independent derivation paths: 100% success).
-- **GATE-4.3:** Trace Logger operational (step-level JSONL trace streaming for future Tier 2 training).
-
-### 5.5 Week 5: Learned A* / Best-First Search Engine (ALL GATES PASSED)
-- **GATE-5.1:** Global open-set priority queue with `f(n) = g(n) + h(n)` implemented.
-- **GATE-5.2:** Closed-set visited state hashing prevents circular reasoning.
-- **GATE-5.3:** Diamond DAG solved in **6 steps** vs 12 unguided (**50% step reduction**, **2.70x faster**).
-- **GATE-5.4:** Linear chain D=4 solved in **7 steps** vs 9 unguided (**22.2% step reduction**).
-- **GATE-5.5:** Trace Logger hooked into search engine for training data streaming.
-
-### 5.6 Week 6: Stage 0 Candidate Pruning & Bidirectional Search Primitives (ALL GATES PASSED)
-- **GATE-6.1:** Stage 0 filtering reduces forward candidates by **>70%** on D=6 noisy chain (48 -> 4-11 per step).
-- **GATE-6.2:** D=6 chain (25 distractors) solved in **16 steps** (threshold: <35).
-- **GATE-6.3:** L(3,3) tree conjunction (20 distractors) solved in **16 steps** (threshold: <30).
-- **GATE-6.4:** Backward primitive unit tests (5/5 pass): `backward_step`, `check_connection`.
-
-#### Week 6 Full Benchmark Table (55 tests, 0 failed):
-
-| Scenario | Unguided Steps | Full PRISM A* Steps | Step Reduction | Wall Clock |
-|----------|---------------|---------------------|----------------|------------|
-| Linear Chain D=4 (10 distractors) | 9 | 7 | 22.2% | 0.0092s |
-| Linear Chain D=6 (25 distractors) | 19 | 16 | 15.8% | 0.0293s |
-| Diamond DAG D_short=3/D_long=7 (30 distractors) | 12 | 6 | **50.0%** | 0.0125s |
-| Tree Conjunction L(3,3) (20 distractors) | 19 | 16 | 15.8% | 0.0281s |
-
-### 5.7 Week 7: Tier 2 Strategic LLM Reasoner & Subgoal-Driven Search (ALL GATES PASSED)
-- **GATE-7.1:** Dynamic stall detector triggers on plateaus ($\tau_{\text{stall}} \le 0.20$ for $\ge 5$ steps) and depth threshold ($D > 10$) with cooldown protection; 0 false triggers on clean chains.
-- **GATE-7.2:** Structured subgoal parser validates JSON responses and enforces concept grounding hallucination guards against known domain entities.
-- **GATE-7.3:** Multi-backend LLM client supporting OpenRouter free models (`meta-llama/llama-3.3-70b-instruct:free`) via `urllib` and deterministic mock fallback; zero crashes on API timeouts or network errors.
-- **GATE-7.4:** Semantic Gap Recovery: unassisted A* search fails completely (0% success, stalls at 4 steps), while Tier 2 guided A* proposes bridging subgoal `(Inheritance C M)` and completes the proof in **9 steps**.
-
-#### Week 7 Semantic Gap Benchmark:
-
-| Scenario | Search Configuration | Success | Steps | Subgoals | Proof Len | Time |
-|----------|----------------------|---------|-------|----------|-----------|------|
-| **Semantic Gap (15 Distractors)** | Unassisted A* Search | **FAIL** | 4 | 0 | 0 | 0.0047s |
-| **Semantic Gap (15 Distractors)** | Tier 2 Guided A* Search | **PASS** | 9 | 1 | 6 | 0.0108s |
+For layer ownership, invariants, and where new work should go, see [`ARCHITECTURE.md`](ARCHITECTURE.md).
 
 ---
 
-## 6. How to Run Benchmarks and Tests
+## 5. Design Guarantees
 
-### 1. Running Unit Tests (Pytest)
+These hold regardless of implementation progress — they are architectural commitments, not results to be verified week by week:
+
+- **Soundness by construction:** PRISM never computes or influences a truth value. Every conclusion PLN reaches is computed entirely by PLN's own unmodified formulas, regardless of which tier proposed the candidate.
+- **Graceful degradation:** a missing goal, a malformed sentence, or a scorer/FFI failure always falls back to PLN's original confidence-only behavior — never a crash, never a silent wrong answer.
+- **Backward compatibility:** every existing call site, rule, and example that doesn't pass a goal continues to behave exactly as it did before PRISM existed.
+
+---
+
+## 6. How to Run
+
+### Unit tests
 ```bash
-cd /home/abel/Desktop/icog_labs/pln
+cd <repo-root>
 python3 -m pytest prism/tests/
 ```
 
-### 2. Running MeTTa PRISM Integration Tests
+### MeTTa integration tests
 ```bash
-cd /home/abel/Desktop/icog_labs/pln/PeTTa
-sh run.sh ../prism/tests/integration/test_depth_penalty.metta
-sh run.sh ../prism/tests/integration/test_stage0_metta.metta
+cd <repo-root>/PeTTa
 sh run.sh ../prism/tests/integration/test_fallback.metta
 sh run.sh ../prism/tests/integration/test_prism_hook.metta
 ```
 
-### 3. Running Synthetic Chain Parameter Sweeps
+### Synthetic benchmark sweeps
 ```bash
-cd /home/abel/Desktop/icog_labs/pln
+cd <repo-root>
 
-# Run unguided baseline sweep
+# Unguided baseline
 python3 -m prism.benchmarks.run_benchmark --depths 5 8 10 --distractors 0 10 25 50 --repeats 2 --max-steps 80
 
-# Run PRISM-guided sweep (Week 3)
-python3 -m prism.benchmarks.run_benchmark --guided --depths 5 8 10 --distractors 0 10 25 50 --repeats 2 --max-steps 80 --output prism/benchmarks/results/baseline_guided_week3.json
+# PRISM-guided
+python3 -m prism.benchmarks.run_benchmark --guided --depths 5 8 10 --distractors 0 10 25 50 --repeats 2 --max-steps 80 --output prism/benchmarks/results/<name>.json
 ```
 
-### 4. Running Full PLN Regression Suite
+### Full PLN regression suite
 ```bash
-cd /home/abel/Desktop/icog_labs/pln/PeTTa
-# Run all 7 rule tests
+cd <repo-root>/PeTTa
 for f in ./repos/PLN/ruletests/*.metta; do sh run.sh "$f" | grep "should"; done
 ```
+
+---
+
+## 7. Documentation Map
+
+This project's documentation is split by purpose — each document below covers a different concern, so results and status are never duplicated here:
+
+| Document | Covers |
+|---|---|
+| `PRISM_PLN_Inference_Control_Proposal.docx` | The what and why — problem, gaps, AGI relevance, proposed solution |
+| `PRISM_Implementation_Specification.docx` | The how — file-level code changes, formulas, training objectives |
+| `milestones/milestone_week*.md` | Full per-week deliverables, gate criteria, and raw benchmark data |
+| `PRISM_Results_Synthesis.docx` | The presentation narrative — headline results, honest limitations, updated as weeks land |
+| `ARCHITECTURE.md` | Layer ownership, invariants, where new work belongs |
+| `AGENTS.md` | Quick-reference context for AI coding agents working in this repo |
