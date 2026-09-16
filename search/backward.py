@@ -8,8 +8,14 @@ checks (§9.3) for bidirectional search and Tier 2 LLM subgoal integration.
 from dataclasses import dataclass, field
 from typing import Any, Dict, List, Optional, Sequence, Set, Tuple
 
+from prism.core.config import DEFAULT_CONFIG, Tier1Config
 from prism.search.rules import ParsedSentence, parse_sentence
 from prism.search.state import matches_goal
+from prism.tier1.heuristic_v1 import (
+    compute_depth_discount,
+    extract_atoms,
+    extract_confidence,
+)
 
 
 @dataclass(frozen=True)
@@ -160,3 +166,53 @@ def check_connection(
             if matches_goal(belief, subgoal):
                 return belief, subgoal
     return None
+
+
+def compute_backward_score(
+    subgoal: Any,
+    initial_beliefs: Sequence[Any],
+    config: Optional[Tier1Config] = None,
+    depth: int = 0,
+) -> float:
+    """
+    Compute heuristic priority score for a backward subgoal relative to initial premises (§9.2).
+
+    Measures how close the subgoal is to the known base facts (inverting the goal-proximity concept).
+    High score indicates that the subgoal is strongly anchored in known premises.
+
+    Parameters
+    ----------
+    subgoal : Any
+        The candidate subgoal expression to evaluate.
+    initial_beliefs : Sequence[Any]
+        The root initial beliefs / premises.
+    config : Optional[Tier1Config]
+        Scorer hyperparameters (weights alpha, beta, delta, gamma).
+    depth : int
+        Current decomposition depth of the subgoal.
+
+    Returns
+    -------
+    float
+        Heuristic priority score in [0.0, 1.0].
+    """
+    cfg = config or DEFAULT_CONFIG.tier1
+    s_atoms = extract_atoms(subgoal)
+    if not s_atoms:
+        return 0.0
+
+    # Aggregate atoms from all initial premises
+    base_atoms: Set[str] = set()
+    for b in initial_beliefs:
+        base_atoms |= extract_atoms(b)
+
+    if not base_atoms:
+        return 0.0
+
+    # Fraction of subgoal atoms anchored in initial premises
+    overlap = len(s_atoms & base_atoms) / len(s_atoms)
+    conf = extract_confidence(subgoal, cfg.default_confidence)
+    depth_bonus = compute_depth_discount(depth, cfg.delta, cfg.gamma)
+
+    return (cfg.alpha * overlap) + (cfg.beta * conf) + depth_bonus
+
