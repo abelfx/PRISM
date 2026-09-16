@@ -105,9 +105,10 @@ prism/
 │
 ├── search/                            # Global search engine
 │   ├── engine.py                      # AStarSearchEngine: f(n) = g(n) + h(n)
-│   ├── state.py                       # SearchNode, belief-state hashing, goal matching
-│   ├── rules.py                       # Forward candidate generation
-│   └── backward.py                    # Backward chaining, meet-in-the-middle detection
+│   ├── state.py                       # SearchNode, belief hashing, goal matching
+│   ├── rules.py                       # Rule matching & forward candidate generation
+│   ├── backward.py                    # Backward chaining, meet-in-the-middle detection
+│   └── bidirectional.py               # BidirectionalSearchEngine: dual frontiers, proof stitching
 │
 ├── tier2/                             # Strategic LLM reasoner
 │   ├── stall_detector.py              # Plateau/depth/cooldown-based stall detection
