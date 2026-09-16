@@ -133,6 +133,35 @@ class Tier2Config:
 
 
 @dataclass(frozen=True)
+class BidirectionalConfig:
+    """
+    Configuration parameters for Bidirectional A* Search Engine.
+
+    Inputs:
+        enabled (bool): Whether bidirectional search is enabled.
+        forward_backward_ratio (float): Ratio of forward to backward expansions (1.0 = equal turns).
+        connection_check_interval (int): Frequency of checking intersection between frontiers.
+        max_backward_depth (int): Max decomposition depth for backward subgoals.
+        backward_beam_width (int): Max subgoals retained per backward expansion.
+        max_steps (int): Total combined derivation steps budget.
+        use_stage0_filter (bool): Whether to use Stage 0 premise pre-filtering.
+
+    Outputs:
+        Immutable configuration instance.
+
+    What it does NOT handle:
+        Does not execute search or manage queues.
+    """
+    enabled: bool = True
+    forward_backward_ratio: float = 1.0
+    connection_check_interval: int = 1
+    max_backward_depth: int = 10
+    backward_beam_width: int = 5
+    max_steps: int = 100
+    use_stage0_filter: bool = True
+
+
+@dataclass(frozen=True)
 class PrismConfig:
     """
     Top-level master configuration container for PRISM.
@@ -142,6 +171,7 @@ class PrismConfig:
         stage0 (Stage0Config): Configuration for Stage 0 premise pre-filter.
         search (SearchConfig): Configuration for Learned A* search engine.
         tier2 (Tier2Config): Configuration for Tier 2 Strategic LLM reasoner.
+        bidirectional (BidirectionalConfig): Configuration for Bidirectional A* search engine.
 
     Outputs:
         Master configuration instance.
@@ -153,7 +183,9 @@ class PrismConfig:
     stage0: Stage0Config = Stage0Config()
     search: SearchConfig = SearchConfig()
     tier2: Tier2Config = Tier2Config()
+    bidirectional: BidirectionalConfig = BidirectionalConfig()
 
 
 # Global default configuration instance
 DEFAULT_CONFIG = PrismConfig()
+
