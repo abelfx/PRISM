@@ -9,6 +9,11 @@ from prism.search.backward import (
     BackwardCandidate,
     backward_step,
     check_connection,
+    compute_backward_score,
+)
+from prism.search.bidirectional import (
+    BidirectionalSearchEngine,
+    stitch_proof_traces,
 )
 from prism.search.engine import AStarSearchEngine, SearchResult
 from prism.search.rules import (
@@ -19,6 +24,8 @@ from prism.search.rules import (
     parse_sentence,
 )
 from prism.search.state import (
+    BidirectionalSearchNode,
+    BidirectionalSearchResult,
     SearchNode,
     extract_proof_path,
     extract_statement_term,
@@ -28,6 +35,8 @@ from prism.search.state import (
 
 __all__ = [
     "SearchNode",
+    "BidirectionalSearchNode",
+    "BidirectionalSearchResult",
     "hash_belief_state",
     "matches_goal",
     "extract_statement_term",
@@ -42,4 +51,8 @@ __all__ = [
     "BackwardCandidate",
     "backward_step",
     "check_connection",
+    "compute_backward_score",
+    "BidirectionalSearchEngine",
+    "stitch_proof_traces",
 ]
+
