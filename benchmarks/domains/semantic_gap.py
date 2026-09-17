@@ -101,6 +101,17 @@ def generate_semantic_gap(
         facts.append(bridge_fact)
     facts.extend(distractor_facts)
 
+    proof_nodes = list(dict.fromkeys(source_nodes + target_nodes))
+    prior_s = round(1.0 / max(len(proof_nodes), 1), 4)
+    stv_decls = [f"(= (STV {n}) (stv {prior_s} 0.9))" for n in proof_nodes]
+    distractor_concepts = []
+    for f in distractor_facts:
+        parts = f["statement"].strip("()").split()
+        distractor_concepts.extend(parts[1:3])
+    stv_decls.extend(
+        f"(= (STV {c}) (stv 0.1 0.9))" for c in dict.fromkeys(distractor_concepts)
+    )
+
     return {
         "domain": "semantic_gap",
         "goal": ["Inheritance", goal_source, goal_target],
@@ -114,5 +125,6 @@ def generate_semantic_gap(
         "target_facts": target_facts,
         "distractor_facts": distractor_facts,
         "facts": facts,
+        "stv_declarations": stv_decls,
         "include_bridge_in_kb": include_bridge_in_kb,
     }

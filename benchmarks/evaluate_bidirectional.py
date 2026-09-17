@@ -19,7 +19,7 @@ import time
 from typing import Any, Dict, List
 
 from prism.benchmarks.domains.transitive_chain import generate_with_distractors
-from prism.benchmarks.evaluate_search_comparison import format_spec_facts
+from prism.benchmarks.evaluate_search_comparison import format_spec_facts, format_spec_stvs
 from prism.core.config import BidirectionalConfig, SearchConfig
 from prism.search.bidirectional import BidirectionalSearchEngine
 from prism.search.engine import AStarSearchEngine
@@ -29,6 +29,7 @@ def run_benchmark_depth(depth: int, n_distractors: int = 20, seed: int = 42) -> 
     """Execute unidirectional vs bidirectional search comparison for a given depth."""
     spec = generate_with_distractors(depth=depth, n_distractors=n_distractors, seed=seed)
     facts = format_spec_facts(spec)
+    stvs = format_spec_stvs(spec)
     goal = spec["goal"]
 
     # 1. Unidirectional Forward A* Search
@@ -36,7 +37,9 @@ def run_benchmark_depth(depth: int, n_distractors: int = 20, seed: int = 42) -> 
     fwd_engine = AStarSearchEngine(config=fwd_cfg)
 
     t0 = time.perf_counter()
-    fwd_res = fwd_engine.search(initial_tasks=facts, initial_beliefs=facts, goal=goal)
+    fwd_res = fwd_engine.search(
+        initial_tasks=facts, initial_beliefs=facts, goal=goal, concept_stvs=stvs
+    )
     t_fwd = time.perf_counter() - t0
 
     # 2. Bidirectional A* Search
@@ -44,7 +47,7 @@ def run_benchmark_depth(depth: int, n_distractors: int = 20, seed: int = 42) -> 
     bwd_engine = BidirectionalSearchEngine(config=bwd_cfg)
 
     t1 = time.perf_counter()
-    bwd_res = bwd_engine.search(goal, facts)
+    bwd_res = bwd_engine.search(goal, facts, concept_stvs=stvs)
     t_bwd = time.perf_counter() - t1
 
     # Reductions
