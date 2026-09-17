@@ -1,13 +1,13 @@
 """
-Forward Derivation Rules and Candidate Expansion for PRISM Search.
+Forward candidate expansion for PRISM search.
 
-Implements structural deduction rules (Inheritance transitivity, Similarity transitivity)
-with PLN truth-value calculation and cyclic evidence prevention.
+Parses Sentences, asks live `PLN.Apply` for legal one-step conclusions, and
+updates task/belief buffers. Truth-value arithmetic lives in lib_pln.metta.
 """
 
 from dataclasses import dataclass
 import re
-from typing import Any, List, Optional, Sequence, Set, Tuple
+from typing import Any, Dict, List, Optional, Sequence, Set, Tuple
 
 
 @dataclass(frozen=True)
@@ -147,84 +147,30 @@ def parse_sentence(sentence: Any) -> Optional[ParsedSentence]:
     return None
 
 
-def deduce_pair(p1: ParsedSentence, p2: ParsedSentence) -> Optional[Any]:
-    """
-    Attempt deduction between two sentences if they form a transitive chain.
-
-    Conditions:
-        1. p1.object_node == p2.subject (or symmetric match if Similarity).
-        2. Evidence stamps are disjoint (prevents circular evidence loops).
-
-    Inputs:
-        p1 (ParsedSentence): First premise.
-        p2 (ParsedSentence): Second premise.
-
-    Outputs:
-        Optional[Any]: Derived conclusion Sentence in list format, or None.
-
-    What it does NOT handle:
-        Does not check truth value revision with preexisting identical conclusions.
-    """
-    # Prevent trivial self-loops (A -> A)
-    if p1.subject == p2.object_node:
-        return None
-
-    # Check transitive link: (Rel1 A B) and (Rel2 B C)
-    if p1.object_node == p2.subject:
-        sub = p1.subject
-        obj = p2.object_node
-    elif p1.relation == "Similarity" and p1.subject == p2.subject:
-        # (Similarity B A) rewritten as (Similarity A B)
-        sub = p1.object_node
-        obj = p2.object_node
-    else:
-        return None
-
-    # Enforce evidence disjointness
-    stamp1 = set(p1.evidence_stamp)
-    stamp2 = set(p2.evidence_stamp)
-    if stamp1 and stamp2 and not stamp1.isdisjoint(stamp2):
-        return None
-
-    # Determine output relation
-    if p1.relation == "Similarity" and p2.relation == "Similarity":
-        out_rel = "Similarity"
-    else:
-        out_rel = "Inheritance"
-
-    # Compute conclusion STV
-    s = round(p1.strength * p2.strength, 4)
-    c = round(p1.confidence * p2.confidence * p1.strength, 4)
-
-    # Combine evidence stamps deterministically
-    combined_stamp = sorted(list(stamp1 | stamp2))
-
-    return ["Sentence", [[out_rel, sub, obj], ["stv", s, c]], combined_stamp]
-
-
 def generate_forward_candidates(
     tasks: Sequence[Any],
     beliefs: Sequence[Any],
     goal: Any = None,
     use_stage0: bool = False,
     task_selection_k: int = 3,
+    concept_stvs: Optional[Dict[str, Tuple[float, float]]] = None,
 ) -> List[Any]:
     """
-    Generate all valid 1-step forward deduction candidates between tasks and beliefs.
+    Generate all valid 1-step forward PLN candidates between tasks and beliefs.
 
-    Inputs:
-        tasks (Sequence[Any]): Active task queue.
-        beliefs (Sequence[Any]): Known beliefs.
-        goal (Any): Derivation goal term (optional).
-        use_stage0 (bool): Whether to pre-filter premises using Stage 0 concept indexing.
-        task_selection_k (int): Maximum active tasks to expand when Stage 0 is active.
-
-    Outputs:
-        List[Any]: List of newly derivable candidate sentences.
-
-    What it does NOT handle:
-        Does not evaluate heuristic scores or manage the global priority agenda.
+    Each pair is applied with live `PLN.Apply` in `lib_pln.metta`.
+    `PLN.Apply` already tries both `|-` directions, so each pair is sent once.
     """
+    from prism.search.pln_runtime import apply_pln_pair, infer_concept_stvs
+
+    stvs = dict(concept_stvs or {})
+    if not stvs:
+        stvs = infer_concept_stvs(list(tasks) + list(beliefs))
+    else:
+        inferred = infer_concept_stvs(list(tasks) + list(beliefs))
+        for name, tv in inferred.items():
+            stvs.setdefault(name, tv)
+
     parsed_tasks: List[ParsedSentence] = []
     for t in tasks:
         p = parse_sentence(t)
@@ -246,6 +192,21 @@ def generate_forward_candidates(
         for b in parsed_beliefs
     }
 
+    def consider(p1: ParsedSentence, p2: ParsedSentence) -> None:
+        result = apply_pln_pair(p1, p2, stvs)
+        if not result:
+            return
+        parsed = parse_sentence(result)
+        if not parsed:
+            return
+        sig = (
+            f"{parsed.relation}:{parsed.subject}:{parsed.object_node}:"
+            f"{','.join(parsed.evidence_stamp)}"
+        )
+        if sig not in existing_sigs and sig not in seen_conclusions:
+            seen_conclusions.add(sig)
+            candidates.append(result)
+
     if use_stage0 and goal is not None:
         from prism.stage0 import extract_concepts, filter_beliefs
 
@@ -264,50 +225,12 @@ def generate_forward_candidates(
             filtered_parsed = [
                 p for p in (parse_sentence(b) for b in filtered_raw if b) if p
             ]
-
             for b in filtered_parsed:
-                # Direction 1: task -> belief
-                res1 = deduce_pair(t, b)
-                if res1:
-                    parsed_res1 = parse_sentence(res1)
-                    if parsed_res1:
-                        sig1 = f"{parsed_res1.relation}:{parsed_res1.subject}:{parsed_res1.object_node}:{','.join(parsed_res1.evidence_stamp)}"
-                        if sig1 not in existing_sigs and sig1 not in seen_conclusions:
-                            seen_conclusions.add(sig1)
-                            candidates.append(res1)
-
-                # Direction 2: belief -> task
-                res2 = deduce_pair(b, t)
-                if res2:
-                    parsed_res2 = parse_sentence(res2)
-                    if parsed_res2:
-                        sig2 = f"{parsed_res2.relation}:{parsed_res2.subject}:{parsed_res2.object_node}:{','.join(parsed_res2.evidence_stamp)}"
-                        if sig2 not in existing_sigs and sig2 not in seen_conclusions:
-                            seen_conclusions.add(sig2)
-                            candidates.append(res2)
+                consider(t, b)
     else:
-        # Standard unguided Cartesian pair deduction
         for t in parsed_tasks:
             for b in parsed_beliefs:
-                # Direction 1: task -> belief
-                res1 = deduce_pair(t, b)
-                if res1:
-                    parsed_res1 = parse_sentence(res1)
-                    if parsed_res1:
-                        sig1 = f"{parsed_res1.relation}:{parsed_res1.subject}:{parsed_res1.object_node}:{','.join(parsed_res1.evidence_stamp)}"
-                        if sig1 not in existing_sigs and sig1 not in seen_conclusions:
-                            seen_conclusions.add(sig1)
-                            candidates.append(res1)
-
-                # Direction 2: belief -> task
-                res2 = deduce_pair(b, t)
-                if res2:
-                    parsed_res2 = parse_sentence(res2)
-                    if parsed_res2:
-                        sig2 = f"{parsed_res2.relation}:{parsed_res2.subject}:{parsed_res2.object_node}:{','.join(parsed_res2.evidence_stamp)}"
-                        if sig2 not in existing_sigs and sig2 not in seen_conclusions:
-                            seen_conclusions.add(sig2)
-                            candidates.append(res2)
+                consider(t, b)
 
     return candidates
 
