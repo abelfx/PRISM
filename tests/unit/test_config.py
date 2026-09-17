@@ -11,6 +11,7 @@ from prism.core.config import (
     Stage0Config,
     Tier1Config,
     Tier2Config,
+    BidirectionalConfig,
 )
 
 
@@ -87,6 +88,16 @@ def test_master_config_structure():
     assert DEFAULT_CONFIG.stage0.enabled is True
     assert DEFAULT_CONFIG.search.beam_width == 5
     assert DEFAULT_CONFIG.tier2.enabled is True
+    assert DEFAULT_CONFIG.bidirectional.connection_check_interval == 1
+    assert DEFAULT_CONFIG.bidirectional.max_backward_depth == 10
+
+
+def test_bidirectional_config_defaults():
+    cfg = BidirectionalConfig()
+    assert cfg.connection_check_interval == 1
+    assert cfg.max_backward_depth == 10
+    assert cfg.forward_backward_ratio == 1.0
+    assert cfg.backward_beam_width == 5
 
 
 

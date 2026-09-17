@@ -7,9 +7,9 @@ goal recognition, proof path reconstruction, and cycle prevention.
 import heapq
 from prism.core.config import SearchConfig, Tier1Config
 from prism.search.engine import AStarSearchEngine, SearchResult
+from prism.search.pln_runtime import apply_pln_pair
 from prism.search.rules import (
     apply_candidate,
-    deduce_pair,
     generate_forward_candidates,
     parse_sentence,
 )
@@ -88,12 +88,13 @@ def test_matches_goal_representations():
 
 
 def test_pln_forward_deduction_rule():
-    """Verify deduce_pair computes valid conclusions with disjoint stamps."""
+    """Verify forward apply uses live lib_pln, not a product rewrite."""
     p1 = parse_sentence(["Sentence", [["Inheritance", "A", "B"], ["stv", 0.9, 0.8]], ["1"]])
     p2 = parse_sentence(["Sentence", [["Inheritance", "B", "C"], ["stv", 0.8, 0.7]], ["2"]])
+    stvs = {"A": (1.0 / 3.0, 0.9), "B": (1.0 / 3.0, 0.9), "C": (1.0 / 3.0, 0.9)}
 
     assert p1 is not None and p2 is not None
-    conclusion = deduce_pair(p1, p2)
+    conclusion = apply_pln_pair(p1, p2, stvs)
     assert conclusion is not None
 
     parsed_conc = parse_sentence(conclusion)
@@ -101,12 +102,12 @@ def test_pln_forward_deduction_rule():
     assert parsed_conc.subject == "A"
     assert parsed_conc.object_node == "C"
     assert parsed_conc.evidence_stamp == ("1", "2")
-    assert parsed_conc.strength == round(0.9 * 0.8, 4)
-    assert parsed_conc.confidence == round(0.8 * 0.7 * 0.9, 4)
+    assert parsed_conc.confidence > 0.0
+    # Toy rewrite s1*s2 must not be used
+    assert parsed_conc.strength != round(0.9 * 0.8, 4)
 
-    # Circular evidence check: overlapping stamps must NOT deduce
     p_circ = parse_sentence(["Sentence", [["Inheritance", "C", "D"], ["stv", 0.9, 0.9]], ["1"]])
-    assert deduce_pair(p1, p_circ) is None
+    assert apply_pln_pair(p1, p_circ, stvs) is None
 
 
 def test_astar_search_linear_chain_success():
@@ -249,12 +250,14 @@ def test_generate_forward_candidates_stage0_filtering():
 
     spec = generate_with_distractors(depth=6, n_distractors=25, seed=42)
     facts = format_spec_facts(spec)
+    from prism.benchmarks.evaluate_search_comparison import format_spec_stvs
+    stvs = format_spec_stvs(spec)
     goal = spec["goal"]
 
     # Without Stage 0
-    cands_raw = generate_forward_candidates(facts, facts, goal=goal, use_stage0=False)
+    cands_raw = generate_forward_candidates(facts, facts, goal=goal, use_stage0=False, concept_stvs=stvs)
     # With Stage 0
-    cands_s0 = generate_forward_candidates(facts, facts, goal=goal, use_stage0=True)
+    cands_s0 = generate_forward_candidates(facts, facts, goal=goal, use_stage0=True, concept_stvs=stvs)
 
     assert len(cands_raw) > 30
     assert len(cands_s0) < len(cands_raw)
@@ -269,11 +272,13 @@ def test_astar_search_high_noise_chain_rescue():
 
     spec = generate_with_distractors(depth=6, n_distractors=25, seed=42)
     facts = format_spec_facts(spec)
+    from prism.benchmarks.evaluate_search_comparison import format_spec_stvs
+    stvs = format_spec_stvs(spec)
     goal = spec["goal"]
 
     cfg = SearchConfig(max_steps=35, beam_width=5, guided=True, use_stage0_filter=True)
     engine = AStarSearchEngine(config=cfg)
-    result = engine.search(initial_tasks=facts, initial_beliefs=facts, goal=goal)
+    result = engine.search(initial_tasks=facts, initial_beliefs=facts, goal=goal, concept_stvs=stvs)
 
     assert result.goal_found is True
     assert result.steps_expanded < 35
@@ -287,11 +292,13 @@ def test_astar_search_tree_conjunction_rescue():
 
     spec = generate_tree_with_distractors(depth_left=3, depth_right=3, n_distractors=20, seed=42)
     facts = format_spec_facts(spec)
+    from prism.benchmarks.evaluate_search_comparison import format_spec_stvs
+    stvs = format_spec_stvs(spec)
     goal = spec["goal"]
 
     cfg = SearchConfig(max_steps=30, beam_width=5, guided=True, use_stage0_filter=True)
     engine = AStarSearchEngine(config=cfg)
-    result = engine.search(initial_tasks=facts, initial_beliefs=facts, goal=goal)
+    result = engine.search(initial_tasks=facts, initial_beliefs=facts, goal=goal, concept_stvs=stvs)
 
     assert result.goal_found is True
     assert result.steps_expanded < 30
