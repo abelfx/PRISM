@@ -47,7 +47,7 @@ def run_gap_benchmark(live: bool = False):
     print(f"PRISM TIER 2: SEMANTIC GAP STALL & RESCUE BENCHMARK ({mode_str})")
     print("=" * 95)
     print("Note: search sits on lib_pln Truth_Deduction. A subgoal is not a proof.")
-    print("      Missing bridge axioms are never fabricated.")
+    print("      Tier 2 may prioritize a derivable lemma; missing axioms are never fabricated.")
     print("-" * 95)
 
     spec = generate_semantic_gap(
@@ -55,6 +55,7 @@ def run_gap_benchmark(live: bool = False):
         depth_target=2,
         n_distractors=10,
         include_bridge_in_kb=False,
+        include_bridge_support=True,
         seed=42,
     )
     facts = format_facts(spec)
@@ -63,7 +64,7 @@ def run_gap_benchmark(live: bool = False):
 
     print(f"\nScenario: Semantic Gap Benchmark (Source: A->B->C, Target: M->N->Z)")
     print(f"Goal: {goal} | Initial Facts: {len(facts)} | Distractors: {len(spec['distractor_facts'])}")
-    print(f"Missing Link: Semantic bridge required between C and target cluster")
+    print("Latent Bridge: C->M is derivable from the input facts C->H and H->M")
     print("-" * 95)
     print(
         f"{'Search Configuration':<36} | {'Success':<7} | {'Steps':<7} | "
@@ -77,7 +78,7 @@ def run_gap_benchmark(live: bool = False):
     res_unassisted = eng_unassisted.search(
         initial_tasks=facts, initial_beliefs=facts, goal=goal, concept_stvs=stvs
     )
-    _row("A* Search (no bridge in KB)", res_unassisted, time.perf_counter() - t0)
+    _row("A* Search (latent bridge, no Tier 2)", res_unassisted, time.perf_counter() - t0)
 
     if live:
         t2_cfg = Tier2Config(
@@ -93,15 +94,15 @@ def run_gap_benchmark(live: bool = False):
     else:
         canned_subgoal = json.dumps({
             "subgoal": "(Inheritance C M)",
-            "suggested_premise": "(Inheritance C M)",
-            "reasoning": "Bridge concept C in source cluster to concept M in target cluster",
+            "suggested_premise": "(Inheritance C H)",
+            "reasoning": "Derive C to M from the known premises C to H and H to M",
         })
         client = MockLLMClient(canned_responses=[canned_subgoal])
-        t2_cfg = Tier2Config(stall_threshold=0.25, stall_steps=1)
-        label = "Tier 2 Guided (mock subgoal, no inject)"
+        t2_cfg = Tier2Config(stall_threshold=0.80, stall_steps=1, cooldown_steps=100)
+        label = "Tier 2 Guided (derive via PLN.Apply)"
 
     reasoner = Tier2Reasoner(config=t2_cfg, client=client)
-    cfg_assisted = SearchConfig(max_steps=50, guided=True, enable_tier2=True, stall_threshold=0.25)
+    cfg_assisted = SearchConfig(max_steps=50, beam_width=1, guided=True, enable_tier2=True, stall_threshold=0.80)
     eng_assisted = AStarSearchEngine(config=cfg_assisted, tier2_reasoner=reasoner)
     t0 = time.perf_counter()
     res_assisted = eng_assisted.search(
@@ -136,7 +137,7 @@ def run_gap_benchmark(live: bool = False):
         print(f"  Proposed Subgoal : {sg.subgoal_str}")
         print(f"  Suggested Premise: {sg.suggested_premise_str}")
         print(f"  Model Rationale  : {sg.reasoning}")
-        print("  Outcome          : subgoal recorded; not inserted as a T2_ axiom.")
+        print("  Outcome          : subgoal derived from existing premises; no axiom injected.")
 
     print("\n" + "=" * 95)
 
