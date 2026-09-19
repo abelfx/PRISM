@@ -134,12 +134,13 @@ def test_bidirectional_proof_stitching_soundness():
     )
 
 
-def test_bidirectional_deep_scaling_reduction():
+@pytest.mark.parametrize("depth", [8, 10, 12])
+def test_bidirectional_deep_forward_expansion_reduction(depth: int):
     """
-    GATE-8.3: Verify search space / step reduction on D=8 chain with 20 distractors.
+    GATE-8.3: Verify reduction in costly forward PLN expansions on deep chains.
     Compares BidirectionalSearchEngine against unidirectional AStarSearchEngine.
     """
-    spec = generate_with_distractors(depth=8, n_distractors=20, seed=42)
+    spec = generate_with_distractors(depth=depth, n_distractors=20, seed=42)
     facts = format_spec_facts(spec)
     stvs = format_spec_stvs(spec)
     goal = spec["goal"]
@@ -158,12 +159,8 @@ def test_bidirectional_deep_scaling_reduction():
     assert fwd_result.goal_found is True
     assert len(bwd_result.proof_path) >= 2
 
-    nodes_fwd = fwd_result.nodes_generated
-    nodes_bwd = bwd_result.nodes_generated
-    print(
-        f"D=8 Comparison: Unidirectional Nodes={nodes_fwd} vs "
-        f"Bidirectional Nodes={nodes_bwd}"
-    )
+    reduction = 1.0 - (bwd_result.forward_steps / fwd_result.steps_expanded)
+    assert reduction >= 0.40
 
 
 
@@ -244,4 +241,3 @@ def test_bidirectional_connection_check_interval_still_finds_goal():
     )
     result = engine.search(spec["goal"], facts, concept_stvs=stvs)
     assert result.goal_found is True
-

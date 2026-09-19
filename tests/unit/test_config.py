@@ -51,6 +51,7 @@ def test_search_config_defaults():
     assert sc.deduplicate_beliefs is True
     assert sc.guided is True
     assert sc.use_stage0_filter is True
+    assert sc.tier2_waypoint_weight == 0.5
     assert sc.beam_threshold == 0.0
     assert sc.task_selection_k == 3
     assert sc.enable_tier2 is False
@@ -98,6 +99,5 @@ def test_bidirectional_config_defaults():
     assert cfg.max_backward_depth == 10
     assert cfg.forward_backward_ratio == 1.0
     assert cfg.backward_beam_width == 5
-
 
 
