@@ -148,6 +148,7 @@ class AStarSearchEngine:
         nodes_generated = 1
         search_stalled = False
         subgoals_proposed: List[Any] = []
+        strategic_subgoals: List[Any] = []
 
         if self.tier2_reasoner:
             self.tier2_reasoner.reset()
@@ -240,6 +241,7 @@ class AStarSearchEngine:
                     )
                     if subgoal_res:
                         subgoals_proposed.append(subgoal_res)
+                        strategic_subgoals.append(subgoal_res.subgoal)
                         derived = self._pln_derive_subgoal(
                             subgoal_res, current_node.beliefs
                         )
@@ -257,6 +259,16 @@ class AStarSearchEngine:
                         goal,
                         lambda c, g: compute_v1_score(c, g, self.tier1_config),
                     )
+                    # A Tier 2 subgoal is a temporary waypoint, not an axiom.
+                    # Prefer legal candidates that advance toward that waypoint
+                    # while PLN remains solely responsible for deriving them.
+                    if strategic_subgoals:
+                        waypoint_score = max(
+                            compute_v1_score(candidate, waypoint, self.tier1_config)
+                            for waypoint in strategic_subgoals
+                        )
+                        weight = self.config.tier2_waypoint_weight
+                        score = ((1.0 - weight) * score) + (weight * waypoint_score)
                     scored_candidates.append((score, candidate))
 
                 # Sort descending by score
@@ -280,6 +292,7 @@ class AStarSearchEngine:
                     )
                     if subgoal_res:
                         subgoals_proposed.append(subgoal_res)
+                        strategic_subgoals.append(subgoal_res.subgoal)
                         derived = self._pln_derive_subgoal(
                             subgoal_res, current_node.beliefs
                         )
@@ -374,11 +387,6 @@ class AStarSearchEngine:
         from prism.search.pln_runtime import apply_pln_sentences
 
         target = subgoal_res.subgoal
-        if subgoal_res.suggested_premise:
-            for belief in beliefs:
-                if matches_goal(belief, subgoal_res.suggested_premise):
-                    return None
-
         for decomp in backward_step(target, beliefs):
             if decomp.completeness < 1.0 or len(decomp.available_premises) < 2:
                 continue
