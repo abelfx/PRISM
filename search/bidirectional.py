@@ -563,6 +563,24 @@ class BidirectionalSearchEngine:
                     if not bwd_candidates:
                         continue
 
+                    # The forward frontier already grows outward from the
+                    # query subject. Keep the backward frontier directional:
+                    # regress the target object toward that subject instead
+                    # of duplicating forward-prefix exploration.
+                    parsed_target = parse_sentence(sg)
+                    if parsed_target:
+                        regressive = [
+                            candidate
+                            for candidate in bwd_candidates
+                            if any(
+                                (parsed_missing := parse_sentence(missing)) is not None
+                                and parsed_missing.subject == parsed_target.subject
+                                for missing in candidate.missing_premises
+                            )
+                        ]
+                        if regressive:
+                            bwd_candidates = regressive
+
                     # Sort by completeness and heuristic score
                     for b_cand in bwd_candidates[: self.config.backward_beam_width]:
                         if not b_cand.missing_premises:
@@ -741,5 +759,4 @@ class BidirectionalSearchEngine:
                     break
 
         return derived_sentence
-
 
