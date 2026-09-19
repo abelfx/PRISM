@@ -4,7 +4,14 @@ Verifies defaults, immutability, and parameter boundaries.
 """
 
 import pytest
-from prism.core.config import DEFAULT_CONFIG, PrismConfig, SearchConfig, Stage0Config, Tier1Config
+from prism.core.config import (
+    DEFAULT_CONFIG,
+    PrismConfig,
+    SearchConfig,
+    Stage0Config,
+    Tier1Config,
+    Tier2Config,
+)
 
 
 def test_tier1_config_defaults():
@@ -45,6 +52,7 @@ def test_search_config_defaults():
     assert sc.use_stage0_filter is True
     assert sc.beam_threshold == 0.0
     assert sc.task_selection_k == 3
+    assert sc.enable_tier2 is False
 
 
 def test_search_config_immutability():
@@ -54,11 +62,31 @@ def test_search_config_immutability():
         sc.beam_width = 10  # type: ignore
 
 
+def test_tier2_config_defaults():
+    """Verify Tier 2 Strategic LLM configuration defaults."""
+    t2 = Tier2Config()
+    assert t2.enabled is True
+    assert t2.stall_threshold == 0.20
+    assert t2.stall_steps == 5
+    assert t2.max_depth_threshold == 10
+    assert t2.cooldown_steps == 8
+    assert t2.backend == "mock"
+    assert ":free" in t2.model_name
+
+
+def test_tier2_config_immutability():
+    """Ensure Tier2Config is frozen immutable."""
+    t2 = Tier2Config()
+    with pytest.raises(Exception):
+        t2.stall_threshold = 0.50  # type: ignore
+
+
 def test_master_config_structure():
     """Verify master PrismConfig integrates sub-configs."""
     assert DEFAULT_CONFIG.tier1.alpha == 0.65
     assert DEFAULT_CONFIG.stage0.enabled is True
     assert DEFAULT_CONFIG.search.beam_width == 5
+    assert DEFAULT_CONFIG.tier2.enabled is True
 
 
 

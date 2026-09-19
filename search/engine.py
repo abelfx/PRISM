@@ -62,6 +62,7 @@ class SearchResult:
     wall_clock_seconds: float
     stalled: bool = False
     proof_trace: List[Any] = field(default_factory=list)
+    subgoals_proposed: List[Any] = field(default_factory=list)
 
 
 class AStarSearchEngine:
@@ -72,12 +73,10 @@ class AStarSearchEngine:
         config (SearchConfig): Search hyperparameters (beam width, max steps, costs).
         tier1_config (Tier1Config): Heuristic scoring parameters.
         cache (Optional[ScoreCache]): Cache for candidate heuristic scores.
+        tier2_reasoner (Optional[Any]): Strategic LLM reasoner for stall recovery.
 
     Outputs:
         SearchResult dataclass containing derived proof path and search telemetry.
-
-    What it does NOT handle:
-        Does not perform backward abduction or call Tier 2 LLMs (handled in Week 8).
     """
 
     def __init__(
@@ -85,10 +84,18 @@ class AStarSearchEngine:
         config: Optional[SearchConfig] = None,
         tier1_config: Optional[Tier1Config] = None,
         cache: Optional[ScoreCache] = None,
+        tier2_reasoner: Optional[Any] = None,
     ) -> None:
         self.config = config or DEFAULT_CONFIG.search
         self.tier1_config = tier1_config or DEFAULT_CONFIG.tier1
         self.cache = cache or ScoreCache()
+        if tier2_reasoner is not None:
+            self.tier2_reasoner = tier2_reasoner
+        elif getattr(self.config, "enable_tier2", False):
+            from prism.tier2.reasoner import Tier2Reasoner
+            self.tier2_reasoner = Tier2Reasoner()
+        else:
+            self.tier2_reasoner = None
 
     def search(
         self,
@@ -132,6 +139,10 @@ class AStarSearchEngine:
         steps_expanded = 0
         nodes_generated = 1
         search_stalled = False
+        subgoals_proposed: List[Any] = []
+
+        if self.tier2_reasoner:
+            self.tier2_reasoner.reset()
 
         # Compute initial heuristic cost
         if self.config.guided:
@@ -191,6 +202,7 @@ class AStarSearchEngine:
                         wall_clock_seconds=round(elapsed, 4),
                         stalled=search_stalled,
                         proof_trace=trace_session.steps if trace_session else [],
+                        subgoals_proposed=subgoals_proposed,
                     )
 
             # 2. Candidate generation
@@ -206,7 +218,41 @@ class AStarSearchEngine:
                 candidates = generator(current_node.tasks, current_node.beliefs)
 
             if not candidates:
-                continue
+                search_stalled = True
+                if self.tier2_reasoner and self.tier2_reasoner.check_stall(
+                    0.0, current_depth=current_node.depth
+                ):
+                    domain_concepts = self._extract_domain_concepts(current_node.beliefs, goal)
+                    subgoal_res = self.tier2_reasoner.propose_subgoal(
+                        goal=goal,
+                        beliefs=current_node.beliefs,
+                        recent_derivations=[current_node.action] if current_node.action else None,
+                        domain_concepts=domain_concepts,
+                    )
+                    if subgoal_res:
+                        subgoals_proposed.append(subgoal_res)
+                        from prism.search.backward import backward_step
+                        backward_step(subgoal_res.subgoal, current_node.beliefs)
+
+                        premise_to_inject = subgoal_res.subgoal
+                        if subgoal_res.suggested_premise:
+                            is_known = any(
+                                matches_goal(b, subgoal_res.suggested_premise)
+                                for b in current_node.beliefs
+                            )
+                            if not is_known:
+                                premise_to_inject = subgoal_res.suggested_premise
+
+                        if premise_to_inject:
+                            injected_sentence = [
+                                "Sentence",
+                                [premise_to_inject, ["stv", 0.9, 0.9]],
+                                [f"T2_{steps_expanded}"],
+                            ]
+                            candidates = [injected_sentence]
+
+                if not candidates:
+                    continue
 
             # 3. Score and prioritize candidates
             if self.config.guided:
@@ -226,6 +272,40 @@ class AStarSearchEngine:
                 top_score = scored_candidates[0][0] if scored_candidates else 0.0
                 if top_score < self.config.stall_threshold:
                     search_stalled = True
+
+                # Tier 2 strategic intervention if stall detected
+                if self.tier2_reasoner and self.tier2_reasoner.check_stall(
+                    top_score, current_depth=current_node.depth
+                ):
+                    domain_concepts = self._extract_domain_concepts(current_node.beliefs, goal)
+                    subgoal_res = self.tier2_reasoner.propose_subgoal(
+                        goal=goal,
+                        beliefs=current_node.beliefs,
+                        recent_derivations=[current_node.action] if current_node.action else None,
+                        domain_concepts=domain_concepts,
+                    )
+                    if subgoal_res:
+                        subgoals_proposed.append(subgoal_res)
+                        from prism.search.backward import backward_step
+                        backward_step(subgoal_res.subgoal, current_node.beliefs)
+
+                        premise_to_inject = subgoal_res.subgoal
+                        if subgoal_res.suggested_premise:
+                            is_known = any(
+                                matches_goal(b, subgoal_res.suggested_premise)
+                                for b in current_node.beliefs
+                            )
+                            if not is_known:
+                                premise_to_inject = subgoal_res.suggested_premise
+
+                        if premise_to_inject:
+                            injected_sentence = [
+                                "Sentence",
+                                [premise_to_inject, ["stv", 0.9, 0.9]],
+                                [f"T2_{steps_expanded}"],
+                            ]
+                            scored_candidates.insert(0, (0.95, injected_sentence))
+                            top_score = 0.95
 
                 if self.config.beam_threshold > 0.0 and scored_candidates:
                     threshold = top_score - self.config.beam_threshold
@@ -302,4 +382,14 @@ class AStarSearchEngine:
             wall_clock_seconds=round(elapsed, 4),
             stalled=search_stalled,
             proof_trace=trace_session.steps if trace_session else [],
+            subgoals_proposed=subgoals_proposed,
         )
+
+    @staticmethod
+    def _extract_domain_concepts(beliefs: Sequence[Any], goal: Any) -> Set[str]:
+        """Extract all known atomic concepts from active beliefs and goal."""
+        from prism.stage0.index import extract_concepts
+        concepts: Set[str] = set(extract_concepts(goal))
+        for b in beliefs:
+            concepts.update(extract_concepts(b))
+        return concepts

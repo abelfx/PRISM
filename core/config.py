@@ -6,6 +6,7 @@ used across PRISM tiers. No hardcoded constants should appear in algorithmic log
 """
 
 from dataclasses import dataclass
+from typing import Optional
 
 
 @dataclass(frozen=True)
@@ -89,6 +90,46 @@ class SearchConfig:
     use_stage0_filter: bool = True
     beam_threshold: float = 0.0
     task_selection_k: int = 3
+    enable_tier2: bool = False
+
+
+@dataclass(frozen=True)
+class Tier2Config:
+    """
+    Configuration parameters for Tier 2 Strategic LLM Reasoner.
+
+    Inputs:
+        enabled (bool): Whether Tier 2 LLM reasoning is enabled.
+        stall_threshold (float): Tier 1 score threshold below which a step is low-promise.
+        stall_steps (int): Consecutive low-scoring steps required to trigger stall.
+        max_depth_threshold (int): Search depth beyond which proactive subgoal is sought.
+        cooldown_steps (int): Derivation steps to wait before re-invoking Tier 2.
+        backend (str): Provider backend ('mock', 'openrouter', 'ollama', 'openai').
+        model_name (str): Model identifier (default OpenRouter free model).
+        api_key (Optional[str]): Provider API key or None to read from environment.
+        base_url (str): Provider base endpoint URL.
+        timeout_seconds (float): HTTP request timeout.
+        max_tokens (int): Max generation tokens.
+        temperature (float): Generation temperature.
+
+    Outputs:
+        Immutable configuration instance.
+
+    What it does NOT handle:
+        Does not issue HTTP calls or maintain derivation state.
+    """
+    enabled: bool = True
+    stall_threshold: float = 0.20
+    stall_steps: int = 5
+    max_depth_threshold: int = 10
+    cooldown_steps: int = 8
+    backend: str = "mock"
+    model_name: str = "nex-agi/nex-n2.5-mini:free"
+    api_key: Optional[str] = None
+    base_url: str = "https://openrouter.ai/api/v1"
+    timeout_seconds: float = 30.0
+    max_tokens: int = 1024
+    temperature: float = 0.1
 
 
 @dataclass(frozen=True)
@@ -100,6 +141,7 @@ class PrismConfig:
         tier1 (Tier1Config): Configuration for Tier 1 fast scorer.
         stage0 (Stage0Config): Configuration for Stage 0 premise pre-filter.
         search (SearchConfig): Configuration for Learned A* search engine.
+        tier2 (Tier2Config): Configuration for Tier 2 Strategic LLM reasoner.
 
     Outputs:
         Master configuration instance.
@@ -110,6 +152,7 @@ class PrismConfig:
     tier1: Tier1Config = Tier1Config()
     stage0: Stage0Config = Stage0Config()
     search: SearchConfig = SearchConfig()
+    tier2: Tier2Config = Tier2Config()
 
 
 # Global default configuration instance

@@ -16,6 +16,7 @@ from prism.benchmarks.domains.transitive_chain import (
     generate_with_distractors,
     write_metta_file,
 )
+from prism.benchmarks.domains.semantic_gap import generate_semantic_gap
 from prism.benchmarks.domains.tree_dag import (
     generate_tree_conjunction,
     generate_tree_metta_content,
@@ -39,4 +40,5 @@ __all__ = [
     "generate_tree_metta_content",
     "write_tree_metta_file",
     "verify_tree_conjunction_solution",
+    "generate_semantic_gap",
 ]

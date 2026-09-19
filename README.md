@@ -131,6 +131,14 @@ prism/
 │   ├── rules.py                       # generate_forward_candidates, parse_sentence, Stage 0 branch
 │   └── backward.py                    # BackwardCandidate, backward_step, check_connection
 │
+├── tier2/                             # Strategic LLM Reasoner (Week 7)
+│   ├── __init__.py                    # Public API: Tier2Reasoner, SubgoalResult, etc.
+│   ├── stall_detector.py              # Dynamic stall detector (plateau, depth, cooldown)
+│   ├── prompt.py                      # Context-aware prompt builder
+│   ├── client.py                      # Multi-backend LLM client (OpenRouter, Ollama, Mock)
+│   ├── parser.py                      # Subgoal JSON parser & concept grounding guard
+│   └── reasoner.py                    # Strategic reasoning coordinator
+│
 ├── tests/                             # Unit and integration test suites
 │   ├── conftest.py                    # Pytest environment & path configuration
 │   ├── README.md                      # Documentation of test suite
@@ -142,6 +150,10 @@ prism/
 │   │   ├── test_scorer.py             # Scorer coordinator & cache
 │   │   ├── test_search.py             # A* engine gates (Weeks 5-6)
 │   │   ├── test_backward.py           # Backward primitive unit tests (Week 6)
+│   │   ├── test_tier2_stall.py        # Stall detector tests (Week 7)
+│   │   ├── test_tier2_parser.py       # Subgoal parser & hallucination guard (Week 7)
+│   │   ├── test_tier2_client.py       # LLM client & mock fallback (Week 7)
+│   │   ├── test_tier2_integration.py  # Semantic gap rescue tests (Week 7)
 │   │   ├── test_trace_logger.py       # Trace logger & JSONL export
 │   │   └── test_tree_dag.py           # Tree/DAG topology generators
 │   └── integration/                   # MeTTa integration tests (PeTTa run.sh)
@@ -215,6 +227,19 @@ For detailed milestone reports, consult [`milestones/milestone_week1.md`](../mil
 | Linear Chain D=6 (25 distractors) | 19 | 16 | 15.8% | 0.0293s |
 | Diamond DAG D_short=3/D_long=7 (30 distractors) | 12 | 6 | **50.0%** | 0.0125s |
 | Tree Conjunction L(3,3) (20 distractors) | 19 | 16 | 15.8% | 0.0281s |
+
+### 5.7 Week 7: Tier 2 Strategic LLM Reasoner & Subgoal-Driven Search (ALL GATES PASSED)
+- **GATE-7.1:** Dynamic stall detector triggers on plateaus ($\tau_{\text{stall}} \le 0.20$ for $\ge 5$ steps) and depth threshold ($D > 10$) with cooldown protection; 0 false triggers on clean chains.
+- **GATE-7.2:** Structured subgoal parser validates JSON responses and enforces concept grounding hallucination guards against known domain entities.
+- **GATE-7.3:** Multi-backend LLM client supporting OpenRouter free models (`meta-llama/llama-3.3-70b-instruct:free`) via `urllib` and deterministic mock fallback; zero crashes on API timeouts or network errors.
+- **GATE-7.4:** Semantic Gap Recovery: unassisted A* search fails completely (0% success, stalls at 4 steps), while Tier 2 guided A* proposes bridging subgoal `(Inheritance C M)` and completes the proof in **9 steps**.
+
+#### Week 7 Semantic Gap Benchmark:
+
+| Scenario | Search Configuration | Success | Steps | Subgoals | Proof Len | Time |
+|----------|----------------------|---------|-------|----------|-----------|------|
+| **Semantic Gap (15 Distractors)** | Unassisted A* Search | **FAIL** | 4 | 0 | 0 | 0.0047s |
+| **Semantic Gap (15 Distractors)** | Tier 2 Guided A* Search | **PASS** | 9 | 1 | 6 | 0.0108s |
 
 ---
 
