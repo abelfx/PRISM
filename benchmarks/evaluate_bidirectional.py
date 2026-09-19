@@ -10,8 +10,8 @@ Measures:
   - Steps Expanded (Total, Forward, Backward)
   - Nodes Generated (Search Space Size)
   - Proof Length
-  - Step Reduction %
-  - Search Space Reduction %
+  - Expensive forward PLN expansion reduction %
+  - Total dual-frontier bookkeeping overhead %
   - Wall Clock Time
 """
 
@@ -50,15 +50,17 @@ def run_benchmark_depth(depth: int, n_distractors: int = 20, seed: int = 42) -> 
     bwd_res = bwd_engine.search(goal, facts, concept_stvs=stvs)
     t_bwd = time.perf_counter() - t1
 
-    # Reductions
-    step_red = (
-        (fwd_res.steps_expanded - bwd_res.steps_expanded) / fwd_res.steps_expanded
+    # Backward decomposition is symbolic and cheap; forward expansions invoke
+    # live PLN.Apply over candidate pairs. Report them independently rather
+    # than pretending a linear proof can require 50% fewer total logical steps.
+    forward_expansion_red = (
+        (fwd_res.steps_expanded - bwd_res.forward_steps) / fwd_res.steps_expanded
         if fwd_res.steps_expanded > 0
         else 0.0
     )
-    node_red = (
-        (fwd_res.nodes_generated - bwd_res.nodes_generated) / fwd_res.nodes_generated
-        if fwd_res.nodes_generated > 0
+    total_step_overhead = (
+        (bwd_res.steps_expanded - fwd_res.steps_expanded) / fwd_res.steps_expanded
+        if fwd_res.steps_expanded > 0
         else 0.0
     )
 
@@ -83,8 +85,8 @@ def run_benchmark_depth(depth: int, n_distractors: int = 20, seed: int = 42) -> 
             "meeting": bwd_res.meeting_point is not None,
             "time": round(t_bwd, 4),
         },
-        "step_reduction": step_red,
-        "node_reduction": node_red,
+        "forward_expansion_reduction": forward_expansion_red,
+        "total_step_overhead": total_step_overhead,
     }
 
 
@@ -110,7 +112,11 @@ def main():
 
         print(f"D={d:<5} | {'Unidirectional Forward A*':<26} | {f_status:<7} | {f['steps']:<7} | {'N/A':<9} | {f['nodes']:<7} | {f['proof_len']:<7} | {f['time']:.4f}s")
         print(f"D={d:<5} | {'Bidirectional A* (PRISM)':<26} | {b_status:<7} | {b['steps']:<7} | {f'{b['fwd_steps']}/{b['bwd_steps']}':<9} | {b['nodes']:<7} | {b['proof_len']:<7} | {b['time']:.4f}s")
-        print(f"       -> Efficiency Gains: Step Reduction = {res['step_reduction']:.1%} | Search Space Reduction = {res['node_reduction']:.1%}")
+        print(
+            "       -> Efficiency: Forward PLN Expansion Reduction = "
+            f"{res['forward_expansion_reduction']:.1%} | "
+            f"Total Step Overhead = {res['total_step_overhead']:.1%}"
+        )
         print("-" * 105)
 
     print("\nBenchmark completed successfully.")
