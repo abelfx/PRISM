@@ -5,7 +5,7 @@ Defines the search tree node, priority queue evaluation ordering, canonical
 belief state hashing for closed-set duplicate detection, and proof path reconstruction.
 """
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 import hashlib
 import re
 from typing import Any, Dict, List, Optional, Sequence, Set
@@ -186,3 +186,81 @@ def extract_proof_path(
 
     path.reverse()
     return path
+
+
+@dataclass
+class BidirectionalSearchNode:
+    """
+    Search node for dual-frontier bidirectional A* search.
+
+    Attributes
+    ----------
+    state_id : int
+        Monotonically increasing state ID.
+    direction : str
+        Search direction: "FORWARD" or "BACKWARD".
+    node : SearchNode
+        Underlying SearchNode instance tracking tasks, beliefs, costs.
+    subgoals : List[Any]
+        Active required subgoals (used primarily in backward search).
+    """
+
+    state_id: int
+    direction: str
+    node: SearchNode
+    subgoals: List[Any] = field(default_factory=list)
+
+    def __lt__(self, other: "BidirectionalSearchNode") -> bool:
+        """Priority ordering delegated to inner SearchNode."""
+        return self.node < other.node
+
+
+@dataclass
+class BidirectionalSearchResult:
+    """
+    Result container for bidirectional search execution.
+
+    Attributes
+    ----------
+    goal_found : bool
+        Whether the derivation successfully reached the target goal.
+    meeting_point : Optional[Any]
+        The intermediate bridging lemma where forward and backward frontiers met.
+    proof_path : List[SearchNode]
+        Reconstructed sequence of forward-executable states.
+    goal_sentence : Optional[Any]
+        The exact derived goal sentence.
+    steps_expanded : int
+        Total derivation steps expanded across both frontiers.
+    forward_steps : int
+        Steps expanded along the forward frontier.
+    backward_steps : int
+        Steps expanded along the backward frontier.
+    nodes_generated : int
+        Total number of state nodes generated.
+    visited_states_count : int
+        Total number of unique states in closed sets.
+    wall_clock_seconds : float
+        Elapsed search time in seconds.
+    stalled : bool
+        Whether search stalled before recovery or termination.
+    proof_trace : List[Any]
+        Chronological proof trace steps if tracing was enabled.
+    subgoals_proposed : List[Any]
+        Subgoals proposed during search by Tier 2 reasoner.
+    """
+
+    goal_found: bool
+    meeting_point: Optional[Any]
+    proof_path: List[SearchNode]
+    goal_sentence: Optional[Any]
+    steps_expanded: int
+    forward_steps: int
+    backward_steps: int
+    nodes_generated: int
+    visited_states_count: int
+    wall_clock_seconds: float
+    stalled: bool = False
+    proof_trace: List[Any] = field(default_factory=list)
+    subgoals_proposed: List[Any] = field(default_factory=list)
+
