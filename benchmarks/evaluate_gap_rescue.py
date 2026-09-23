@@ -53,7 +53,8 @@ def run_gap_benchmark(live: bool = False):
     spec = generate_semantic_gap(
         depth_source=2,
         depth_target=2,
-        n_distractors=10,
+        n_distractors=0,
+        n_goal_decoys=5,
         include_bridge_in_kb=False,
         include_bridge_support=True,
         seed=42,
@@ -63,7 +64,7 @@ def run_gap_benchmark(live: bool = False):
     goal = spec["goal"]
 
     print(f"\nScenario: Semantic Gap Benchmark (Source: A->B->C, Target: M->N->Z)")
-    print(f"Goal: {goal} | Initial Facts: {len(facts)} | Distractors: {len(spec['distractor_facts'])}")
+    print(f"Goal: {goal} | Initial Facts: {len(facts)} | Goal-relevant decoy facts: {len(spec['distractor_facts'])}")
     print("Latent Bridge: C->M is derivable from the input facts C->H and H->M")
     print("-" * 95)
     print(
@@ -72,7 +73,8 @@ def run_gap_benchmark(live: bool = False):
     )
     print("-" * 95)
 
-    cfg_unassisted = SearchConfig(max_steps=50, guided=True, enable_tier2=False, stall_threshold=0.25)
+    shared_budget = 8
+    cfg_unassisted = SearchConfig(max_steps=shared_budget, beam_width=1, guided=True, enable_tier2=False, stall_threshold=0.80)
     eng_unassisted = AStarSearchEngine(config=cfg_unassisted)
     t0 = time.perf_counter()
     res_unassisted = eng_unassisted.search(
@@ -84,8 +86,10 @@ def run_gap_benchmark(live: bool = False):
         t2_cfg = Tier2Config(
             backend="openrouter",
             model_name="nex-agi/nex-n2.5-mini:free",
-            stall_threshold=0.25,
+            # Deliberately force one intervention so --live is a real API test.
+            stall_threshold=0.80,
             stall_steps=1,
+            cooldown_steps=100,
             timeout_seconds=30.0,
             max_tokens=1500,
         )
@@ -102,7 +106,7 @@ def run_gap_benchmark(live: bool = False):
         label = "Tier 2 Guided (derive via PLN.Apply)"
 
     reasoner = Tier2Reasoner(config=t2_cfg, client=client)
-    cfg_assisted = SearchConfig(max_steps=50, beam_width=1, guided=True, enable_tier2=True, stall_threshold=0.80)
+    cfg_assisted = SearchConfig(max_steps=shared_budget, beam_width=1, guided=True, enable_tier2=True, stall_threshold=0.80)
     eng_assisted = AStarSearchEngine(config=cfg_assisted, tier2_reasoner=reasoner)
     t0 = time.perf_counter()
     res_assisted = eng_assisted.search(
@@ -137,7 +141,7 @@ def run_gap_benchmark(live: bool = False):
         print(f"  Proposed Subgoal : {sg.subgoal_str}")
         print(f"  Suggested Premise: {sg.suggested_premise_str}")
         print(f"  Model Rationale  : {sg.reasoning}")
-        print("  Outcome          : subgoal derived from existing premises; no axiom injected.")
+        print("  Outcome          : accepted as a waypoint; all proof steps remain PLN-derived.")
 
     print("\n" + "=" * 95)
 
