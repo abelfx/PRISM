@@ -10,9 +10,6 @@ import re
 from dataclasses import dataclass
 from typing import Any, Dict, List, Optional, Set
 
-from prism.search.rules import parse_sentence
-
-
 VALID_RELATIONS = {
     "Inheritance",
     "Similarity",
@@ -121,6 +118,8 @@ def parse_subgoal_response(
 
     # 2. Trivial Goal Guard: subgoal must not be identical to active goal
     if active_goal:
+        from prism.search.rules import parse_sentence
+
         parsed_goal = parse_sentence(active_goal)
         if parsed_goal:
             if (
