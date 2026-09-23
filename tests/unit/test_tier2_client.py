@@ -105,3 +105,4 @@ def test_tier2_reasoner_error_containment():
 
     res = reasoner.propose_subgoal(goal, beliefs)
     assert res is None  # Graceful fallback
+    assert reasoner.stall_detector.cooldown_remaining == cfg.cooldown_steps

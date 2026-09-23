@@ -68,6 +68,48 @@ def test_tier2_search_rescue_on_derivable_semantic_gap():
     assert all("T2_" not in str(getattr(step, "action", "")) for step in res_assisted.proof_path)
 
 
+def test_tier2_route_beats_goal_relevant_decoys_under_shared_budget():
+    spec = generate_semantic_gap(
+        depth_source=2,
+        depth_target=2,
+        n_distractors=0,
+        n_goal_decoys=5,
+        include_bridge_support=True,
+        seed=42,
+    )
+    facts = _format_facts(spec)
+    stvs = format_spec_stvs(spec)
+    budget = 8
+    baseline = AStarSearchEngine(
+        SearchConfig(max_steps=budget, beam_width=1, guided=True, enable_tier2=False)
+    ).search(facts, facts, spec["goal"], concept_stvs=stvs)
+
+    reasoner = Tier2Reasoner(
+        Tier2Config(stall_threshold=0.80, stall_steps=1, cooldown_steps=100),
+        MockLLMClient(
+            canned_responses=[json.dumps({
+                "subgoal": "(Inheritance C M)",
+                "suggested_premise": "(Inheritance C H)",
+                "reasoning": "C H and H M derive the bridge",
+            })]
+        ),
+    )
+    assisted = AStarSearchEngine(
+        SearchConfig(
+            max_steps=budget,
+            beam_width=1,
+            guided=True,
+            enable_tier2=True,
+            stall_threshold=0.80,
+        ),
+        tier2_reasoner=reasoner,
+    ).search(facts, facts, spec["goal"], concept_stvs=stvs)
+
+    assert not baseline.goal_found
+    assert assisted.goal_found
+    assert assisted.steps_expanded <= budget
+
+
 def test_tier2_does_not_inject_missing_bridge():
     """A genuinely unsupported LLM bridge remains unproved and cannot satisfy the goal."""
     spec = generate_semantic_gap(
