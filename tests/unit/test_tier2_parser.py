@@ -23,6 +23,8 @@ def test_build_stall_prompt_structure():
     assert "(Inheritance A B)" in prompt
     assert "(Inheritance B C)" in prompt
     assert "DERIVATIONS ATTEMPTED SO FAR" in prompt
+    assert "EXACTLY ONE binary inference step" in prompt
+    assert "name both supporting facts" in prompt
 
 
 def test_parse_subgoal_valid_json():

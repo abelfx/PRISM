@@ -9,6 +9,7 @@ This directory contains the profiling, latency benchmarking, and search-efficien
 ```
 prism/benchmarks/
 ├── run_benchmark.py               # Main CLI benchmark driver & parameter sweep runner
+├── evaluate_scaling_generalization.py # Week 9 scaling and cross-domain gates
 ├── domains/                       # Benchmark domain generators
 │   ├── __init__.py
 │   └── transitive_chain.py        # Synthetic transitive chain generator (D in [5, 20])
@@ -159,3 +160,45 @@ python3 -m prism.benchmarks.run_benchmark --depths 5 8 10 --distractors 0 10 25 
 # Run PRISM-guided sweep (Week 3)
 python3 -m prism.benchmarks.run_benchmark --guided --depths 5 8 10 --distractors 0 10 25 50 --repeats 2 --max-steps 80 --output prism/benchmarks/results/baseline_guided_week3.json
 ```
+
+### 3. Run Scaling and Cross-Domain Evaluation
+
+```bash
+cd <repo-root>
+python3 -m prism.benchmarks.evaluate_scaling_generalization \
+  --output prism/benchmarks/results/week9_scaling_generalization.json
+```
+
+This records four increasing AtomSpace proxy sizes, Stage 0 pair-frontier
+reduction, end-to-end search metrics, waste-growth exponents, and frozen-config
+transfer across chain, diamond, tree, and semantic-gap domains. The random
+baseline uses the recorded seeds 11, 23, 42, 67 and 89. Its goal-blind
+structurally applicable premise pairs are shuffled and every selected action is
+validated by real `PLN.Apply`; with beam width one, unused later candidates are
+not evaluated.
+
+The recorded repeated live Tier-2 check passed 3/3 assisted runs while the
+same-budget unassisted search failed 3/3. The live model proposed three
+different PLN-derivable waypoints (`H -> N`, `C -> M`, and `A -> C`); proposals
+were never inserted as beliefs. Reproduce the optional provider-dependent run
+with:
+
+```bash
+OPENROUTER_API_KEY=... \
+python3 -m prism.benchmarks.evaluate_gap_rescue --live --runs 3 \
+  --output prism/benchmarks/results/week9_tier2_live_repeats.json
+```
+
+### 4. Run Progressive External-KG Evaluation
+
+```bash
+cd <repo-root>
+python3 -m prism.benchmarks.evaluate_external_kg_scaling \
+  --output prism/benchmarks/results/week9_external_kg_scaling.json
+```
+
+This streams the three supplied MeTTa exports, maps only `isa` to PLN
+`Inheritance`, deduplicates source edges, constructs held-out source-derived
+transitive goals, and evaluates 100-, 1,000-, and 5,000-edge slices. Raw files
+are never changed. Missing TVs use the explicit recorded default `(0.8, 0.9)`;
+uniform source TVs are retained.

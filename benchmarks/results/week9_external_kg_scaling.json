@@ -1,0 +1,358 @@
+{
+  "schema_version": 1,
+  "reproducibility": {
+    "python": "3.12.3",
+    "prism_revision": "287c92db3c6312a42f31b4e16320719b698021bb",
+    "petta_revision": "ae66fa8e41dcd5539d614706bd4e5cfb34f9608d",
+    "pln_revision": "a026bac72caa6f3a64600ac9600c4a6aacd511dd",
+    "sizes": [
+      100,
+      1000,
+      5000
+    ],
+    "chain_depth": 3,
+    "max_steps": 20
+  },
+  "sources": [
+    {
+      "source": "/home/abel/Desktop/icog_labs/pln/wordnet_stv_clean.metta",
+      "source_sha256": "89136fea59ef20a19975035e7bd61a33b7c18c0e336edbbeaec8a623838da9e6",
+      "load_seconds": 0.8314541670006292,
+      "normalization": {
+        "source_relation": "isa",
+        "pln_relation": "Inheritance",
+        "raw_relation_edges": 89089,
+        "unique_nonself_edges": 89089,
+        "pln_executable_edges": 88311,
+        "duplicates_removed": 0,
+        "self_loops_rejected": 0,
+        "unsupported_compound_lines": 0,
+        "source_tv_counts": [
+          {
+            "tv": [
+              0.8,
+              0.9
+            ],
+            "count": 89089
+          }
+        ],
+        "missing_tv_count": 0,
+        "applied_tv": [
+          0.8,
+          0.9
+        ],
+        "tv_policy": "preserved uniform source TV"
+      },
+      "proof": {
+        "source_edges": [
+          [
+            "a-list_n_01",
+            "list_n_01"
+          ],
+          [
+            "list_n_01",
+            "database_n_01"
+          ],
+          [
+            "database_n_01",
+            "information_n_01"
+          ]
+        ],
+        "held_out_goal": [
+          "Inheritance",
+          "a-list_n_01",
+          "information_n_01"
+        ],
+        "goal_absent_from_source": true
+      },
+      "sizes": [
+        {
+          "requested_edges": 100,
+          "status": "completed",
+          "stage0_frontier": {
+            "raw_pairs": 10000,
+            "filtered_pairs": 6,
+            "reduction": 0.9994
+          },
+          "frontier_seconds": 0.0029853970008844044,
+          "prism": {
+            "success": true,
+            "steps": 3,
+            "nodes_generated": 3,
+            "visited_states": 3,
+            "proof_actions": 2,
+            "wasted_expansions": 0,
+            "waste_ratio": 0.0,
+            "wall_clock_seconds": 0.1115
+          }
+        },
+        {
+          "requested_edges": 1000,
+          "status": "completed",
+          "stage0_frontier": {
+            "raw_pairs": 1000000,
+            "filtered_pairs": 6,
+            "reduction": 0.999994
+          },
+          "frontier_seconds": 0.0643217580000055,
+          "prism": {
+            "success": true,
+            "steps": 3,
+            "nodes_generated": 3,
+            "visited_states": 3,
+            "proof_actions": 2,
+            "wasted_expansions": 0,
+            "waste_ratio": 0.0,
+            "wall_clock_seconds": 0.5803
+          }
+        },
+        {
+          "requested_edges": 5000,
+          "status": "completed",
+          "stage0_frontier": {
+            "raw_pairs": 25000000,
+            "filtered_pairs": 6,
+            "reduction": 1.0
+          },
+          "frontier_seconds": 0.1372007370009669,
+          "prism": {
+            "success": true,
+            "steps": 3,
+            "nodes_generated": 3,
+            "visited_states": 3,
+            "proof_actions": 2,
+            "wasted_expansions": 0,
+            "waste_ratio": 0.0,
+            "wall_clock_seconds": 10.7527
+          }
+        }
+      ],
+      "largest_successful_tested_slice": 5000,
+      "full_source_inference_claimed": false
+    },
+    {
+      "source": "/home/abel/Desktop/icog_labs/pln/output_prolog_ready.metta",
+      "source_sha256": "e0e4d3ac19f8881901aaecc7f80a9a8580e7be3e31c2835c977198738cbe7686",
+      "load_seconds": 0.6277275009997538,
+      "normalization": {
+        "source_relation": "isa",
+        "pln_relation": "Inheritance",
+        "raw_relation_edges": 101625,
+        "unique_nonself_edges": 63508,
+        "pln_executable_edges": 63117,
+        "duplicates_removed": 38117,
+        "self_loops_rejected": 0,
+        "unsupported_compound_lines": 10,
+        "source_tv_counts": [
+          {
+            "tv": [
+              0.8,
+              0.9
+            ],
+            "count": 63508
+          }
+        ],
+        "missing_tv_count": 0,
+        "applied_tv": [
+          0.8,
+          0.9
+        ],
+        "tv_policy": "preserved uniform source TV"
+      },
+      "proof": {
+        "source_edges": [
+          [
+            "a-scan_ultrasonography_n_01",
+            "sonography_n_01"
+          ],
+          [
+            "sonography_n_01",
+            "imaging_n_02"
+          ],
+          [
+            "imaging_n_02",
+            "pictorial_representation_n_01"
+          ]
+        ],
+        "held_out_goal": [
+          "Inheritance",
+          "a-scan_ultrasonography_n_01",
+          "pictorial_representation_n_01"
+        ],
+        "goal_absent_from_source": true
+      },
+      "sizes": [
+        {
+          "requested_edges": 100,
+          "status": "completed",
+          "stage0_frontier": {
+            "raw_pairs": 10000,
+            "filtered_pairs": 6,
+            "reduction": 0.9994
+          },
+          "frontier_seconds": 0.002866058002837235,
+          "prism": {
+            "success": true,
+            "steps": 3,
+            "nodes_generated": 3,
+            "visited_states": 3,
+            "proof_actions": 2,
+            "wasted_expansions": 0,
+            "waste_ratio": 0.0,
+            "wall_clock_seconds": 0.3939
+          }
+        },
+        {
+          "requested_edges": 1000,
+          "status": "completed",
+          "stage0_frontier": {
+            "raw_pairs": 1000000,
+            "filtered_pairs": 6,
+            "reduction": 0.999994
+          },
+          "frontier_seconds": 0.027995206000923645,
+          "prism": {
+            "success": true,
+            "steps": 3,
+            "nodes_generated": 3,
+            "visited_states": 3,
+            "proof_actions": 2,
+            "wasted_expansions": 0,
+            "waste_ratio": 0.0,
+            "wall_clock_seconds": 3.9415
+          }
+        },
+        {
+          "requested_edges": 5000,
+          "status": "completed",
+          "stage0_frontier": {
+            "raw_pairs": 25000000,
+            "filtered_pairs": 6,
+            "reduction": 1.0
+          },
+          "frontier_seconds": 0.1511223829984374,
+          "prism": {
+            "success": true,
+            "steps": 3,
+            "nodes_generated": 3,
+            "visited_states": 3,
+            "proof_actions": 2,
+            "wasted_expansions": 0,
+            "waste_ratio": 0.0,
+            "wall_clock_seconds": 28.7619
+          }
+        }
+      ],
+      "largest_successful_tested_slice": 5000,
+      "full_source_inference_claimed": false
+    },
+    {
+      "source": "/home/abel/Desktop/icog_labs/pln/kg.metta",
+      "source_sha256": "3d44cbc5a3bad106da43a8fb8690cc41288c6b9d1779d590516c92b573739f90",
+      "load_seconds": 7.932771056999627,
+      "normalization": {
+        "source_relation": "isa",
+        "pln_relation": "Inheritance",
+        "raw_relation_edges": 456586,
+        "unique_nonself_edges": 229813,
+        "pln_executable_edges": 228598,
+        "duplicates_removed": 226609,
+        "self_loops_rejected": 164,
+        "unsupported_compound_lines": 0,
+        "source_tv_counts": [],
+        "missing_tv_count": 229813,
+        "applied_tv": [
+          0.8,
+          0.9
+        ],
+        "tv_policy": "explicit benchmark default 0.8/0.9 for missing or mixed source TVs"
+      },
+      "proof": {
+        "source_edges": [
+          [
+            "a60_n",
+            "austin_car_n"
+          ],
+          [
+            "austin_car_n",
+            "car_n"
+          ],
+          [
+            "car_n",
+            "motor_vehicle_n"
+          ]
+        ],
+        "held_out_goal": [
+          "Inheritance",
+          "a60_n",
+          "motor_vehicle_n"
+        ],
+        "goal_absent_from_source": true
+      },
+      "sizes": [
+        {
+          "requested_edges": 100,
+          "status": "completed",
+          "stage0_frontier": {
+            "raw_pairs": 10000,
+            "filtered_pairs": 6,
+            "reduction": 0.9994
+          },
+          "frontier_seconds": 0.002749003000644734,
+          "prism": {
+            "success": true,
+            "steps": 3,
+            "nodes_generated": 3,
+            "visited_states": 3,
+            "proof_actions": 2,
+            "wasted_expansions": 0,
+            "waste_ratio": 0.0,
+            "wall_clock_seconds": 0.6896
+          }
+        },
+        {
+          "requested_edges": 1000,
+          "status": "completed",
+          "stage0_frontier": {
+            "raw_pairs": 1000000,
+            "filtered_pairs": 6,
+            "reduction": 0.999994
+          },
+          "frontier_seconds": 0.033438556998589775,
+          "prism": {
+            "success": true,
+            "steps": 3,
+            "nodes_generated": 3,
+            "visited_states": 3,
+            "proof_actions": 2,
+            "wasted_expansions": 0,
+            "waste_ratio": 0.0,
+            "wall_clock_seconds": 6.9361
+          }
+        },
+        {
+          "requested_edges": 5000,
+          "status": "completed",
+          "stage0_frontier": {
+            "raw_pairs": 25000000,
+            "filtered_pairs": 6,
+            "reduction": 1.0
+          },
+          "frontier_seconds": 0.1495913010003278,
+          "prism": {
+            "success": true,
+            "steps": 3,
+            "nodes_generated": 3,
+            "visited_states": 3,
+            "proof_actions": 2,
+            "wasted_expansions": 0,
+            "waste_ratio": 0.0,
+            "wall_clock_seconds": 37.5121
+          }
+        }
+      ],
+      "largest_successful_tested_slice": 5000,
+      "full_source_inference_claimed": false
+    }
+  ]
+}

@@ -87,6 +87,10 @@ def _parse_apply_results(lines: Sequence[str]) -> Optional[Any]:
     from prism.search.rules import parse_sentence
 
     for line in lines:
+        # An undefined PLN.Apply is returned unevaluated and contains its input
+        # Sentences.  Never mistake one of those premises for a conclusion.
+        if "PLN.Apply" in line:
+            continue
         for match in _SENTENCE_RE.finditer(line):
             rel, sub, obj = match.group(1), match.group(2), match.group(3)
             strength = float(match.group(4))

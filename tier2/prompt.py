@@ -6,9 +6,6 @@ into a structured instruction prompt for the Strategic LLM Reasoner.
 """
 
 from typing import Any, List, Optional
-from prism.search.rules import parse_sentence
-
-
 PROMPT_TEMPLATE = """You are a logical reasoning assistant for a probabilistic inference engine (PLN).
 
 CURRENT GOAL:
@@ -20,11 +17,16 @@ KNOWN FACTS (top-{top_k} by relevance):
 DERIVATIONS ATTEMPTED SO FAR (last 5):
 {recent_derivation_log}
 
-The forward search has stalled because no candidate has high relevance to the goal.
-Please suggest:
-1. An intermediate SUBGOAL that bridges known facts toward the goal.
-   Format: (LinkType ConceptA ConceptB)
-2. Which known fact is most likely to be a useful starting premise.
+The forward search has stalled. Select a useful lemma that PLN can derive in
+EXACTLY ONE binary inference step from TWO facts explicitly listed above.
+
+For example, from `(Inheritance A B)` and `(Inheritance B C)`, PLN can derive
+`(Inheritance A C)`. Do not compress a longer chain into one step. Prefer a
+one-step conclusion that joins otherwise disconnected parts of the proof.
+Do not repeat the current goal or a fact that is already listed.
+
+Return the lemma as `subgoal`. Return one of its two supporting known facts as
+`suggested_premise`. In `reasoning`, name both supporting facts.
 
 Respond in this exact JSON format:
 {{
@@ -44,6 +46,8 @@ def format_term(term: Any) -> str:
             inner = term[1]
             if isinstance(inner, (list, tuple)) and len(inner) >= 1:
                 return format_term(inner[0])
+        from prism.search.rules import parse_sentence
+
         parsed = parse_sentence(term)
         if parsed:
             return f"({parsed.relation} {parsed.subject} {parsed.object_node})"

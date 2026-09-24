@@ -1,0 +1,303 @@
+{
+  "schema_version": 1,
+  "reproducibility": {
+    "python": "3.12.3",
+    "prism_revision": "89d5aa7be58cb25318ae98cb169a2d8fb1d16b2e",
+    "petta_revision": "ae66fa8e41dcd5539d614706bd4e5cfb34f9608d",
+    "pln_revision": "a026bac72caa6f3a64600ac9600c4a6aacd511dd",
+    "source_sha256": "892970bee972aa1b93cc8695d9dd15e57854eb07643790647c1306d77973d676",
+    "parameters": {
+      "sources": 5,
+      "targets": 10,
+      "queries": 5,
+      "strength": 0.9,
+      "confidence": 0.8,
+      "max_steps": 40,
+      "queue_size": 150,
+      "beam_width": 5,
+      "timeout": 30.0
+    }
+  },
+  "source": "/home/abel/Desktop/icog_labs/pln/kgadexp.metta",
+  "source_balanced": false,
+  "raw_edges": 8280,
+  "unique_edges": 3930,
+  "duplicates_removed": 4350,
+  "slice": {
+    "sources": 5,
+    "targets": 10,
+    "undirected_edges": 50,
+    "pln_sentences": 100
+  },
+  "runs": [
+    {
+      "goal": [
+        "Similarity",
+        "abamectin",
+        "acetamiprid"
+      ],
+      "baseline": {
+        "success": true,
+        "seconds": 0.9403651710017584,
+        "exit_code": 0,
+        "result": "((stv 0.8143959791953331 0.6336000000000002) (9 19))",
+        "parsed": {
+          "strength": 0.8143959791953331,
+          "confidence": 0.6336000000000002,
+          "evidence": [
+            "9",
+            "19"
+          ]
+        },
+        "timed_out": false
+      },
+      "exact_stv_agreement": true,
+      "same_evidence_path": false,
+      "prism": {
+        "success": true,
+        "seconds": 0.49473837099867524,
+        "steps": 2,
+        "nodes": 2,
+        "proof_length": 2,
+        "goal_sentence": [
+          "Sentence",
+          [
+            [
+              "Similarity",
+              "abamectin",
+              "acetamiprid"
+            ],
+            [
+              "stv",
+              0.8143959791953331,
+              0.6336000000000002
+            ]
+          ],
+          [
+            "1",
+            "11"
+          ]
+        ],
+        "parsed": {
+          "strength": 0.8143959791953331,
+          "confidence": 0.6336000000000002,
+          "evidence": [
+            "1",
+            "11"
+          ]
+        }
+      }
+    },
+    {
+      "goal": [
+        "Similarity",
+        "abamectin",
+        "alachlor"
+      ],
+      "baseline": {
+        "success": false,
+        "seconds": 1.027639337000437,
+        "exit_code": 0,
+        "result": "()",
+        "parsed": null,
+        "timed_out": false
+      },
+      "exact_stv_agreement": false,
+      "same_evidence_path": false,
+      "prism": {
+        "success": true,
+        "seconds": 0.4381470270018326,
+        "steps": 2,
+        "nodes": 2,
+        "proof_length": 2,
+        "goal_sentence": [
+          "Sentence",
+          [
+            [
+              "Similarity",
+              "abamectin",
+              "alachlor"
+            ],
+            [
+              "stv",
+              0.8143959791953331,
+              0.6336000000000002
+            ]
+          ],
+          [
+            "1",
+            "21"
+          ]
+        ],
+        "parsed": {
+          "strength": 0.8143959791953331,
+          "confidence": 0.6336000000000002,
+          "evidence": [
+            "1",
+            "21"
+          ]
+        }
+      }
+    },
+    {
+      "goal": [
+        "Similarity",
+        "abamectin",
+        "aldicarb"
+      ],
+      "baseline": {
+        "success": false,
+        "seconds": 0.9897476260011899,
+        "exit_code": 0,
+        "result": "()",
+        "parsed": null,
+        "timed_out": false
+      },
+      "exact_stv_agreement": false,
+      "same_evidence_path": false,
+      "prism": {
+        "success": true,
+        "seconds": 0.4388010220027354,
+        "steps": 2,
+        "nodes": 2,
+        "proof_length": 2,
+        "goal_sentence": [
+          "Sentence",
+          [
+            [
+              "Similarity",
+              "abamectin",
+              "aldicarb"
+            ],
+            [
+              "stv",
+              0.8143959791953331,
+              0.6336000000000002
+            ]
+          ],
+          [
+            "1",
+            "31"
+          ]
+        ],
+        "parsed": {
+          "strength": 0.8143959791953331,
+          "confidence": 0.6336000000000002,
+          "evidence": [
+            "1",
+            "31"
+          ]
+        }
+      }
+    },
+    {
+      "goal": [
+        "Similarity",
+        "abamectin",
+        "aldrin"
+      ],
+      "baseline": {
+        "success": false,
+        "seconds": 0.9784035140000924,
+        "exit_code": 0,
+        "result": "()",
+        "parsed": null,
+        "timed_out": false
+      },
+      "exact_stv_agreement": false,
+      "same_evidence_path": false,
+      "prism": {
+        "success": true,
+        "seconds": 0.45524292399932165,
+        "steps": 2,
+        "nodes": 2,
+        "proof_length": 2,
+        "goal_sentence": [
+          "Sentence",
+          [
+            [
+              "Similarity",
+              "abamectin",
+              "aldrin"
+            ],
+            [
+              "stv",
+              0.8143959791953331,
+              0.6336000000000002
+            ]
+          ],
+          [
+            "1",
+            "41"
+          ]
+        ],
+        "parsed": {
+          "strength": 0.8143959791953331,
+          "confidence": 0.6336000000000002,
+          "evidence": [
+            "1",
+            "41"
+          ]
+        }
+      }
+    },
+    {
+      "goal": [
+        "Similarity",
+        "acetamiprid",
+        "alachlor"
+      ],
+      "baseline": {
+        "success": true,
+        "seconds": 0.9877177489979658,
+        "exit_code": 0,
+        "result": "((stv 0.8143959791953331 0.6336000000000002) (19 29))",
+        "parsed": {
+          "strength": 0.8143959791953331,
+          "confidence": 0.6336000000000002,
+          "evidence": [
+            "19",
+            "29"
+          ]
+        },
+        "timed_out": false
+      },
+      "exact_stv_agreement": true,
+      "same_evidence_path": false,
+      "prism": {
+        "success": true,
+        "seconds": 0.44189788800213137,
+        "steps": 2,
+        "nodes": 2,
+        "proof_length": 2,
+        "goal_sentence": [
+          "Sentence",
+          [
+            [
+              "Similarity",
+              "acetamiprid",
+              "alachlor"
+            ],
+            [
+              "stv",
+              0.8143959791953331,
+              0.6336000000000002
+            ]
+          ],
+          [
+            "11",
+            "21"
+          ]
+        ],
+        "parsed": {
+          "strength": 0.8143959791953331,
+          "confidence": 0.6336000000000002,
+          "evidence": [
+            "11",
+            "21"
+          ]
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,838 @@
+{
+  "schema_version": 2,
+  "seed": 42,
+  "reproducibility": {
+    "prism_revision": "287c92db3c6312a42f31b4e16320719b698021bb",
+    "petta_revision": "ae66fa8e41dcd5539d614706bd4e5cfb34f9608d",
+    "pln_revision": "a026bac72caa6f3a64600ac9600c4a6aacd511dd",
+    "sizes": [
+      0,
+      10,
+      25,
+      50
+    ],
+    "depth": 5,
+    "scaling_steps": 30,
+    "cross_domain_steps": 20,
+    "random_seeds": [
+      11,
+      23,
+      42,
+      67,
+      89
+    ]
+  },
+  "scaling": {
+    "domain": "transitive_chain",
+    "depth": 5,
+    "max_steps": 30,
+    "random_seeds": [
+      11,
+      23,
+      42,
+      67,
+      89
+    ],
+    "sizes": [
+      {
+        "distractors": 0,
+        "facts": 5,
+        "stage0_frontier": {
+          "raw_pairs": 25,
+          "filtered_pairs": 6,
+          "reduction": 0.76
+        },
+        "random": {
+          "success": true,
+          "steps": 11,
+          "nodes_generated": 11,
+          "visited_states": 11,
+          "proof_actions": 10,
+          "wasted_expansions": 0,
+          "waste_ratio": 0.0,
+          "wall_clock_seconds": 0.0073
+        },
+        "random_trials": [
+          {
+            "seed": 11,
+            "success": true,
+            "steps": 7,
+            "nodes_generated": 7,
+            "visited_states": 7,
+            "proof_actions": 6,
+            "wasted_expansions": 0,
+            "waste_ratio": 0.0,
+            "wall_clock_seconds": 0.1175
+          },
+          {
+            "seed": 23,
+            "success": true,
+            "steps": 11,
+            "nodes_generated": 11,
+            "visited_states": 11,
+            "proof_actions": 10,
+            "wasted_expansions": 0,
+            "waste_ratio": 0.0,
+            "wall_clock_seconds": 0.0057
+          },
+          {
+            "seed": 42,
+            "success": true,
+            "steps": 11,
+            "nodes_generated": 11,
+            "visited_states": 11,
+            "proof_actions": 10,
+            "wasted_expansions": 0,
+            "waste_ratio": 0.0,
+            "wall_clock_seconds": 0.0073
+          },
+          {
+            "seed": 67,
+            "success": true,
+            "steps": 9,
+            "nodes_generated": 9,
+            "visited_states": 9,
+            "proof_actions": 8,
+            "wasted_expansions": 0,
+            "waste_ratio": 0.0,
+            "wall_clock_seconds": 0.0089
+          },
+          {
+            "seed": 89,
+            "success": true,
+            "steps": 7,
+            "nodes_generated": 7,
+            "visited_states": 7,
+            "proof_actions": 6,
+            "wasted_expansions": 0,
+            "waste_ratio": 0.0,
+            "wall_clock_seconds": 0.0024
+          }
+        ],
+        "random_aggregate": {
+          "trials": 5,
+          "successes": 5,
+          "success_rate": 1.0,
+          "mean_steps": 9.0,
+          "mean_wasted_expansions": 0.0,
+          "min_wasted_expansions": 0,
+          "max_wasted_expansions": 0
+        },
+        "prism": {
+          "success": true,
+          "steps": 5,
+          "nodes_generated": 5,
+          "visited_states": 5,
+          "proof_actions": 4,
+          "wasted_expansions": 0,
+          "waste_ratio": 0.0,
+          "wall_clock_seconds": 0.0113
+        }
+      },
+      {
+        "distractors": 10,
+        "facts": 15,
+        "stage0_frontier": {
+          "raw_pairs": 225,
+          "filtered_pairs": 6,
+          "reduction": 0.973333
+        },
+        "random": {
+          "success": false,
+          "steps": 30,
+          "nodes_generated": 31,
+          "visited_states": 31,
+          "proof_actions": 0,
+          "wasted_expansions": 29,
+          "waste_ratio": 1.0,
+          "wall_clock_seconds": 0.0232
+        },
+        "random_trials": [
+          {
+            "seed": 11,
+            "success": false,
+            "steps": 30,
+            "nodes_generated": 31,
+            "visited_states": 31,
+            "proof_actions": 0,
+            "wasted_expansions": 29,
+            "waste_ratio": 1.0,
+            "wall_clock_seconds": 0.0251
+          },
+          {
+            "seed": 23,
+            "success": false,
+            "steps": 30,
+            "nodes_generated": 31,
+            "visited_states": 31,
+            "proof_actions": 0,
+            "wasted_expansions": 29,
+            "waste_ratio": 1.0,
+            "wall_clock_seconds": 0.0238
+          },
+          {
+            "seed": 42,
+            "success": false,
+            "steps": 30,
+            "nodes_generated": 31,
+            "visited_states": 31,
+            "proof_actions": 0,
+            "wasted_expansions": 29,
+            "waste_ratio": 1.0,
+            "wall_clock_seconds": 0.0232
+          },
+          {
+            "seed": 67,
+            "success": false,
+            "steps": 30,
+            "nodes_generated": 31,
+            "visited_states": 31,
+            "proof_actions": 0,
+            "wasted_expansions": 29,
+            "waste_ratio": 1.0,
+            "wall_clock_seconds": 0.0263
+          },
+          {
+            "seed": 89,
+            "success": false,
+            "steps": 30,
+            "nodes_generated": 31,
+            "visited_states": 31,
+            "proof_actions": 0,
+            "wasted_expansions": 29,
+            "waste_ratio": 1.0,
+            "wall_clock_seconds": 0.0218
+          }
+        ],
+        "random_aggregate": {
+          "trials": 5,
+          "successes": 0,
+          "success_rate": 0.0,
+          "mean_steps": 30.0,
+          "mean_wasted_expansions": 29.0,
+          "min_wasted_expansions": 29,
+          "max_wasted_expansions": 29
+        },
+        "prism": {
+          "success": true,
+          "steps": 5,
+          "nodes_generated": 5,
+          "visited_states": 5,
+          "proof_actions": 4,
+          "wasted_expansions": 0,
+          "waste_ratio": 0.0,
+          "wall_clock_seconds": 0.0148
+        }
+      },
+      {
+        "distractors": 25,
+        "facts": 30,
+        "stage0_frontier": {
+          "raw_pairs": 900,
+          "filtered_pairs": 6,
+          "reduction": 0.993333
+        },
+        "random": {
+          "success": false,
+          "steps": 30,
+          "nodes_generated": 31,
+          "visited_states": 31,
+          "proof_actions": 0,
+          "wasted_expansions": 29,
+          "waste_ratio": 1.0,
+          "wall_clock_seconds": 0.0414
+        },
+        "random_trials": [
+          {
+            "seed": 11,
+            "success": false,
+            "steps": 30,
+            "nodes_generated": 31,
+            "visited_states": 31,
+            "proof_actions": 0,
+            "wasted_expansions": 29,
+            "waste_ratio": 1.0,
+            "wall_clock_seconds": 0.0293
+          },
+          {
+            "seed": 23,
+            "success": false,
+            "steps": 30,
+            "nodes_generated": 31,
+            "visited_states": 31,
+            "proof_actions": 0,
+            "wasted_expansions": 29,
+            "waste_ratio": 1.0,
+            "wall_clock_seconds": 0.0285
+          },
+          {
+            "seed": 42,
+            "success": false,
+            "steps": 30,
+            "nodes_generated": 31,
+            "visited_states": 31,
+            "proof_actions": 0,
+            "wasted_expansions": 29,
+            "waste_ratio": 1.0,
+            "wall_clock_seconds": 0.0414
+          },
+          {
+            "seed": 67,
+            "success": false,
+            "steps": 30,
+            "nodes_generated": 31,
+            "visited_states": 31,
+            "proof_actions": 0,
+            "wasted_expansions": 29,
+            "waste_ratio": 1.0,
+            "wall_clock_seconds": 0.0315
+          },
+          {
+            "seed": 89,
+            "success": false,
+            "steps": 30,
+            "nodes_generated": 31,
+            "visited_states": 31,
+            "proof_actions": 0,
+            "wasted_expansions": 29,
+            "waste_ratio": 1.0,
+            "wall_clock_seconds": 0.0323
+          }
+        ],
+        "random_aggregate": {
+          "trials": 5,
+          "successes": 0,
+          "success_rate": 0.0,
+          "mean_steps": 30.0,
+          "mean_wasted_expansions": 29.0,
+          "min_wasted_expansions": 29,
+          "max_wasted_expansions": 29
+        },
+        "prism": {
+          "success": true,
+          "steps": 5,
+          "nodes_generated": 5,
+          "visited_states": 5,
+          "proof_actions": 4,
+          "wasted_expansions": 0,
+          "waste_ratio": 0.0,
+          "wall_clock_seconds": 0.0163
+        }
+      },
+      {
+        "distractors": 50,
+        "facts": 55,
+        "stage0_frontier": {
+          "raw_pairs": 3025,
+          "filtered_pairs": 6,
+          "reduction": 0.998017
+        },
+        "random": {
+          "success": false,
+          "steps": 30,
+          "nodes_generated": 31,
+          "visited_states": 31,
+          "proof_actions": 0,
+          "wasted_expansions": 29,
+          "waste_ratio": 1.0,
+          "wall_clock_seconds": 0.0467
+        },
+        "random_trials": [
+          {
+            "seed": 11,
+            "success": false,
+            "steps": 30,
+            "nodes_generated": 31,
+            "visited_states": 31,
+            "proof_actions": 0,
+            "wasted_expansions": 29,
+            "waste_ratio": 1.0,
+            "wall_clock_seconds": 0.0539
+          },
+          {
+            "seed": 23,
+            "success": false,
+            "steps": 30,
+            "nodes_generated": 31,
+            "visited_states": 31,
+            "proof_actions": 0,
+            "wasted_expansions": 29,
+            "waste_ratio": 1.0,
+            "wall_clock_seconds": 0.05
+          },
+          {
+            "seed": 42,
+            "success": false,
+            "steps": 30,
+            "nodes_generated": 31,
+            "visited_states": 31,
+            "proof_actions": 0,
+            "wasted_expansions": 29,
+            "waste_ratio": 1.0,
+            "wall_clock_seconds": 0.0467
+          },
+          {
+            "seed": 67,
+            "success": false,
+            "steps": 30,
+            "nodes_generated": 31,
+            "visited_states": 31,
+            "proof_actions": 0,
+            "wasted_expansions": 29,
+            "waste_ratio": 1.0,
+            "wall_clock_seconds": 0.0481
+          },
+          {
+            "seed": 89,
+            "success": false,
+            "steps": 30,
+            "nodes_generated": 31,
+            "visited_states": 31,
+            "proof_actions": 0,
+            "wasted_expansions": 29,
+            "waste_ratio": 1.0,
+            "wall_clock_seconds": 0.0483
+          }
+        ],
+        "random_aggregate": {
+          "trials": 5,
+          "successes": 0,
+          "success_rate": 0.0,
+          "mean_steps": 30.0,
+          "mean_wasted_expansions": 29.0,
+          "min_wasted_expansions": 29,
+          "max_wasted_expansions": 29
+        },
+        "prism": {
+          "success": true,
+          "steps": 5,
+          "nodes_generated": 5,
+          "visited_states": 5,
+          "proof_actions": 4,
+          "wasted_expansions": 0,
+          "waste_ratio": 0.0,
+          "wall_clock_seconds": 0.0334
+        }
+      }
+    ],
+    "random_waste_exponent": 1.415894,
+    "prism_waste_exponent": 0.0,
+    "random_waste_exponents_by_seed": [
+      {
+        "seed": 11,
+        "waste_exponent": 1.415894
+      },
+      {
+        "seed": 23,
+        "waste_exponent": 1.415894
+      },
+      {
+        "seed": 42,
+        "waste_exponent": 1.415894
+      },
+      {
+        "seed": 67,
+        "waste_exponent": 1.415894
+      },
+      {
+        "seed": 89,
+        "waste_exponent": 1.415894
+      }
+    ],
+    "mean_random_waste_exponent": 1.415894
+  },
+  "cross_domain": {
+    "max_steps": 20,
+    "seed": 42,
+    "random_seeds": [
+      11,
+      23,
+      42,
+      67,
+      89
+    ],
+    "domains": [
+      {
+        "domain": "chain",
+        "facts": 25,
+        "goal": "(Inheritance A F)",
+        "random": {
+          "success": false,
+          "steps": 20,
+          "nodes_generated": 21,
+          "visited_states": 21,
+          "proof_actions": 0,
+          "wasted_expansions": 19,
+          "waste_ratio": 1.0,
+          "wall_clock_seconds": 0.0178
+        },
+        "random_trials": [
+          {
+            "seed": 11,
+            "success": false,
+            "steps": 20,
+            "nodes_generated": 21,
+            "visited_states": 21,
+            "proof_actions": 0,
+            "wasted_expansions": 19,
+            "waste_ratio": 1.0,
+            "wall_clock_seconds": 0.0203
+          },
+          {
+            "seed": 23,
+            "success": false,
+            "steps": 20,
+            "nodes_generated": 21,
+            "visited_states": 21,
+            "proof_actions": 0,
+            "wasted_expansions": 19,
+            "waste_ratio": 1.0,
+            "wall_clock_seconds": 0.0191
+          },
+          {
+            "seed": 42,
+            "success": false,
+            "steps": 20,
+            "nodes_generated": 21,
+            "visited_states": 21,
+            "proof_actions": 0,
+            "wasted_expansions": 19,
+            "waste_ratio": 1.0,
+            "wall_clock_seconds": 0.0178
+          },
+          {
+            "seed": 67,
+            "success": false,
+            "steps": 20,
+            "nodes_generated": 21,
+            "visited_states": 21,
+            "proof_actions": 0,
+            "wasted_expansions": 19,
+            "waste_ratio": 1.0,
+            "wall_clock_seconds": 0.019
+          },
+          {
+            "seed": 89,
+            "success": false,
+            "steps": 20,
+            "nodes_generated": 21,
+            "visited_states": 21,
+            "proof_actions": 0,
+            "wasted_expansions": 19,
+            "waste_ratio": 1.0,
+            "wall_clock_seconds": 0.0196
+          }
+        ],
+        "random_aggregate": {
+          "trials": 5,
+          "successes": 0,
+          "success_rate": 0.0,
+          "mean_steps": 20.0,
+          "mean_wasted_expansions": 19.0,
+          "min_wasted_expansions": 19,
+          "max_wasted_expansions": 19
+        },
+        "prism": {
+          "success": true,
+          "steps": 5,
+          "nodes_generated": 5,
+          "visited_states": 5,
+          "proof_actions": 4,
+          "wasted_expansions": 0,
+          "waste_ratio": 0.0,
+          "wall_clock_seconds": 0.0149
+        }
+      },
+      {
+        "domain": "diamond",
+        "facts": 30,
+        "goal": "(Inheritance A Z)",
+        "random": {
+          "success": false,
+          "steps": 20,
+          "nodes_generated": 21,
+          "visited_states": 21,
+          "proof_actions": 0,
+          "wasted_expansions": 19,
+          "waste_ratio": 1.0,
+          "wall_clock_seconds": 0.0191
+        },
+        "random_trials": [
+          {
+            "seed": 11,
+            "success": false,
+            "steps": 20,
+            "nodes_generated": 21,
+            "visited_states": 21,
+            "proof_actions": 0,
+            "wasted_expansions": 19,
+            "waste_ratio": 1.0,
+            "wall_clock_seconds": 0.0511
+          },
+          {
+            "seed": 23,
+            "success": false,
+            "steps": 20,
+            "nodes_generated": 21,
+            "visited_states": 21,
+            "proof_actions": 0,
+            "wasted_expansions": 19,
+            "waste_ratio": 1.0,
+            "wall_clock_seconds": 0.0191
+          },
+          {
+            "seed": 42,
+            "success": false,
+            "steps": 20,
+            "nodes_generated": 21,
+            "visited_states": 21,
+            "proof_actions": 0,
+            "wasted_expansions": 19,
+            "waste_ratio": 1.0,
+            "wall_clock_seconds": 0.0191
+          },
+          {
+            "seed": 67,
+            "success": false,
+            "steps": 20,
+            "nodes_generated": 21,
+            "visited_states": 21,
+            "proof_actions": 0,
+            "wasted_expansions": 19,
+            "waste_ratio": 1.0,
+            "wall_clock_seconds": 0.0201
+          },
+          {
+            "seed": 89,
+            "success": false,
+            "steps": 20,
+            "nodes_generated": 21,
+            "visited_states": 21,
+            "proof_actions": 0,
+            "wasted_expansions": 19,
+            "waste_ratio": 1.0,
+            "wall_clock_seconds": 0.0195
+          }
+        ],
+        "random_aggregate": {
+          "trials": 5,
+          "successes": 0,
+          "success_rate": 0.0,
+          "mean_steps": 20.0,
+          "mean_wasted_expansions": 19.0,
+          "min_wasted_expansions": 19,
+          "max_wasted_expansions": 19
+        },
+        "prism": {
+          "success": true,
+          "steps": 3,
+          "nodes_generated": 3,
+          "visited_states": 3,
+          "proof_actions": 2,
+          "wasted_expansions": 0,
+          "waste_ratio": 0.0,
+          "wall_clock_seconds": 0.0161
+        }
+      },
+      {
+        "domain": "tree",
+        "facts": 26,
+        "goal": "(Inheritance A Z)",
+        "random": {
+          "success": false,
+          "steps": 20,
+          "nodes_generated": 21,
+          "visited_states": 21,
+          "proof_actions": 0,
+          "wasted_expansions": 19,
+          "waste_ratio": 1.0,
+          "wall_clock_seconds": 0.0173
+        },
+        "random_trials": [
+          {
+            "seed": 11,
+            "success": false,
+            "steps": 20,
+            "nodes_generated": 21,
+            "visited_states": 21,
+            "proof_actions": 0,
+            "wasted_expansions": 19,
+            "waste_ratio": 1.0,
+            "wall_clock_seconds": 0.0182
+          },
+          {
+            "seed": 23,
+            "success": false,
+            "steps": 20,
+            "nodes_generated": 21,
+            "visited_states": 21,
+            "proof_actions": 0,
+            "wasted_expansions": 19,
+            "waste_ratio": 1.0,
+            "wall_clock_seconds": 0.0164
+          },
+          {
+            "seed": 42,
+            "success": false,
+            "steps": 20,
+            "nodes_generated": 21,
+            "visited_states": 21,
+            "proof_actions": 0,
+            "wasted_expansions": 19,
+            "waste_ratio": 1.0,
+            "wall_clock_seconds": 0.0173
+          },
+          {
+            "seed": 67,
+            "success": false,
+            "steps": 20,
+            "nodes_generated": 21,
+            "visited_states": 21,
+            "proof_actions": 0,
+            "wasted_expansions": 19,
+            "waste_ratio": 1.0,
+            "wall_clock_seconds": 0.0166
+          },
+          {
+            "seed": 89,
+            "success": false,
+            "steps": 20,
+            "nodes_generated": 21,
+            "visited_states": 21,
+            "proof_actions": 0,
+            "wasted_expansions": 19,
+            "waste_ratio": 1.0,
+            "wall_clock_seconds": 0.0165
+          }
+        ],
+        "random_aggregate": {
+          "trials": 5,
+          "successes": 0,
+          "success_rate": 0.0,
+          "mean_steps": 20.0,
+          "mean_wasted_expansions": 19.0,
+          "min_wasted_expansions": 19,
+          "max_wasted_expansions": 19
+        },
+        "prism": {
+          "success": true,
+          "steps": 6,
+          "nodes_generated": 6,
+          "visited_states": 6,
+          "proof_actions": 5,
+          "wasted_expansions": 0,
+          "waste_ratio": 0.0,
+          "wall_clock_seconds": 0.0227
+        }
+      },
+      {
+        "domain": "semantic_gap",
+        "facts": 16,
+        "goal": [
+          "Inheritance",
+          "A",
+          "Z"
+        ],
+        "random": {
+          "success": false,
+          "steps": 20,
+          "nodes_generated": 21,
+          "visited_states": 21,
+          "proof_actions": 0,
+          "wasted_expansions": 19,
+          "waste_ratio": 1.0,
+          "wall_clock_seconds": 0.0153
+        },
+        "random_trials": [
+          {
+            "seed": 11,
+            "success": false,
+            "steps": 20,
+            "nodes_generated": 21,
+            "visited_states": 21,
+            "proof_actions": 0,
+            "wasted_expansions": 19,
+            "waste_ratio": 1.0,
+            "wall_clock_seconds": 0.0366
+          },
+          {
+            "seed": 23,
+            "success": false,
+            "steps": 20,
+            "nodes_generated": 21,
+            "visited_states": 21,
+            "proof_actions": 0,
+            "wasted_expansions": 19,
+            "waste_ratio": 1.0,
+            "wall_clock_seconds": 0.0173
+          },
+          {
+            "seed": 42,
+            "success": false,
+            "steps": 20,
+            "nodes_generated": 21,
+            "visited_states": 21,
+            "proof_actions": 0,
+            "wasted_expansions": 19,
+            "waste_ratio": 1.0,
+            "wall_clock_seconds": 0.0153
+          },
+          {
+            "seed": 67,
+            "success": false,
+            "steps": 20,
+            "nodes_generated": 21,
+            "visited_states": 21,
+            "proof_actions": 0,
+            "wasted_expansions": 19,
+            "waste_ratio": 1.0,
+            "wall_clock_seconds": 0.0155
+          },
+          {
+            "seed": 89,
+            "success": false,
+            "steps": 20,
+            "nodes_generated": 21,
+            "visited_states": 21,
+            "proof_actions": 0,
+            "wasted_expansions": 19,
+            "waste_ratio": 1.0,
+            "wall_clock_seconds": 0.0153
+          }
+        ],
+        "random_aggregate": {
+          "trials": 5,
+          "successes": 0,
+          "success_rate": 0.0,
+          "mean_steps": 20.0,
+          "mean_wasted_expansions": 19.0,
+          "min_wasted_expansions": 19,
+          "max_wasted_expansions": 19
+        },
+        "prism": {
+          "success": true,
+          "steps": 11,
+          "nodes_generated": 11,
+          "visited_states": 11,
+          "proof_actions": 5,
+          "wasted_expansions": 5,
+          "waste_ratio": 0.5,
+          "wall_clock_seconds": 0.4847
+        }
+      }
+    ],
+    "random_successes": 0,
+    "prism_successes": 4,
+    "aggregate_random_successes": 0,
+    "aggregate_random_trials": 20,
+    "aggregate_random_success_rate": 0.0,
+    "prism_success_rate": 1.0,
+    "passes_random_baseline": true
+  },
+  "gates": {
+    "stage0_reduction_at_least_40pct": true,
+    "prism_waste_growth_sublinear": true,
+    "prism_waste_growth_below_random": true,
+    "cross_domain_beats_random": true
+  }
+}

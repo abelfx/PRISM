@@ -13,7 +13,7 @@ from typing import Any, Callable, Dict, List, Optional, Sequence, Set, Tuple
 from prism.benchmarks.utils.trace_logger import ProofTraceSession
 from prism.core.cache import ScoreCache
 from prism.core.config import DEFAULT_CONFIG, SearchConfig, Tier1Config
-from prism.search.rules import apply_candidate, generate_forward_candidates
+from prism.search.rules import apply_candidate, generate_forward_candidates, parse_sentence
 from prism.search.state import (
     SearchNode,
     extract_proof_path,
@@ -21,6 +21,57 @@ from prism.search.state import (
     matches_goal,
 )
 from prism.tier1.heuristic_v1 import compute_v1_score, extract_confidence
+
+
+def compute_waypoint_route_score(
+    candidate: Any,
+    goal: Any,
+    waypoint: Any,
+    beliefs: Sequence[Any] = (),
+) -> float:
+    """Score conclusions on a grounded route through a proposed waypoint."""
+    parsed_candidate = parse_sentence(candidate)
+    parsed_goal = parse_sentence(goal)
+    parsed_waypoint = parse_sentence(waypoint)
+    if not parsed_candidate or not parsed_goal or not parsed_waypoint:
+        return 0.0
+    if not (
+        parsed_candidate.relation
+        == parsed_goal.relation
+        == parsed_waypoint.relation
+    ):
+        return 0.0
+
+    adjacency: Dict[str, Set[str]] = {}
+    for belief in beliefs:
+        parsed = parse_sentence(belief)
+        if parsed and parsed.relation == parsed_goal.relation:
+            adjacency.setdefault(parsed.subject, set()).add(parsed.object_node)
+    # The waypoint is a planning edge only. It can affect priority, but cannot
+    # enter the belief state until PLN derives it.
+    adjacency.setdefault(parsed_waypoint.subject, set()).add(
+        parsed_waypoint.object_node
+    )
+
+    def reachable(start: str, target: str) -> bool:
+        if start == target:
+            return True
+        frontier = [start]
+        seen = {start}
+        while frontier:
+            node = frontier.pop()
+            for neighbour in adjacency.get(node, ()):
+                if neighbour == target:
+                    return True
+                if neighbour not in seen:
+                    seen.add(neighbour)
+                    frontier.append(neighbour)
+        return False
+
+    return 1.0 if (
+        reachable(parsed_goal.subject, parsed_candidate.subject)
+        and reachable(parsed_candidate.object_node, parsed_goal.object_node)
+    ) else 0.0
 
 
 @dataclass
@@ -264,7 +315,12 @@ class AStarSearchEngine:
                     # while PLN remains solely responsible for deriving them.
                     if strategic_subgoals:
                         waypoint_score = max(
-                            compute_v1_score(candidate, waypoint, self.tier1_config)
+                            max(
+                                compute_waypoint_route_score(
+                                    candidate, goal, waypoint, current_node.beliefs
+                                ),
+                                compute_v1_score(candidate, waypoint, self.tier1_config),
+                            )
                             for waypoint in strategic_subgoals
                         )
                         weight = self.config.tier2_waypoint_weight

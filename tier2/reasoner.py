@@ -62,6 +62,10 @@ class Tier2Reasoner:
             Optional[SubgoalResult]: Parsed and validated subgoal, or None if failed.
         """
         self.total_proposals += 1
+        # Cool down after every provider attempt, including malformed responses
+        # and network failures. Otherwise one outage causes an API call per
+        # search expansion.
+        self.stall_detector.record_invocation()
 
         try:
             prompt = build_stall_prompt(
@@ -80,7 +84,6 @@ class Tier2Reasoner:
             )
 
             if subgoal_res:
-                self.stall_detector.record_invocation()
                 self.successful_subgoals += 1
                 logger.info(f"[PRISM Tier 2] Proposed Subgoal: {subgoal_res.subgoal_str}")
                 return subgoal_res

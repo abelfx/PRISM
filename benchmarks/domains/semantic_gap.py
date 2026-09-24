@@ -14,6 +14,7 @@ def generate_semantic_gap(
     depth_source: int = 2,
     depth_target: int = 2,
     n_distractors: int = 20,
+    n_goal_decoys: int = 0,
     include_bridge_in_kb: bool = False,
     include_bridge_support: bool = False,
     seed: int = 42,
@@ -32,6 +33,8 @@ def generate_semantic_gap(
         depth_source: Length of premise chain in source cluster.
         depth_target: Length of premise chain in target cluster.
         n_distractors: Number of background distractor facts to inject.
+        n_goal_decoys: Number of high-confidence dead-end chains rooted at the
+            goal source. These are deliberately hard for goal-overlap scoring.
         include_bridge_in_kb: If True, the completed bridge is an input fact.
         include_bridge_support: If True, two input premises make the bridge
             legally derivable, but the completed bridge is not an input fact.
@@ -115,6 +118,27 @@ def generate_semantic_gap(
         })
         eid += 1
 
+    for i in range(n_goal_decoys):
+        midpoint = f"DecoyMid{i}"
+        endpoint = f"DecoyEnd{i}"
+        distractor_facts.extend(
+            [
+                {
+                    "statement": f"(Inheritance {goal_source} {midpoint})",
+                    "stv": "(stv 0.99 0.99)",
+                    "evidence_id": str(eid),
+                    "cluster": "goal_decoy",
+                },
+                {
+                    "statement": f"(Inheritance {midpoint} {endpoint})",
+                    "stv": "(stv 0.99 0.99)",
+                    "evidence_id": str(eid + 1),
+                    "cluster": "goal_decoy",
+                },
+            ]
+        )
+        eid += 2
+
     facts = list(source_facts) + list(target_facts)
     if include_bridge_in_kb:
         facts.append(bridge_fact)
@@ -129,8 +153,18 @@ def generate_semantic_gap(
     for f in distractor_facts:
         parts = f["statement"].strip("()").split()
         distractor_concepts.extend(parts[1:3])
+    goal_decoy_concepts = {
+        concept
+        for fact in distractor_facts
+        if fact["cluster"] == "goal_decoy"
+        for concept in fact["statement"].strip("()").split()[1:3]
+        if concept != goal_source
+    }
     stv_decls.extend(
-        f"(= (STV {c}) (stv 0.1 0.9))" for c in dict.fromkeys(distractor_concepts)
+        f"(= (STV {c}) (stv 0.9 0.99))"
+        if c in goal_decoy_concepts
+        else f"(= (STV {c}) (stv 0.1 0.9))"
+        for c in dict.fromkeys(distractor_concepts)
     )
 
     return {
