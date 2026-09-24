@@ -8,30 +8,33 @@ and records structured JSON benchmarks and proof trace datasets.
 import argparse
 import json
 import os
+from pathlib import Path
 import subprocess
 import time
 from typing import Any, Dict, List, Optional, Tuple
 
-from prism.benchmarks.domains.multipath_dag import (
+from benchmarks.domains.multipath_dag import (
     classify_diamond_solution,
     generate_diamond_with_distractors,
     write_diamond_metta_file,
 )
-from prism.benchmarks.domains.transitive_chain import (
+from benchmarks.domains.transitive_chain import (
     generate_with_distractors,
     write_metta_file,
 )
-from prism.benchmarks.domains.tree_dag import (
+from benchmarks.domains.tree_dag import (
     generate_tree_with_distractors,
     verify_tree_conjunction_solution,
     write_tree_metta_file,
 )
-from prism.benchmarks.utils.metrics import parse_selected_log
-from prism.benchmarks.utils.trace_logger import ProofTraceSession
+from benchmarks.utils.metrics import parse_selected_log
+from prism.observability.tracing import ProofTraceSession
 
-DEFAULT_PETTA_DIR = "/home/abel/Desktop/icog_labs/pln/PeTTa"
-DEFAULT_TEMP_DIR = "/home/abel/Desktop/icog_labs/pln/prism/benchmarks/scratch"
-DEFAULT_RESULTS_DIR = "/home/abel/Desktop/icog_labs/pln/prism/benchmarks/results"
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
+WORKSPACE_ROOT = PROJECT_ROOT.parent
+DEFAULT_PETTA_DIR = os.environ.get("PETTA_HOME", str(WORKSPACE_ROOT / "PeTTa"))
+DEFAULT_TEMP_DIR = str(PROJECT_ROOT / "artifacts" / "scratch")
+DEFAULT_RESULTS_DIR = str(PROJECT_ROOT / "artifacts" / "benchmarks")
 
 
 def run_single(

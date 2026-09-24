@@ -161,7 +161,7 @@ def generate_forward_candidates(
     Each pair is applied with live `PLN.Apply` in `lib_pln.metta`.
     `PLN.Apply` already tries both `|-` directions, so each pair is sent once.
     """
-    from prism.search.pln_runtime import apply_pln_pair, infer_concept_stvs
+    from prism.adapters.petta.runtime import apply_pln_pair, infer_concept_stvs
 
     stvs = dict(concept_stvs or {})
     if not stvs:

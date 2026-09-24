@@ -36,7 +36,7 @@ The test suite is partitioned into two tiers:
 ### 2.1 Running All Python Unit Tests
 From the workspace root (`/home/abel/Desktop/icog_labs/pln`):
 ```bash
-python3 -m pytest prism/tests/
+python3 -m pytest
 ```
 Expected outcome: **24/24 passed in < 0.05s**.
 
@@ -44,16 +44,16 @@ Expected outcome: **24/24 passed in < 0.05s**.
 From the PeTTa directory (`/home/abel/Desktop/icog_labs/pln/PeTTa`):
 ```bash
 # 1. Depth penalty verification
-sh run.sh ../prism/tests/integration/test_depth_penalty.metta
+PYTHONPATH=../prism/src sh run.sh ../prism/tests/integration/test_depth_penalty.metta
 
 # 2. Stage 0 premise pre-filtering verification
-sh run.sh ../prism/tests/integration/test_stage0_metta.metta
+PYTHONPATH=../prism/src sh run.sh ../prism/tests/integration/test_stage0_metta.metta
 
 # 3. Exception containment and fallback verification
-sh run.sh ../prism/tests/integration/test_fallback.metta
+PYTHONPATH=../prism/src sh run.sh ../prism/tests/integration/test_fallback.metta
 
 # 4. Goal-directed task selection verification
-sh run.sh ../prism/tests/integration/test_prism_hook.metta
+PYTHONPATH=../prism/src sh run.sh ../prism/tests/integration/test_prism_hook.metta
 ```
 
 ---

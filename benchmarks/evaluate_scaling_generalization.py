@@ -15,12 +15,12 @@ import random
 import subprocess
 from typing import Any, Callable, Dict, Iterable, List, Sequence, Tuple
 
-from prism.benchmarks.domains.multipath_dag import generate_diamond_with_distractors
-from prism.benchmarks.domains.semantic_gap import generate_semantic_gap
-from prism.benchmarks.domains.transitive_chain import generate_with_distractors
-from prism.benchmarks.domains.tree_dag import generate_tree_with_distractors
-from prism.benchmarks.evaluate_gap_rescue import format_facts as format_gap_facts
-from prism.benchmarks.evaluate_search_comparison import format_spec_facts, format_spec_stvs
+from benchmarks.domains.multipath_dag import generate_diamond_with_distractors
+from benchmarks.domains.semantic_gap import generate_semantic_gap
+from benchmarks.domains.transitive_chain import generate_with_distractors
+from benchmarks.domains.tree_dag import generate_tree_with_distractors
+from benchmarks.evaluate_gap_rescue import format_facts as format_gap_facts
+from benchmarks.evaluate_search_comparison import format_spec_facts, format_spec_stvs
 from prism.core.config import SearchConfig
 from prism.search.engine import AStarSearchEngine, SearchResult
 from prism.search.rules import parse_sentence
@@ -99,7 +99,7 @@ def seeded_random_generator(
     rng = random.Random(seed)
 
     def generate(tasks: Sequence[Any], beliefs: Sequence[Any]) -> List[Any]:
-        from prism.search.pln_runtime import apply_pln_pair
+        from prism.adapters.petta.runtime import apply_pln_pair
 
         parsed_tasks = [p for p in (parse_sentence(item) for item in tasks) if p]
         parsed_beliefs = [p for p in (parse_sentence(item) for item in beliefs) if p]

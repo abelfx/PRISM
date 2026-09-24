@@ -13,7 +13,7 @@ import tempfile
 import time
 from typing import Any, Dict, List, Sequence
 
-from prism.benchmarks.domains.kg_similarity import (
+from benchmarks.domains.kg_similarity import (
     concept_stvs,
     held_out_queries,
     load_similarity_kg,

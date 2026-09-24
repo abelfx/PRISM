@@ -10,14 +10,14 @@ import subprocess
 import time
 from typing import Any, Dict, List, Sequence
 
-from prism.benchmarks.domains.external_kg import (
+from benchmarks.domains.external_kg import (
     executable_edges,
     find_transitive_chain,
     load_relation,
     progressive_slice,
     to_inheritance_sentences,
 )
-from prism.benchmarks.evaluate_scaling_generalization import (
+from benchmarks.evaluate_scaling_generalization import (
     _search_metrics,
     stage0_pair_frontier,
 )

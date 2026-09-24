@@ -31,7 +31,7 @@ from prism.search.rules import (
     generate_forward_candidates,
     parse_sentence,
 )
-from prism.search.pln_runtime import apply_pln_sentences, infer_concept_stvs
+from prism.adapters.petta.runtime import apply_pln_sentences, infer_concept_stvs
 from prism.search.state import (
     BidirectionalSearchNode,
     BidirectionalSearchResult,

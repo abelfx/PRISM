@@ -1,5 +1,5 @@
 !(import! &self (library lib_import))
-!(import_prolog_functions_from_file "prism/ffi/prism_ffi.pl" (prism-score prism-filter-beliefs))
+!(import_prolog_functions_from_file "prism/src/prism/adapters/petta/prism_ffi.pl" (prism-score prism-filter-beliefs))
 
 (= (PremiseFilter $Candidate $Goal $Beliefs)
    (if (or (== $Goal ()) (== $Candidate ()))

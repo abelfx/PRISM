@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from prism.benchmarks.domains.external_kg import (
+from benchmarks.domains.external_kg import (
     find_transitive_chain,
     load_relation,
     progressive_slice,

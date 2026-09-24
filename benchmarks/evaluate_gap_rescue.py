@@ -6,8 +6,8 @@ A proposed subgoal is only derived when PLN.Apply can prove it from existing
 premises — missing axioms are never injected.
 
 Usage:
-  python3 -m prism.benchmarks.evaluate_gap_rescue         # Offline mock mode (fast)
-  python3 -m prism.benchmarks.evaluate_gap_rescue --live  # Live OpenRouter mode
+  python3 -m benchmarks.evaluate_gap_rescue         # Offline mock mode (fast)
+  python3 -m benchmarks.evaluate_gap_rescue --live  # Live OpenRouter mode
 """
 
 import argparse
@@ -17,8 +17,8 @@ import subprocess
 import time
 from typing import Any, Dict, List
 
-from prism.benchmarks.domains.semantic_gap import generate_semantic_gap
-from prism.benchmarks.evaluate_search_comparison import format_spec_stvs
+from benchmarks.domains.semantic_gap import generate_semantic_gap
+from benchmarks.evaluate_search_comparison import format_spec_stvs
 from prism.core.config import SearchConfig, Tier2Config
 from prism.search.engine import AStarSearchEngine
 from prism.tier2.client import MockLLMClient, OpenRouterClient

@@ -1,0 +1,2 @@
+# Install PRISM in editable mode with its test dependencies.
+-e .[test]

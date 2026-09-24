@@ -5,7 +5,7 @@ and conjunctive solution verification.
 """
 
 import pytest
-from prism.benchmarks.domains.tree_dag import (
+from benchmarks.domains.tree_dag import (
     generate_tree_conjunction,
     generate_tree_metta_content,
     generate_tree_with_distractors,

@@ -197,11 +197,11 @@ def parse_selected_log(
         collector.evidence_stamp = ev_res
 
         if domain_type == "diamond_dag":
-            from prism.benchmarks.domains.multipath_dag import classify_diamond_solution
+            from benchmarks.domains.multipath_dag import classify_diamond_solution
 
             collector.solution_path = classify_diamond_solution(ev_res, spec)
         elif domain_type == "tree_conjunction":
-            from prism.benchmarks.domains.tree_dag import (
+            from benchmarks.domains.tree_dag import (
                 verify_tree_conjunction_solution,
             )
 

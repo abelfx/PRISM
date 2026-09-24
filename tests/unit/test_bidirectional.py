@@ -12,9 +12,9 @@ import json
 import pytest
 from typing import Any, Dict, List
 
-from prism.benchmarks.domains.semantic_gap import generate_semantic_gap
-from prism.benchmarks.domains.transitive_chain import generate_with_distractors
-from prism.benchmarks.evaluate_search_comparison import format_spec_facts, format_spec_stvs
+from benchmarks.domains.semantic_gap import generate_semantic_gap
+from benchmarks.domains.transitive_chain import generate_with_distractors
+from benchmarks.evaluate_search_comparison import format_spec_facts, format_spec_stvs
 from prism.core.config import BidirectionalConfig, SearchConfig, Tier1Config, Tier2Config
 from prism.search.backward import (
     backward_step,

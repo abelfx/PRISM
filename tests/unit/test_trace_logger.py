@@ -8,7 +8,7 @@ import json
 import os
 import tempfile
 
-from prism.benchmarks.utils.trace_logger import ProofStepTrace, ProofTraceSession
+from prism.observability.tracing import ProofStepTrace, ProofTraceSession
 
 
 def test_trace_record_step_feature_extraction():

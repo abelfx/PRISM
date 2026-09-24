@@ -6,8 +6,8 @@ Verifies GATE-7.4: Semantic gap stall detection, subgoal recovery, and error saf
 import json
 from typing import Any, Dict, List
 
-from prism.benchmarks.domains.semantic_gap import generate_semantic_gap
-from prism.benchmarks.evaluate_search_comparison import format_spec_stvs
+from benchmarks.domains.semantic_gap import generate_semantic_gap
+from benchmarks.evaluate_search_comparison import format_spec_stvs
 from prism.core.config import SearchConfig, Tier2Config
 from prism.search.engine import AStarSearchEngine
 from prism.tier2.client import MockLLMClient
@@ -162,8 +162,8 @@ def test_tier2_pln_apply_when_bridge_is_in_kb():
 
 def test_tier2_search_clean_chain_no_intervention():
     """Verify GATE-7.1: Tier 2 does NOT intervene on clean derivation paths."""
-    from prism.benchmarks.domains.transitive_chain import generate_with_distractors
-    from prism.benchmarks.evaluate_search_comparison import format_spec_facts
+    from benchmarks.domains.transitive_chain import generate_with_distractors
+    from benchmarks.evaluate_search_comparison import format_spec_facts
 
     spec = generate_with_distractors(depth=4, n_distractors=5, seed=42)
     facts = format_spec_facts(spec)

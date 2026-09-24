@@ -7,7 +7,7 @@ This directory contains the profiling, latency benchmarking, and search-efficien
 ## 1. Directory Structure
 
 ```
-prism/benchmarks/
+benchmarks/
 ├── run_benchmark.py               # Main CLI benchmark driver & parameter sweep runner
 ├── evaluate_scaling_generalization.py # Week 9 scaling and cross-domain gates
 ├── domains/                       # Benchmark domain generators
@@ -20,7 +20,7 @@ prism/benchmarks/
 ├── metta/                         # Raw MeTTa benchmark scripts
 │   ├── benchmark_pycall.metta     # Cached FFI round-trip latency test
 │   └── benchmark_uncached.metta   # Uncached FFI latency test
-└── results/                       # Empirical benchmark datasets
+└── results/reference/             # Curated empirical benchmark datasets
     ├── baseline_unguided.json     # Recorded unguided PLN baseline numbers
     ├── baseline_guided_v1.json    # Recorded PRISM Tier 1 v1 guided numbers (Week 2)
     └── baseline_guided_week3.json # Recorded PRISM Tier 1 v1 + Stage 0 numbers (Week 3)
@@ -152,21 +152,21 @@ sh run.sh ../prism/benchmarks/metta/benchmark_uncached.metta
 
 ### 2. Run Synthetic Chain Parameter Sweeps
 ```bash
-cd /home/abel/Desktop/icog_labs/pln
+cd <prism-repo>
 
 # Run unguided baseline sweep
-python3 -m prism.benchmarks.run_benchmark --depths 5 8 10 --distractors 0 10 25 50 --repeats 2 --max-steps 80
+python3 -m benchmarks.run_benchmark --depths 5 8 10 --distractors 0 10 25 50 --repeats 2 --max-steps 80
 
 # Run PRISM-guided sweep (Week 3)
-python3 -m prism.benchmarks.run_benchmark --guided --depths 5 8 10 --distractors 0 10 25 50 --repeats 2 --max-steps 80 --output prism/benchmarks/results/baseline_guided_week3.json
+python3 -m benchmarks.run_benchmark --guided --depths 5 8 10 --distractors 0 10 25 50 --repeats 2 --max-steps 80 --output benchmarks/results/reference/baseline_guided_week3.json
 ```
 
 ### 3. Run Scaling and Cross-Domain Evaluation
 
 ```bash
 cd <repo-root>
-python3 -m prism.benchmarks.evaluate_scaling_generalization \
-  --output prism/benchmarks/results/week9_scaling_generalization.json
+python3 -m benchmarks.evaluate_scaling_generalization \
+  --output benchmarks/results/reference/week9_scaling_generalization.json
 ```
 
 This records four increasing AtomSpace proxy sizes, Stage 0 pair-frontier
@@ -185,16 +185,16 @@ with:
 
 ```bash
 OPENROUTER_API_KEY=... \
-python3 -m prism.benchmarks.evaluate_gap_rescue --live --runs 3 \
-  --output prism/benchmarks/results/week9_tier2_live_repeats.json
+python3 -m benchmarks.evaluate_gap_rescue --live --runs 3 \
+  --output benchmarks/results/reference/week9_tier2_live_repeats.json
 ```
 
 ### 4. Run Progressive External-KG Evaluation
 
 ```bash
 cd <repo-root>
-python3 -m prism.benchmarks.evaluate_external_kg_scaling \
-  --output prism/benchmarks/results/week9_external_kg_scaling.json
+python3 -m benchmarks.evaluate_external_kg_scaling \
+  --output benchmarks/results/reference/week9_external_kg_scaling.json
 ```
 
 This streams the three supplied MeTTa exports, maps only `isa` to PLN
