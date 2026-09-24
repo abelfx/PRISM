@@ -1,0 +1,290 @@
+{
+  "schema_version": 1,
+  "mode": "live_openrouter",
+  "runs_requested": 3,
+  "reproducibility": {
+    "prism_revision": "287c92db3c6312a42f31b4e16320719b698021bb",
+    "petta_revision": "ae66fa8e41dcd5539d614706bd4e5cfb34f9608d",
+    "pln_revision": "a026bac72caa6f3a64600ac9600c4a6aacd511dd",
+    "model": "nex-agi/nex-n2.5-mini:free",
+    "shared_step_budget": 8
+  },
+  "runs": [
+    {
+      "mode": "live_openrouter",
+      "model": "nex-agi/nex-n2.5-mini:free",
+      "shared_budget": 8,
+      "goal": [
+        "Inheritance",
+        "A",
+        "Z"
+      ],
+      "unassisted": {
+        "success": false,
+        "steps": 8,
+        "nodes_generated": 9,
+        "visited_states": 9,
+        "proof_length": 0,
+        "seconds": 0.369109,
+        "goal_sentence": null,
+        "proposals": []
+      },
+      "assisted": {
+        "success": true,
+        "steps": 6,
+        "nodes_generated": 6,
+        "visited_states": 6,
+        "proof_length": 6,
+        "seconds": 5.864715,
+        "goal_sentence": [
+          "Sentence",
+          [
+            [
+              "Inheritance",
+              "A",
+              "Z"
+            ],
+            [
+              "stv",
+              0.5500570898535349,
+              0.10014580432395785
+            ]
+          ],
+          [
+            "1",
+            "2",
+            "3",
+            "4",
+            "6",
+            "7"
+          ]
+        ],
+        "proposals": [
+          {
+            "subgoal": "(Inheritance H N)",
+            "suggested_premise": "(Inheritance H M)",
+            "reasoning": "Combine (Inheritance H M) with (Inheritance M N) to bridge the A-to-H and N-to-Z portions of the chain."
+          }
+        ]
+      },
+      "bridge_in_kb_control": {
+        "success": true,
+        "steps": 5,
+        "nodes_generated": 5,
+        "visited_states": 5,
+        "proof_length": 5,
+        "seconds": 0.012021,
+        "goal_sentence": [
+          "Sentence",
+          [
+            [
+              "Inheritance",
+              "A",
+              "Z"
+            ],
+            [
+              "stv",
+              0.6038355986177053,
+              0.13801408790376166
+            ]
+          ],
+          [
+            "1",
+            "2",
+            "3",
+            "4",
+            "5"
+          ]
+        ],
+        "proposals": []
+      },
+      "soundness_policy": "LLM proposals are planning waypoints only; every accepted sentence is returned by PLN.Apply"
+    },
+    {
+      "mode": "live_openrouter",
+      "model": "nex-agi/nex-n2.5-mini:free",
+      "shared_budget": 8,
+      "goal": [
+        "Inheritance",
+        "A",
+        "Z"
+      ],
+      "unassisted": {
+        "success": false,
+        "steps": 8,
+        "nodes_generated": 9,
+        "visited_states": 9,
+        "proof_length": 0,
+        "seconds": 0.312545,
+        "goal_sentence": null,
+        "proposals": []
+      },
+      "assisted": {
+        "success": true,
+        "steps": 7,
+        "nodes_generated": 7,
+        "visited_states": 7,
+        "proof_length": 7,
+        "seconds": 5.715242,
+        "goal_sentence": [
+          "Sentence",
+          [
+            [
+              "Inheritance",
+              "A",
+              "Z"
+            ],
+            [
+              "stv",
+              0.5500570898535349,
+              0.07468302052827722
+            ]
+          ],
+          [
+            "1",
+            "2",
+            "3",
+            "4",
+            "6",
+            "7"
+          ]
+        ],
+        "proposals": [
+          {
+            "subgoal": "(Inheritance C M)",
+            "suggested_premise": "(Inheritance C H)",
+            "reasoning": "From (Inheritance C H) and (Inheritance H M), PLN can derive (Inheritance C M), linking the C side to the M-N-Z chain."
+          }
+        ]
+      },
+      "bridge_in_kb_control": {
+        "success": true,
+        "steps": 5,
+        "nodes_generated": 5,
+        "visited_states": 5,
+        "proof_length": 5,
+        "seconds": 0.011211,
+        "goal_sentence": [
+          "Sentence",
+          [
+            [
+              "Inheritance",
+              "A",
+              "Z"
+            ],
+            [
+              "stv",
+              0.6038355986177053,
+              0.13801408790376166
+            ]
+          ],
+          [
+            "1",
+            "2",
+            "3",
+            "4",
+            "5"
+          ]
+        ],
+        "proposals": []
+      },
+      "soundness_policy": "LLM proposals are planning waypoints only; every accepted sentence is returned by PLN.Apply"
+    },
+    {
+      "mode": "live_openrouter",
+      "model": "nex-agi/nex-n2.5-mini:free",
+      "shared_budget": 8,
+      "goal": [
+        "Inheritance",
+        "A",
+        "Z"
+      ],
+      "unassisted": {
+        "success": false,
+        "steps": 8,
+        "nodes_generated": 9,
+        "visited_states": 9,
+        "proof_length": 0,
+        "seconds": 0.316388,
+        "goal_sentence": null,
+        "proposals": []
+      },
+      "assisted": {
+        "success": true,
+        "steps": 6,
+        "nodes_generated": 6,
+        "visited_states": 6,
+        "proof_length": 6,
+        "seconds": 3.216729,
+        "goal_sentence": [
+          "Sentence",
+          [
+            [
+              "Inheritance",
+              "A",
+              "Z"
+            ],
+            [
+              "stv",
+              0.5500570898535349,
+              0.06750363370350607
+            ]
+          ],
+          [
+            "1",
+            "2",
+            "3",
+            "4",
+            "6",
+            "7"
+          ]
+        ],
+        "proposals": [
+          {
+            "subgoal": "(Inheritance A C)",
+            "suggested_premise": "(Inheritance A B)",
+            "reasoning": "Combine (Inheritance A B) with (Inheritance B C) to connect A to the rest of the A-to-Z chain."
+          }
+        ]
+      },
+      "bridge_in_kb_control": {
+        "success": true,
+        "steps": 5,
+        "nodes_generated": 5,
+        "visited_states": 5,
+        "proof_length": 5,
+        "seconds": 0.011631,
+        "goal_sentence": [
+          "Sentence",
+          [
+            [
+              "Inheritance",
+              "A",
+              "Z"
+            ],
+            [
+              "stv",
+              0.6038355986177053,
+              0.13801408790376166
+            ]
+          ],
+          [
+            "1",
+            "2",
+            "3",
+            "4",
+            "5"
+          ]
+        ],
+        "proposals": []
+      },
+      "soundness_policy": "LLM proposals are planning waypoints only; every accepted sentence is returned by PLN.Apply"
+    }
+  ],
+  "summary": {
+    "unassisted_successes": 0,
+    "assisted_successes": 3,
+    "bridge_control_successes": 3,
+    "assisted_runs_with_proposals": 3
+  }
+}

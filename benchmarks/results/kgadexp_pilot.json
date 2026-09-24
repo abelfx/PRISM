@@ -1,0 +1,122 @@
+{
+  "source": "/home/abel/Desktop/icog_labs/pln/kgadexp.metta",
+  "source_balanced": false,
+  "raw_edges": 8280,
+  "unique_edges": 3930,
+  "duplicates_removed": 4350,
+  "slice": {
+    "sources": 3,
+    "targets": 6,
+    "undirected_edges": 18,
+    "pln_sentences": 36
+  },
+  "runs": [
+    {
+      "goal": [
+        "Similarity",
+        "abamectin",
+        "acetamiprid"
+      ],
+      "baseline": {
+        "success": false,
+        "seconds": 0.348788245999458,
+        "exit_code": 0,
+        "result": "()",
+        "parsed": null,
+        "timed_out": false
+      },
+      "exact_stv_and_evidence_agreement": false,
+      "prism": {
+        "success": true,
+        "seconds": 0.2053025150016765,
+        "steps": 2,
+        "nodes": 2,
+        "proof_length": 2,
+        "goal_sentence": [
+          "Sentence",
+          [
+            [
+              "Similarity",
+              "abamectin",
+              "acetamiprid"
+            ],
+            [
+              "stv",
+              0.8146402764623265,
+              0.6336000000000002
+            ]
+          ],
+          [
+            "1",
+            "7"
+          ]
+        ],
+        "parsed": {
+          "strength": 0.8146402764623265,
+          "confidence": 0.6336000000000002,
+          "evidence": [
+            "1",
+            "7"
+          ]
+        }
+      }
+    },
+    {
+      "goal": [
+        "Similarity",
+        "abamectin",
+        "alachlor"
+      ],
+      "baseline": {
+        "success": true,
+        "seconds": 0.3453604130008898,
+        "exit_code": 0,
+        "result": "((stv 0.8146402764623265 0.6336000000000002) (1 13))",
+        "parsed": {
+          "strength": 0.8146402764623265,
+          "confidence": 0.6336000000000002,
+          "evidence": [
+            "1",
+            "13"
+          ]
+        },
+        "timed_out": false
+      },
+      "exact_stv_and_evidence_agreement": true,
+      "prism": {
+        "success": true,
+        "seconds": 0.13322061999861035,
+        "steps": 2,
+        "nodes": 2,
+        "proof_length": 2,
+        "goal_sentence": [
+          "Sentence",
+          [
+            [
+              "Similarity",
+              "abamectin",
+              "alachlor"
+            ],
+            [
+              "stv",
+              0.8146402764623265,
+              0.6336000000000002
+            ]
+          ],
+          [
+            "1",
+            "13"
+          ]
+        ],
+        "parsed": {
+          "strength": 0.8146402764623265,
+          "confidence": 0.6336000000000002,
+          "evidence": [
+            "1",
+            "13"
+          ]
+        }
+      }
+    }
+  ]
+}
