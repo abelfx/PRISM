@@ -8,7 +8,7 @@ using cumulative path uncertainty costs g(n) and inverted Tier 1 heuristic dista
 from dataclasses import dataclass, field
 import heapq
 import time
-from typing import Any, Callable, Dict, List, Optional, Sequence, Set
+from typing import Any, Callable, Dict, List, Optional, Sequence, Set, Tuple
 
 from prism.benchmarks.utils.trace_logger import ProofTraceSession
 from prism.core.cache import ScoreCache
@@ -106,6 +106,7 @@ class AStarSearchEngine:
             Callable[[Sequence[Any], Sequence[Any]], List[Any]]
         ] = None,
         trace_session: Optional[ProofTraceSession] = None,
+        concept_stvs: Optional[Dict[str, Tuple[float, float]]] = None,
     ) -> SearchResult:
         """
         Execute learned A* search from initial knowledge to derive target goal.
@@ -130,6 +131,13 @@ class AStarSearchEngine:
         """
         t0 = time.perf_counter()
         generator = candidate_generator or generate_forward_candidates
+        from prism.search.pln_runtime import infer_concept_stvs
+
+        stvs = dict(concept_stvs or {})
+        inferred = infer_concept_stvs(list(initial_tasks) + list(initial_beliefs))
+        for name, tv in inferred.items():
+            stvs.setdefault(name, tv)
+        self._concept_stvs = stvs
 
         node_registry: Dict[int, SearchNode] = {}
         open_queue: List[SearchNode] = []
@@ -140,6 +148,7 @@ class AStarSearchEngine:
         nodes_generated = 1
         search_stalled = False
         subgoals_proposed: List[Any] = []
+        strategic_subgoals: List[Any] = []
 
         if self.tier2_reasoner:
             self.tier2_reasoner.reset()
@@ -213,6 +222,7 @@ class AStarSearchEngine:
                     goal=goal,
                     use_stage0=self.config.use_stage0_filter,
                     task_selection_k=self.config.task_selection_k,
+                    concept_stvs=self._concept_stvs,
                 )
             else:
                 candidates = generator(current_node.tasks, current_node.beliefs)
@@ -231,28 +241,14 @@ class AStarSearchEngine:
                     )
                     if subgoal_res:
                         subgoals_proposed.append(subgoal_res)
-                        from prism.search.backward import backward_step
-                        backward_step(subgoal_res.subgoal, current_node.beliefs)
-
-                        premise_to_inject = subgoal_res.subgoal
-                        if subgoal_res.suggested_premise:
-                            is_known = any(
-                                matches_goal(b, subgoal_res.suggested_premise)
-                                for b in current_node.beliefs
-                            )
-                            if not is_known:
-                                premise_to_inject = subgoal_res.suggested_premise
-
-                        if premise_to_inject:
-                            injected_sentence = [
-                                "Sentence",
-                                [premise_to_inject, ["stv", 0.9, 0.9]],
-                                [f"T2_{steps_expanded}"],
-                            ]
-                            candidates = [injected_sentence]
-
-                if not candidates:
-                    continue
+                        strategic_subgoals.append(subgoal_res.subgoal)
+                        derived = self._pln_derive_subgoal(
+                            subgoal_res, current_node.beliefs
+                        )
+                        if derived:
+                            candidates = [derived]
+                    if not candidates:
+                        continue
 
             # 3. Score and prioritize candidates
             if self.config.guided:
@@ -263,6 +259,16 @@ class AStarSearchEngine:
                         goal,
                         lambda c, g: compute_v1_score(c, g, self.tier1_config),
                     )
+                    # A Tier 2 subgoal is a temporary waypoint, not an axiom.
+                    # Prefer legal candidates that advance toward that waypoint
+                    # while PLN remains solely responsible for deriving them.
+                    if strategic_subgoals:
+                        waypoint_score = max(
+                            compute_v1_score(candidate, waypoint, self.tier1_config)
+                            for waypoint in strategic_subgoals
+                        )
+                        weight = self.config.tier2_waypoint_weight
+                        score = ((1.0 - weight) * score) + (weight * waypoint_score)
                     scored_candidates.append((score, candidate))
 
                 # Sort descending by score
@@ -286,25 +292,12 @@ class AStarSearchEngine:
                     )
                     if subgoal_res:
                         subgoals_proposed.append(subgoal_res)
-                        from prism.search.backward import backward_step
-                        backward_step(subgoal_res.subgoal, current_node.beliefs)
-
-                        premise_to_inject = subgoal_res.subgoal
-                        if subgoal_res.suggested_premise:
-                            is_known = any(
-                                matches_goal(b, subgoal_res.suggested_premise)
-                                for b in current_node.beliefs
-                            )
-                            if not is_known:
-                                premise_to_inject = subgoal_res.suggested_premise
-
-                        if premise_to_inject:
-                            injected_sentence = [
-                                "Sentence",
-                                [premise_to_inject, ["stv", 0.9, 0.9]],
-                                [f"T2_{steps_expanded}"],
-                            ]
-                            scored_candidates.insert(0, (0.95, injected_sentence))
+                        strategic_subgoals.append(subgoal_res.subgoal)
+                        derived = self._pln_derive_subgoal(
+                            subgoal_res, current_node.beliefs
+                        )
+                        if derived:
+                            scored_candidates.insert(0, (0.95, derived))
                             top_score = 0.95
 
                 if self.config.beam_threshold > 0.0 and scored_candidates:
@@ -384,6 +377,27 @@ class AStarSearchEngine:
             proof_trace=trace_session.steps if trace_session else [],
             subgoals_proposed=subgoals_proposed,
         )
+
+    def _pln_derive_subgoal(self, subgoal_res: Any, beliefs: Sequence[Any]) -> Optional[Any]:
+        """
+        If Tier 2 names a subgoal whose premises are already in the KB, derive
+        it with PLN.Apply. Never insert a fabricated axiom.
+        """
+        from prism.search.backward import backward_step
+        from prism.search.pln_runtime import apply_pln_sentences
+
+        target = subgoal_res.subgoal
+        for decomp in backward_step(target, beliefs):
+            if decomp.completeness < 1.0 or len(decomp.available_premises) < 2:
+                continue
+            derived = apply_pln_sentences(
+                decomp.available_premises[0],
+                decomp.available_premises[1],
+                getattr(self, "_concept_stvs", None),
+            )
+            if derived:
+                return derived
+        return None
 
     @staticmethod
     def _extract_domain_concepts(beliefs: Sequence[Any], goal: Any) -> Set[str]:

@@ -7,6 +7,7 @@ import json
 from typing import Any, Dict, List
 
 from prism.benchmarks.domains.semantic_gap import generate_semantic_gap
+from prism.benchmarks.evaluate_search_comparison import format_spec_stvs
 from prism.core.config import SearchConfig, Tier2Config
 from prism.search.engine import AStarSearchEngine
 from prism.tier2.client import MockLLMClient
@@ -24,43 +25,97 @@ def _format_facts(spec: Dict[str, Any]) -> List[Any]:
     return facts
 
 
-def test_tier2_search_rescue_on_semantic_gap():
-    """Verify GATE-7.4: Tier 2 detects stall on semantic gap and successfully rescues proof."""
+def test_tier2_search_rescue_on_derivable_semantic_gap():
+    """GATE-7.4: Tier 2 prioritizes a bridge that PLN can derive from input facts."""
     spec = generate_semantic_gap(
         depth_source=2,
         depth_target=2,
         n_distractors=10,
         include_bridge_in_kb=False,
+        include_bridge_support=True,
         seed=42,
     )
     facts = _format_facts(spec)
+    stvs = format_spec_stvs(spec)
     goal = spec["goal"]
 
-    # 1. Without Tier 2: search stalls and fails to reach goal
     cfg_unassisted = SearchConfig(max_steps=50, guided=True, enable_tier2=False)
     eng_unassisted = AStarSearchEngine(config=cfg_unassisted)
-    res_unassisted = eng_unassisted.search(initial_tasks=facts, initial_beliefs=facts, goal=goal)
+    res_unassisted = eng_unassisted.search(
+        initial_tasks=facts, initial_beliefs=facts, goal=goal, concept_stvs=stvs
+    )
+    assert res_unassisted.goal_found
 
-    assert not res_unassisted.goal_found
-
-    # 2. With Tier 2: detects stall, proposes bridging subgoal (C -> M), solves goal
     canned_subgoal = json.dumps({
         "subgoal": "(Inheritance C M)",
-        "suggested_premise": "(Inheritance C M)",
-        "reasoning": "Bridge concept C in source cluster to concept M in target cluster",
+        "suggested_premise": "(Inheritance C H)",
+        "reasoning": "Derive the bridge from known premises C to H and H to M",
     })
     mock_client = MockLLMClient(canned_responses=[canned_subgoal])
-    t2_cfg = Tier2Config(stall_threshold=0.25, stall_steps=1)
+    t2_cfg = Tier2Config(stall_threshold=0.80, stall_steps=1, cooldown_steps=100)
     reasoner = Tier2Reasoner(config=t2_cfg, client=mock_client)
 
-    cfg_assisted = SearchConfig(max_steps=50, guided=True, enable_tier2=True, stall_threshold=0.25)
+    cfg_assisted = SearchConfig(max_steps=50, beam_width=1, guided=True, enable_tier2=True, stall_threshold=0.80)
     eng_assisted = AStarSearchEngine(config=cfg_assisted, tier2_reasoner=reasoner)
-    res_assisted = eng_assisted.search(initial_tasks=facts, initial_beliefs=facts, goal=goal)
+    res_assisted = eng_assisted.search(
+        initial_tasks=facts, initial_beliefs=facts, goal=goal, concept_stvs=stvs
+    )
 
     assert res_assisted.goal_found
     assert len(res_assisted.subgoals_proposed) >= 1
     assert res_assisted.subgoals_proposed[0].subgoal == ["Inheritance", "C", "M"]
     assert len(res_assisted.proof_path) > 0
+    assert all("T2_" not in str(getattr(step, "action", "")) for step in res_assisted.proof_path)
+
+
+def test_tier2_does_not_inject_missing_bridge():
+    """A genuinely unsupported LLM bridge remains unproved and cannot satisfy the goal."""
+    spec = generate_semantic_gap(
+        depth_source=2,
+        depth_target=2,
+        n_distractors=10,
+        include_bridge_in_kb=False,
+        include_bridge_support=False,
+        seed=42,
+    )
+    facts = _format_facts(spec)
+    stvs = format_spec_stvs(spec)
+    payload = json.dumps({
+        "subgoal": "(Inheritance C M)",
+        "suggested_premise": "(Inheritance C M)",
+        "reasoning": "Unsupported bridge",
+    })
+    reasoner = Tier2Reasoner(
+        config=Tier2Config(stall_threshold=0.25, stall_steps=1),
+        client=MockLLMClient(canned_responses=[payload]),
+    )
+    result = AStarSearchEngine(
+        config=SearchConfig(max_steps=50, guided=True, enable_tier2=True, stall_threshold=0.25),
+        tier2_reasoner=reasoner,
+    ).search(facts, facts, spec["goal"], concept_stvs=stvs)
+
+    assert not result.goal_found
+    assert len(result.subgoals_proposed) >= 1
+    assert all("T2_" not in str(getattr(step, "action", "")) for step in result.proof_path)
+
+
+def test_tier2_pln_apply_when_bridge_is_in_kb():
+    """When the bridge fact is already in the KB, real PLN.Apply completes the proof."""
+    spec = generate_semantic_gap(
+        depth_source=2,
+        depth_target=2,
+        n_distractors=10,
+        include_bridge_in_kb=True,
+        seed=42,
+    )
+    facts = _format_facts(spec)
+    stvs = format_spec_stvs(spec)
+    goal = spec["goal"]
+    cfg = SearchConfig(max_steps=50, guided=True, enable_tier2=False)
+    eng = AStarSearchEngine(config=cfg)
+    res = eng.search(initial_tasks=facts, initial_beliefs=facts, goal=goal, concept_stvs=stvs)
+    assert res.goal_found
+    assert res.goal_sentence is not None
 
 
 def test_tier2_search_clean_chain_no_intervention():
@@ -70,6 +125,7 @@ def test_tier2_search_clean_chain_no_intervention():
 
     spec = generate_with_distractors(depth=4, n_distractors=5, seed=42)
     facts = format_spec_facts(spec)
+    stvs = format_spec_stvs(spec)
     goal = spec["goal"]
 
     mock_client = MockLLMClient()
@@ -78,7 +134,7 @@ def test_tier2_search_clean_chain_no_intervention():
 
     cfg = SearchConfig(max_steps=50, guided=True, enable_tier2=True)
     eng = AStarSearchEngine(config=cfg, tier2_reasoner=reasoner)
-    res = eng.search(initial_tasks=facts, initial_beliefs=facts, goal=goal)
+    res = eng.search(initial_tasks=facts, initial_beliefs=facts, goal=goal, concept_stvs=stvs)
 
     assert res.goal_found
     # On clean chain, Tier 2 should have 0 proposals
@@ -96,6 +152,7 @@ def test_tier2_search_error_containment_during_search():
         seed=42,
     )
     facts = _format_facts(spec)
+    stvs = format_spec_stvs(spec)
     goal = spec["goal"]
 
     failing_client = MockLLMClient(error_mode=True)
@@ -106,6 +163,6 @@ def test_tier2_search_error_containment_during_search():
     eng = AStarSearchEngine(config=cfg, tier2_reasoner=reasoner)
 
     # Must complete cleanly without throwing exceptions
-    res = eng.search(initial_tasks=facts, initial_beliefs=facts, goal=goal)
+    res = eng.search(initial_tasks=facts, initial_beliefs=facts, goal=goal, concept_stvs=stvs)
     assert not res.goal_found
     assert len(res.subgoals_proposed) == 0

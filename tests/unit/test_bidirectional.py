@@ -14,7 +14,7 @@ from typing import Any, Dict, List
 
 from prism.benchmarks.domains.semantic_gap import generate_semantic_gap
 from prism.benchmarks.domains.transitive_chain import generate_with_distractors
-from prism.benchmarks.evaluate_search_comparison import format_spec_facts
+from prism.benchmarks.evaluate_search_comparison import format_spec_facts, format_spec_stvs
 from prism.core.config import BidirectionalConfig, SearchConfig, Tier1Config, Tier2Config
 from prism.search.backward import (
     backward_step,
@@ -85,10 +85,11 @@ def test_bidirectional_simple_chain_convergence():
     """
     spec = generate_with_distractors(depth=4, n_distractors=0)
     facts = format_spec_facts(spec)
+    stvs = format_spec_stvs(spec)
     goal = spec["goal"]
 
     engine = BidirectionalSearchEngine()
-    result = engine.search(goal, facts)
+    result = engine.search(goal, facts, concept_stvs=stvs)
 
     assert result.goal_found is True
     assert result.meeting_point is not None
@@ -106,10 +107,11 @@ def test_bidirectional_proof_stitching_soundness():
     """
     spec = generate_with_distractors(depth=5, n_distractors=5, seed=42)
     facts = format_spec_facts(spec)
+    stvs = format_spec_stvs(spec)
     goal = spec["goal"]
 
     engine = BidirectionalSearchEngine()
-    result = engine.search(goal, facts)
+    result = engine.search(goal, facts, concept_stvs=stvs)
 
     assert result.goal_found is True
     assert len(result.proof_path) >= 3
@@ -132,41 +134,39 @@ def test_bidirectional_proof_stitching_soundness():
     )
 
 
-def test_bidirectional_deep_scaling_reduction():
+@pytest.mark.parametrize("depth", [8, 10, 12])
+def test_bidirectional_deep_forward_expansion_reduction(depth: int):
     """
-    GATE-8.3: Verify search space / step reduction on D=8 chain with 20 distractors.
+    GATE-8.3: Verify reduction in costly forward PLN expansions on deep chains.
     Compares BidirectionalSearchEngine against unidirectional AStarSearchEngine.
     """
-    spec = generate_with_distractors(depth=8, n_distractors=20, seed=42)
+    spec = generate_with_distractors(depth=depth, n_distractors=20, seed=42)
     facts = format_spec_facts(spec)
+    stvs = format_spec_stvs(spec)
     goal = spec["goal"]
 
     # 1. Unidirectional A* Engine
     fwd_engine = AStarSearchEngine(config=SearchConfig(max_steps=100, beam_width=5))
-    fwd_result = fwd_engine.search(initial_tasks=facts, initial_beliefs=facts, goal=goal)
+    fwd_result = fwd_engine.search(
+        initial_tasks=facts, initial_beliefs=facts, goal=goal, concept_stvs=stvs
+    )
 
     # 2. Bidirectional Engine
     bwd_engine = BidirectionalSearchEngine(config=BidirectionalConfig(max_steps=100))
-    bwd_result = bwd_engine.search(goal, facts)
+    bwd_result = bwd_engine.search(goal, facts, concept_stvs=stvs)
 
     assert bwd_result.goal_found is True
     assert fwd_result.goal_found is True
+    assert len(bwd_result.proof_path) >= 2
 
-    # State space reduction check
-    nodes_fwd = fwd_result.nodes_generated
-    nodes_bwd = bwd_result.nodes_generated
-
-    reduction = (nodes_fwd - nodes_bwd) / nodes_fwd if nodes_fwd > 0 else 0.0
-    print(f"D=8 Comparison: Unidirectional Nodes={nodes_fwd} vs Bidirectional Nodes={nodes_bwd} (Reduction: {reduction:.1%})")
-
-    # Verify significant reduction in generated nodes / expanded steps
-    assert bwd_result.steps_expanded <= fwd_result.steps_expanded
+    reduction = 1.0 - (bwd_result.forward_steps / fwd_result.steps_expanded)
+    assert reduction >= 0.40
 
 
 
 def test_bidirectional_tier2_waypoint_integration():
     """
-    GATE-8.4: Verify Tier 2 waypoint successfully seeds both frontiers and bridges a gap.
+    GATE-8.4: Tier 2 proposes a waypoint on a missing bridge; it does not inject axioms.
     """
     domain = generate_semantic_gap(
         depth_source=2,
@@ -176,6 +176,7 @@ def test_bidirectional_tier2_waypoint_integration():
         seed=42,
     )
     facts = format_facts(domain)
+    stvs = format_spec_stvs(domain)
     mock_payload = json.dumps({
         "subgoal": "(Inheritance C M)",
         "suggested_premise": "(Inheritance C M)",
@@ -193,9 +194,50 @@ def test_bidirectional_tier2_waypoint_integration():
         tier2_reasoner=tier2_reasoner,
     )
 
-    result = engine.search(domain["goal"], facts)
+    result = engine.search(domain["goal"], facts, concept_stvs=stvs)
 
-    assert result.goal_found is True
+    assert result.goal_found is False
     assert len(result.subgoals_proposed) >= 1
+    assert all("T2_" not in str(getattr(node, "action", "")) for node in result.proof_path)
+
+
+def test_bidirectional_pln_apply_when_bridge_is_in_kb():
+    """With the bridge already in the KB, bidirectional search completes via PLN.Apply."""
+    domain = generate_semantic_gap(
+        depth_source=2,
+        depth_target=2,
+        n_distractors=10,
+        include_bridge_in_kb=True,
+        seed=42,
+    )
+    facts = format_facts(domain)
+    stvs = format_spec_stvs(domain)
+    engine = BidirectionalSearchEngine(config=BidirectionalConfig(max_steps=50))
+    result = engine.search(domain["goal"], facts, concept_stvs=stvs)
+    assert result.goal_found is True
     assert matches_goal(result.goal_sentence, domain["goal"])
 
+
+def test_bidirectional_respects_max_backward_depth():
+    """Backward nodes past max_backward_depth are not expanded."""
+    spec = generate_with_distractors(depth=4, n_distractors=0)
+    facts = format_spec_facts(spec)
+    stvs = format_spec_stvs(spec)
+    engine = BidirectionalSearchEngine(
+        config=BidirectionalConfig(max_steps=50, max_backward_depth=0)
+    )
+    result = engine.search(spec["goal"], facts, concept_stvs=stvs)
+    assert result.goal_found is True
+    assert result.backward_steps == 0
+
+
+def test_bidirectional_connection_check_interval_still_finds_goal():
+    """Goal satisfaction is not gated by connection_check_interval."""
+    spec = generate_with_distractors(depth=4, n_distractors=0)
+    facts = format_spec_facts(spec)
+    stvs = format_spec_stvs(spec)
+    engine = BidirectionalSearchEngine(
+        config=BidirectionalConfig(max_steps=50, connection_check_interval=50)
+    )
+    result = engine.search(spec["goal"], facts, concept_stvs=stvs)
+    assert result.goal_found is True

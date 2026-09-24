@@ -14,7 +14,7 @@ from typing import Any, Dict, List
 from prism.benchmarks.domains.multipath_dag import generate_diamond_with_distractors
 from prism.benchmarks.domains.transitive_chain import generate_with_distractors
 from prism.benchmarks.domains.tree_dag import generate_tree_with_distractors
-from prism.benchmarks.evaluate_search_comparison import format_spec_facts
+from prism.benchmarks.evaluate_search_comparison import format_spec_facts, format_spec_stvs
 from prism.core.config import SearchConfig
 from prism.search.engine import AStarSearchEngine
 
@@ -40,6 +40,7 @@ def run_ablation():
 
     for name, spec in scenarios:
         facts = format_spec_facts(spec)
+        stvs = format_spec_stvs(spec)
         goal = spec["goal"]
         distractor_count = len(spec.get("distractor_facts", []))
         print(f"\nScenario: {name}")
@@ -51,7 +52,9 @@ def run_ablation():
         for label, cfg in configs:
             engine = AStarSearchEngine(config=cfg)
             t0 = time.perf_counter()
-            res = engine.search(initial_tasks=facts, initial_beliefs=facts, goal=goal)
+            res = engine.search(
+                initial_tasks=facts, initial_beliefs=facts, goal=goal, concept_stvs=stvs
+            )
             elapsed = time.perf_counter() - t0
 
             status = "PASS" if res.goal_found else "FAIL"

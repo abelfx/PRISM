@@ -16,10 +16,10 @@ from prism.search.bidirectional import (
     stitch_proof_traces,
 )
 from prism.search.engine import AStarSearchEngine, SearchResult
+from prism.search.pln_runtime import apply_pln_pair
 from prism.search.rules import (
     ParsedSentence,
     apply_candidate,
-    deduce_pair,
     generate_forward_candidates,
     parse_sentence,
 )
@@ -43,7 +43,7 @@ __all__ = [
     "extract_proof_path",
     "ParsedSentence",
     "parse_sentence",
-    "deduce_pair",
+    "apply_pln_pair",
     "generate_forward_candidates",
     "apply_candidate",
     "AStarSearchEngine",

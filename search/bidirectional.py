@@ -27,12 +27,11 @@ from prism.search.backward import (
 )
 from prism.search.engine import SearchResult
 from prism.search.rules import (
-    ParsedSentence,
     apply_candidate,
-    deduce_pair,
     generate_forward_candidates,
     parse_sentence,
 )
+from prism.search.pln_runtime import apply_pln_sentences, infer_concept_stvs
 from prism.search.state import (
     BidirectionalSearchNode,
     BidirectionalSearchResult,
@@ -54,6 +53,7 @@ def stitch_proof_traces(
     backward_nodes: Dict[int, SearchNode],
     backward_decompositions: Dict[int, Tuple[Any, Tuple[Any, ...], Tuple[Any, ...]]],
     goal: Any,
+    concept_stvs: Optional[Dict[str, Tuple[float, float]]] = None,
 ) -> Tuple[List[SearchNode], Optional[Any]]:
     """
     Stitch a forward derivation path with an inverted backward path (§9.3).
@@ -127,22 +127,16 @@ def stitch_proof_traces(
 
         derived_step = None
         for avail in available_premises:
-            parsed_avail = parse_sentence(avail)
-            if not parsed_avail:
-                continue
-
-            # Try deduction in both orders
-            derived = deduce_pair(parsed_lemma, parsed_avail)
+            derived = apply_pln_sentences(active_lemma, avail, concept_stvs)
             if not derived:
-                derived = deduce_pair(parsed_avail, parsed_lemma)
-
+                derived = apply_pln_sentences(avail, active_lemma, concept_stvs)
             if derived:
                 derived_step = derived
                 break
 
         if not derived_step:
-            # If deduction failed (e.g. already exact subgoal), adopt parent subgoal directly
-            derived_step = parent_subgoal
+            # Illegal PLN step: do not adopt an unproven parent subgoal.
+            continue
 
         active_lemma = derived_step
         new_tasks, new_beliefs = apply_candidate(
@@ -218,6 +212,7 @@ class BidirectionalSearchEngine:
         beliefs: Sequence[Any],
         tasks: Optional[Sequence[Any]] = None,
         max_steps: Optional[int] = None,
+        concept_stvs: Optional[Dict[str, Tuple[float, float]]] = None,
     ) -> BidirectionalSearchResult:
         """
         Execute dual-frontier bidirectional A* search toward goal (§9.1).
@@ -243,6 +238,11 @@ class BidirectionalSearchEngine:
 
         initial_beliefs = list(beliefs)
         initial_tasks = list(tasks) if tasks is not None else list(beliefs)
+        stvs = dict(concept_stvs or {})
+        inferred = infer_concept_stvs(initial_beliefs + initial_tasks)
+        for name, tv in inferred.items():
+            stvs.setdefault(name, tv)
+        self._concept_stvs = stvs
 
         # 0. Immediate goal check in initial beliefs
         for b in initial_beliefs:
@@ -343,6 +343,7 @@ class BidirectionalSearchEngine:
                 steps_expanded += 1
                 forward_steps += 1
                 fwd_turns += 1
+                check_meet = self._should_check_connection(steps_expanded)
 
                 # Generate forward candidate deductions
                 candidates = generate_forward_candidates(
@@ -351,6 +352,7 @@ class BidirectionalSearchEngine:
                     goal=goal,
                     use_stage0=self.config.use_stage0_filter,
                     task_selection_k=self.search_config.task_selection_k,
+                    concept_stvs=self._concept_stvs,
                 )
 
                 if not candidates:
@@ -450,12 +452,13 @@ class BidirectionalSearchEngine:
                     # 2. Check Connection with Active Backward Subgoals
                     connection_found = None
                     matched_bwd_id = None
-                    for bwd_id, subgoals in subgoals_by_state.items():
-                        conn = check_connection([cand], subgoals)
-                        if conn:
-                            connection_found = conn
-                            matched_bwd_id = bwd_id
-                            break
+                    if check_meet:
+                        for bwd_id, subgoals in subgoals_by_state.items():
+                            conn = check_connection([cand], subgoals)
+                            if conn:
+                                connection_found = conn
+                                matched_bwd_id = bwd_id
+                                break
 
                     if connection_found and matched_bwd_id is not None:
                         meeting_belief, matched_subgoal = connection_found
@@ -485,6 +488,7 @@ class BidirectionalSearchEngine:
                             backward_nodes,
                             backward_decompositions,
                             goal,
+                            concept_stvs=self._concept_stvs,
                         )
                         elapsed = time.perf_counter() - start_time
                         return BidirectionalSearchResult(
@@ -542,9 +546,12 @@ class BidirectionalSearchEngine:
             # ==========================================
             elif backward_open:
                 current_bwd = heapq.heappop(backward_open)
+                if current_bwd.depth >= self.config.max_backward_depth:
+                    continue
                 steps_expanded += 1
                 backward_steps += 1
                 bwd_turns += 1
+                check_meet = self._should_check_connection(steps_expanded)
 
                 active_subgoals = subgoals_by_state.get(current_bwd.state_id, [])
                 if not active_subgoals:
@@ -555,6 +562,24 @@ class BidirectionalSearchEngine:
                     bwd_candidates = backward_step(sg, initial_beliefs)
                     if not bwd_candidates:
                         continue
+
+                    # The forward frontier already grows outward from the
+                    # query subject. Keep the backward frontier directional:
+                    # regress the target object toward that subject instead
+                    # of duplicating forward-prefix exploration.
+                    parsed_target = parse_sentence(sg)
+                    if parsed_target:
+                        regressive = [
+                            candidate
+                            for candidate in bwd_candidates
+                            if any(
+                                (parsed_missing := parse_sentence(missing)) is not None
+                                and parsed_missing.subject == parsed_target.subject
+                                for missing in candidate.missing_premises
+                            )
+                        ]
+                        if regressive:
+                            bwd_candidates = regressive
 
                     # Sort by completeness and heuristic score
                     for b_cand in bwd_candidates[: self.config.backward_beam_width]:
@@ -569,20 +594,25 @@ class BidirectionalSearchEngine:
                                 continue
                             backward_visited.add(missing_term)
 
+                            new_depth = current_bwd.depth + 1
+                            if new_depth > self.config.max_backward_depth:
+                                continue
+
                             # Check if forward frontier already derived this missing premise
                             conn_found = None
                             matched_fwd_node = None
-                            for fwd_id, fwd_node in forward_nodes.items():
-                                conn = check_connection(fwd_node.beliefs, [missing])
-                                if conn:
-                                    conn_found = conn
-                                    matched_fwd_node = fwd_node
-                                    break
+                            if check_meet:
+                                for fwd_id, fwd_node in forward_nodes.items():
+                                    conn = check_connection(fwd_node.beliefs, [missing])
+                                    if conn:
+                                        conn_found = conn
+                                        matched_fwd_node = fwd_node
+                                        break
 
                             state_counter += 1
                             nodes_generated += 1
                             bwd_score = compute_backward_score(
-                                missing, initial_beliefs, self.tier1_config, depth=current_bwd.depth + 1
+                                missing, initial_beliefs, self.tier1_config, depth=new_depth
                             )
                             step_cost = 0.10 * (1.0 - b_cand.completeness)
                             bwd_g = current_bwd.g_cost + step_cost
@@ -596,7 +626,7 @@ class BidirectionalSearchEngine:
                                 g_cost=round(bwd_g, 4),
                                 h_cost=round(bwd_h, 4),
                                 f_cost=round(bwd_f, 4),
-                                depth=current_bwd.depth + 1,
+                                depth=new_depth,
                                 parent_id=current_bwd.state_id,
                                 action=missing,
                                 step_created=steps_expanded,
@@ -619,6 +649,7 @@ class BidirectionalSearchEngine:
                                     backward_nodes,
                                     backward_decompositions,
                                     goal,
+                                    concept_stvs=self._concept_stvs,
                                 )
                                 elapsed = time.perf_counter() - start_time
                                 return BidirectionalSearchResult(
@@ -653,6 +684,10 @@ class BidirectionalSearchEngine:
             stalled=search_stalled,
             subgoals_proposed=subgoals_proposed,
         )
+
+    def _should_check_connection(self, steps_expanded: int) -> bool:
+        interval = max(1, int(self.config.connection_check_interval))
+        return steps_expanded % interval == 0
 
     def _invoke_tier2(
         self,
@@ -692,43 +727,36 @@ class BidirectionalSearchEngine:
         current_fwd: SearchNode,
         initial_beliefs: List[Any],
     ) -> Optional[Any]:
-        """Seed both forward and backward frontiers using proposed Tier 2 waypoint."""
-        injected_sentence = None
-        # 1. Seed forward frontier with suggested premise
-        premise_to_inject = subgoal_res.suggested_premise or subgoal_res.subgoal
-        if premise_to_inject:
-            if (
-                isinstance(premise_to_inject, (list, tuple))
-                and len(premise_to_inject) >= 2
-                and premise_to_inject[0] == "Sentence"
-            ):
-                injected_sentence = premise_to_inject
-            else:
-                injected_sentence = [
-                    "Sentence",
-                    [premise_to_inject, ["stv", 0.9, 0.9]],
-                    [f"T2_{len(forward_nodes)}"],
-                ]
-            state_id = len(forward_nodes) + 100
-            new_tasks = [injected_sentence] + current_fwd.tasks
-            new_beliefs = current_fwd.beliefs + [injected_sentence]
-            fwd_waypoint = SearchNode(
+        """Seed the backward frontier with a subgoal. Derive via PLN only if premises exist."""
+        derived_sentence = None
+        target = subgoal_res.subgoal
+        if target:
+            state_id = len(forward_nodes) + len(backward_nodes) + 1000
+            bwd_node = SearchNode(
                 state_id=state_id,
-                tasks=new_tasks,
-                beliefs=new_beliefs,
+                tasks=[],
+                beliefs=list(current_fwd.beliefs),
                 g_cost=current_fwd.g_cost + 0.05,
                 h_cost=0.5,
                 f_cost=current_fwd.g_cost + 0.55,
                 depth=current_fwd.depth + 1,
                 parent_id=current_fwd.state_id,
-                action=injected_sentence,
+                action=target,
             )
-            forward_nodes[state_id] = fwd_waypoint
-            heapq.heappush(forward_open, fwd_waypoint)
+            backward_nodes[state_id] = bwd_node
+            subgoals_by_state[state_id] = [target]
+            heapq.heappush(backward_open, bwd_node)
 
-            # Also enrich initial_beliefs so backward search can anchor to this bridge premise
-            initial_beliefs.append(injected_sentence)
+            for decomp in backward_step(target, current_fwd.beliefs):
+                if decomp.completeness < 1.0 or len(decomp.available_premises) < 2:
+                    continue
+                derived_sentence = apply_pln_sentences(
+                    decomp.available_premises[0],
+                    decomp.available_premises[1],
+                    getattr(self, "_concept_stvs", None),
+                )
+                if derived_sentence:
+                    break
 
-        return injected_sentence
-
+        return derived_sentence
 

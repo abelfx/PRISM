@@ -72,6 +72,7 @@ class SearchConfig:
         use_stage0_filter (bool): Whether to pre-filter candidate premises using Stage 0.
         beam_threshold (float): Adaptive beam threshold; if > 0.0, expands candidates with score >= top_score - beam_threshold.
         task_selection_k (int): Number of top-priority tasks to expand per state node.
+        tier2_waypoint_weight (float): Blend weight for an active Tier 2 subgoal.
 
     Outputs:
         Immutable configuration instance.
@@ -91,6 +92,7 @@ class SearchConfig:
     beam_threshold: float = 0.0
     task_selection_k: int = 3
     enable_tier2: bool = False
+    tier2_waypoint_weight: float = 0.5
 
 
 @dataclass(frozen=True)
@@ -188,4 +190,3 @@ class PrismConfig:
 
 # Global default configuration instance
 DEFAULT_CONFIG = PrismConfig()
-

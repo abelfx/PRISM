@@ -42,20 +42,32 @@ def format_spec_facts(spec: Dict[str, Any]) -> List[Any]:
     return facts
 
 
+def format_spec_stvs(spec: Dict[str, Any]) -> Dict[str, tuple]:
+    """Parse domain `(STV ...)` declarations for PLN.Apply concept priors."""
+    from prism.search.pln_runtime import parse_stv_declarations
+
+    return parse_stv_declarations(spec.get("stv_declarations", []))
+
+
 def run_comparison(domain_name: str, spec: Dict[str, Any], max_steps: int = 100) -> Dict[str, Any]:
     """Run head-to-head comparison between Unguided Search and PRISM A* Search."""
     facts = format_spec_facts(spec)
+    stvs = format_spec_stvs(spec)
     goal = spec["goal"]
 
     # 1. Unguided Search (h(n) = 0.0, Uniform-Cost Search / FIFO beam)
     cfg_unguided = SearchConfig(max_steps=max_steps, beam_width=5, guided=False)
     engine_unguided = AStarSearchEngine(config=cfg_unguided)
-    res_unguided = engine_unguided.search(initial_tasks=facts, initial_beliefs=facts, goal=goal)
+    res_unguided = engine_unguided.search(
+        initial_tasks=facts, initial_beliefs=facts, goal=goal, concept_stvs=stvs
+    )
 
     # 2. PRISM Learned A* Search (f(n) = g(n) + h(n), Tier 1 guided)
     cfg_guided = SearchConfig(max_steps=max_steps, beam_width=5, guided=True)
     engine_guided = AStarSearchEngine(config=cfg_guided)
-    res_guided = engine_guided.search(initial_tasks=facts, initial_beliefs=facts, goal=goal)
+    res_guided = engine_guided.search(
+        initial_tasks=facts, initial_beliefs=facts, goal=goal, concept_stvs=stvs
+    )
 
     return {
         "domain": domain_name,
