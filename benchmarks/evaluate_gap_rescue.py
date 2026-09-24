@@ -12,6 +12,8 @@ Usage:
 
 import argparse
 import json
+from pathlib import Path
+import subprocess
 import time
 from typing import Any, Dict, List
 
@@ -21,6 +23,18 @@ from prism.core.config import SearchConfig, Tier2Config
 from prism.search.engine import AStarSearchEngine
 from prism.tier2.client import MockLLMClient, OpenRouterClient
 from prism.tier2.reasoner import Tier2Reasoner
+
+
+ROOT = Path(__file__).resolve().parents[2]
+
+
+def _git_revision(path: Path) -> str:
+    proc = subprocess.run(
+        ["git", "-C", str(path), "rev-parse", "HEAD"],
+        capture_output=True,
+        text=True,
+    )
+    return proc.stdout.strip() if proc.returncode == 0 else "unknown"
 
 
 def format_facts(spec: Dict[str, Any]) -> List[Any]:
@@ -41,7 +55,28 @@ def _row(label: str, res: Any, elapsed: float) -> None:
     )
 
 
-def run_gap_benchmark(live: bool = False):
+def _result_summary(res: Any, elapsed: float) -> Dict[str, Any]:
+    proposals = [
+        {
+            "subgoal": proposal.subgoal_str,
+            "suggested_premise": proposal.suggested_premise_str,
+            "reasoning": proposal.reasoning,
+        }
+        for proposal in res.subgoals_proposed
+    ]
+    return {
+        "success": res.goal_found,
+        "steps": res.steps_expanded,
+        "nodes_generated": res.nodes_generated,
+        "visited_states": res.visited_states_count,
+        "proof_length": len(res.proof_path),
+        "seconds": round(elapsed, 6),
+        "goal_sentence": res.goal_sentence,
+        "proposals": proposals,
+    }
+
+
+def run_gap_benchmark(live: bool = False) -> Dict[str, Any]:
     print("=" * 95)
     mode_str = "LIVE OPENROUTER" if live else "OFFLINE MOCK"
     print(f"PRISM TIER 2: SEMANTIC GAP STALL & RESCUE BENCHMARK ({mode_str})")
@@ -80,7 +115,8 @@ def run_gap_benchmark(live: bool = False):
     res_unassisted = eng_unassisted.search(
         initial_tasks=facts, initial_beliefs=facts, goal=goal, concept_stvs=stvs
     )
-    _row("A* Search (latent bridge, no Tier 2)", res_unassisted, time.perf_counter() - t0)
+    elapsed_unassisted = time.perf_counter() - t0
+    _row("A* Search (latent bridge, no Tier 2)", res_unassisted, elapsed_unassisted)
 
     if live:
         t2_cfg = Tier2Config(
@@ -112,7 +148,8 @@ def run_gap_benchmark(live: bool = False):
     res_assisted = eng_assisted.search(
         initial_tasks=facts, initial_beliefs=facts, goal=goal, concept_stvs=stvs
     )
-    _row(label, res_assisted, time.perf_counter() - t0)
+    elapsed_assisted = time.perf_counter() - t0
+    _row(label, res_assisted, elapsed_assisted)
 
     spec_bridged = generate_semantic_gap(
         depth_source=2,
@@ -132,7 +169,8 @@ def run_gap_benchmark(live: bool = False):
         goal=spec_bridged["goal"],
         concept_stvs=stvs_bridged,
     )
-    _row("A* Search (bridge in KB, real PLN)", res_bridged, time.perf_counter() - t0)
+    elapsed_bridged = time.perf_counter() - t0
+    _row("A* Search (bridge in KB, real PLN)", res_bridged, elapsed_bridged)
 
     print("-" * 95)
     if res_assisted.subgoals_proposed:
@@ -144,10 +182,58 @@ def run_gap_benchmark(live: bool = False):
         print("  Outcome          : accepted as a waypoint; all proof steps remain PLN-derived.")
 
     print("\n" + "=" * 95)
+    return {
+        "mode": "live_openrouter" if live else "offline_mock",
+        "model": "nex-agi/nex-n2.5-mini:free" if live else "deterministic_mock",
+        "shared_budget": shared_budget,
+        "goal": goal,
+        "unassisted": _result_summary(res_unassisted, elapsed_unassisted),
+        "assisted": _result_summary(res_assisted, elapsed_assisted),
+        "bridge_in_kb_control": _result_summary(res_bridged, elapsed_bridged),
+        "soundness_policy": (
+            "LLM proposals are planning waypoints only; every accepted sentence "
+            "is returned by PLN.Apply"
+        ),
+    }
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="PRISM Tier 2 Semantic Gap Benchmark")
     parser.add_argument("--live", action="store_true", help="Run live against OpenRouter API")
+    parser.add_argument("--runs", type=int, default=1)
+    parser.add_argument("--output")
     args = parser.parse_args()
-    run_gap_benchmark(live=args.live)
+    if args.runs < 1:
+        parser.error("--runs must be at least 1")
+    runs = [run_gap_benchmark(live=args.live) for _ in range(args.runs)]
+    result = {
+        "schema_version": 1,
+        "mode": "live_openrouter" if args.live else "offline_mock",
+        "runs_requested": args.runs,
+        "reproducibility": {
+            "prism_revision": _git_revision(ROOT / "prism"),
+            "petta_revision": _git_revision(ROOT / "PeTTa"),
+            "pln_revision": _git_revision(ROOT / "PeTTa" / "repos" / "PLN"),
+            "model": (
+                "nex-agi/nex-n2.5-mini:free" if args.live else "deterministic_mock"
+            ),
+            "shared_step_budget": 8,
+        },
+        "runs": runs,
+        "summary": {
+            "unassisted_successes": sum(
+                int(run["unassisted"]["success"]) for run in runs
+            ),
+            "assisted_successes": sum(
+                int(run["assisted"]["success"]) for run in runs
+            ),
+            "bridge_control_successes": sum(
+                int(run["bridge_in_kb_control"]["success"]) for run in runs
+            ),
+            "assisted_runs_with_proposals": sum(
+                int(bool(run["assisted"]["proposals"])) for run in runs
+            ),
+        },
+    }
+    if args.output:
+        Path(args.output).write_text(json.dumps(result, indent=2) + "\n", encoding="utf-8")
