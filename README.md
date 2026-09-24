@@ -14,7 +14,7 @@ In OpenCog Hyperon, **Probabilistic Logic Networks (PLN)** serves as the core lo
 While PLN's inference rules (deduction, induction, abduction, revision) and truth-value formulas are mathematically well-specified, its **inference search** currently lacks guidance:
 - At each step in a derivation, PLN blindly enumerates eligible rule-premise combinations.
 - Binary inference rules create a combinatorial Cartesian product over the premise pool.
-- Task selection in [`PLN.Derive`](PeTTa/repos/PLN/lib_pln.metta) historically evaluated candidates solely on raw confidence (`$c`), remaining completely blind to the query goal until search concluded.
+- Task selection in [`PLN.Derive`](../PeTTa/repos/PLN/lib_pln.metta) historically evaluated candidates solely on raw confidence (`$c`), remaining completely blind to the query goal until search concluded.
 - Consequently, search quickly stalls on shallow or low-value paths, making multi-hop reasoning over large knowledge graphs computationally intractable.
 
 **PRISM resolves this by introducing a staged, learned inference-control layer.** It acts as an intelligent advisor standing beside PLN: observing candidate moves, scoring them by estimated usefulness and goal relevance, and prioritizing the search frontier — without ever modifying PLN's inference rules or truth-value arithmetic. Soundness is guaranteed by construction, not by testing alone: PRISM never touches the code path that computes a conclusion's truth value, only the order in which legal candidates are tried.
@@ -68,7 +68,12 @@ The full mathematical specification (cost formulas, training objectives, stall-d
 
 ## 3. Real Codebase Integration (`trueagi-io/PLN`)
 
-PRISM is grounded directly in the live `trueagi-io/PLN` implementation located in `PeTTa/repos/PLN/lib_pln.metta`. This table is the fast reference for exactly what PRISM touches — for the full reasoning behind each change, see the Implementation Specification:
+PRISM is grounded directly in the live `trueagi-io/PLN` implementation. In the
+development workspace, PeTTa is normally a sibling checkout at
+`../PeTTa`, with PLN at `../PeTTa/repos/PLN/lib_pln.metta`. Set `PETTA_HOME`
+when using another checkout. This table is the fast reference for exactly what
+PRISM touches — for the full reasoning behind each change, see the
+Implementation Specification:
 
 | Target Function | Location | Original Behavior | PRISM Modification |
 |---|---|---|---|
@@ -83,56 +88,45 @@ PRISM is grounded directly in the live `trueagi-io/PLN` implementation located i
 
 ---
 
-## 4. Package Layout
+## 4. Repository Layout
 
 ```
 prism/
-├── ARCHITECTURE.md                    # System architecture, layer ownership & invariants
-├── AGENTS.md                          # Quick-reference context & checklist for AI agents
 ├── README.md                          # This file
-├── __init__.py                        # Master public package API
+├── pyproject.toml                     # Package and pytest configuration
+├── requirements.txt                  # Editable development/test install
 │
-├── core/                              # System-wide foundation
-│   ├── config.py                      # Immutable hyperparameter dataclasses
-│   ├── cache.py                       # Score memoization cache
-│   └── scorer.py                      # System coordinator, fallback & FFI entry points
+├── src/prism/                         # Installable runtime package
+│   ├── core/                          # Configuration, cache and scorer entry points
+│   ├── stage0/                        # Indexed premise filtering
+│   ├── tier1/                         # Fast symbolic heuristic
+│   ├── tier2/                         # Strategic waypoint guidance
+│   ├── search/                        # Forward, backward and bidirectional search
+│   ├── adapters/petta/                # PeTTa/PLN runtime and Prolog bridges
+│   ├── observability/                 # Proof tracing and diagnostics
+│   └── verification/                  # Reserved for future verification work
 │
-├── stage0/                            # Low-cost premise pre-filtering
-│   └── index.py                       # Inverted index on sentence terms (PremiseIndex)
-│
-├── tier1/                             # Fast policy heuristic scorers (<0.05ms)
-│   └── heuristic_v1.py                # Symbolic term overlap & geometric depth decay
-│
-├── search/                            # Global search engine
-│   ├── engine.py                      # AStarSearchEngine: f(n) = g(n) + h(n)
-│   ├── state.py                       # SearchNode, belief hashing, goal matching
-│   ├── rules.py                       # Rule matching & forward candidate generation
-│   ├── backward.py                    # Backward chaining, meet-in-the-middle detection
-│   └── bidirectional.py               # BidirectionalSearchEngine: dual frontiers, proof stitching
-│
-├── tier2/                             # Strategic LLM reasoner
-│   ├── stall_detector.py              # Plateau/depth/cooldown-based stall detection
-│   ├── prompt.py                      # Context-aware prompt builder
-│   ├── client.py                      # Multi-backend LLM client (OpenRouter, Ollama, Mock)
-│   ├── parser.py                      # Subgoal JSON parser & hallucination guard
-│   └── reasoner.py                    # Strategic reasoning coordinator
-│
-├── ffi/                               # Safe Foreign Function Interface bridge
-│   └── prism_ffi.pl                   # Prolog/Janus FFI predicates and exception guards
-│
-├── benchmarks/                        # Benchmark suite & parameter sweep runners
+├── benchmarks/                        # Evaluation code; never imported by runtime
 │   ├── run_benchmark.py               # CLI benchmark driver
 │   ├── domains/                       # Problem domain generators (chains, diamonds, trees)
 │   ├── utils/                         # Metrics collection & FFI profiling
 │   ├── metta/                         # Raw MeTTa benchmark scripts
-│   └── results/                       # Empirical benchmark datasets (JSON)
+│   └── results/reference/             # Curated empirical evidence
 │
-└── tests/
-    ├── unit/                          # Python unit tests (pytest)
-    └── integration/                   # MeTTa integration tests (run via PeTTa)
+├── tests/
+│   ├── unit/                          # Python tests
+│   └── integration/                   # MeTTa integration tests
+│
+├── docs/
+│   ├── architecture.md                # Ownership and dependency rules
+│   ├── milestones/                    # Week-by-week acceptance records
+│   └── papers/                        # Proposal and implementation specification
+│
+└── scripts/check.sh                   # Local regression entry point
 ```
 
-For layer ownership, invariants, and where new work should go, see [`ARCHITECTURE.md`](ARCHITECTURE.md).
+For layer ownership, invariants, and where new work should go, see
+[`docs/architecture.md`](docs/architecture.md).
 
 ---
 
@@ -148,33 +142,42 @@ These hold regardless of implementation progress — they are architectural comm
 
 ## 6. How to Run
 
+### Install for development
+
+```bash
+cd <prism-repo>
+python3 -m venv .venv
+. .venv/bin/activate
+python -m pip install -r requirements.txt
+```
+
 ### Unit tests
 ```bash
-cd <repo-root>
-python3 -m pytest prism/tests/
+cd <prism-repo>
+python3 -m pytest
 ```
 
 ### MeTTa integration tests
 ```bash
-cd <repo-root>/PeTTa
-sh run.sh ../prism/tests/integration/test_fallback.metta
-sh run.sh ../prism/tests/integration/test_prism_hook.metta
+cd <workspace-root>/PeTTa
+PYTHONPATH=../prism/src sh run.sh ../prism/tests/integration/test_fallback.metta
+PYTHONPATH=../prism/src sh run.sh ../prism/tests/integration/test_prism_hook.metta
 ```
 
 ### Synthetic benchmark sweeps
 ```bash
-cd <repo-root>
+cd <prism-repo>
 
 # Unguided baseline
-python3 -m prism.benchmarks.run_benchmark --depths 5 8 10 --distractors 0 10 25 50 --repeats 2 --max-steps 80
+python3 -m benchmarks.run_benchmark --depths 5 8 10 --distractors 0 10 25 50 --repeats 2 --max-steps 80
 
 # PRISM-guided
-python3 -m prism.benchmarks.run_benchmark --guided --depths 5 8 10 --distractors 0 10 25 50 --repeats 2 --max-steps 80 --output prism/benchmarks/results/<name>.json
+python3 -m benchmarks.run_benchmark --guided --depths 5 8 10 --distractors 0 10 25 50 --repeats 2 --max-steps 80 --output artifacts/<name>.json
 ```
 
 ### Full PLN regression suite
 ```bash
-cd <repo-root>/PeTTa
+cd <workspace-root>/PeTTa
 for f in ./repos/PLN/ruletests/*.metta; do sh run.sh "$f" | grep "should"; done
 ```
 
@@ -186,9 +189,9 @@ This project's documentation is split by purpose — each document below covers 
 
 | Document | Covers |
 |---|---|
-| `PRISM_PLN_Inference_Control_Proposal.docx` | The what and why — problem, gaps, AGI relevance, proposed solution |
-| `PRISM_Implementation_Specification.docx` | The how — file-level code changes, formulas, training objectives |
-| `milestones/milestone_week*.md` | Full per-week deliverables, gate criteria, and raw benchmark data |
-| `PRISM_Results_Synthesis.docx` | The presentation narrative — headline results, honest limitations, updated as weeks land |
-| `ARCHITECTURE.md` | Layer ownership, invariants, where new work belongs |
-| `AGENTS.md` | Quick-reference context for AI coding agents working in this repo |
+| `docs/papers/PRISM_PLN_Inference_Control_Proposal_final.pdf` | The what and why — problem, gaps, AGI relevance and proposed solution |
+| `docs/papers/PRISM_Implementation_Specification.md` | The how — file-level changes, formulas and training objectives |
+| `docs/milestones/milestone_week*.md` | Per-week deliverables, gates and measured results |
+| `docs/architecture.md` | Runtime ownership, dependency direction and artifact policy |
+| `benchmarks/README.md` | Benchmark commands, baselines and result interpretation |
+| `tests/README.md` | Test coverage and integration commands |

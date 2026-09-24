@@ -16,7 +16,7 @@ from prism.search.bidirectional import (
     stitch_proof_traces,
 )
 from prism.search.engine import AStarSearchEngine, SearchResult
-from prism.search.pln_runtime import apply_pln_pair
+from prism.adapters.petta.runtime import apply_pln_pair
 from prism.search.rules import (
     ParsedSentence,
     apply_candidate,

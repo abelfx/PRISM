@@ -3,12 +3,12 @@ Benchmark Utilities for PRISM.
 Contains metrics collection, output log parsing, and profiling tools.
 """
 
-from prism.benchmarks.utils.metrics import (
+from benchmarks.utils.metrics import (
     MetricsCollector,
     is_step_on_proof_path,
     parse_selected_log,
 )
-from prism.benchmarks.utils.trace_logger import (
+from prism.observability.tracing import (
     ProofStepTrace,
     ProofTraceSession,
 )

@@ -11,10 +11,10 @@ Evaluates each search configuration independently across 4 reasoning topologies:
 import time
 from typing import Any, Dict, List
 
-from prism.benchmarks.domains.multipath_dag import generate_diamond_with_distractors
-from prism.benchmarks.domains.transitive_chain import generate_with_distractors
-from prism.benchmarks.domains.tree_dag import generate_tree_with_distractors
-from prism.benchmarks.evaluate_search_comparison import format_spec_facts, format_spec_stvs
+from benchmarks.domains.multipath_dag import generate_diamond_with_distractors
+from benchmarks.domains.transitive_chain import generate_with_distractors
+from benchmarks.domains.tree_dag import generate_tree_with_distractors
+from benchmarks.evaluate_search_comparison import format_spec_facts, format_spec_stvs
 from prism.core.config import SearchConfig
 from prism.search.engine import AStarSearchEngine
 

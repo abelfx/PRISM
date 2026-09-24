@@ -18,8 +18,8 @@ Measures:
 import time
 from typing import Any, Dict, List
 
-from prism.benchmarks.domains.transitive_chain import generate_with_distractors
-from prism.benchmarks.evaluate_search_comparison import format_spec_facts, format_spec_stvs
+from benchmarks.domains.transitive_chain import generate_with_distractors
+from benchmarks.evaluate_search_comparison import format_spec_facts, format_spec_stvs
 from prism.core.config import BidirectionalConfig, SearchConfig
 from prism.search.bidirectional import BidirectionalSearchEngine
 from prism.search.engine import AStarSearchEngine

@@ -3,21 +3,21 @@ Benchmark Evaluation Domains for PRISM.
 Contains domain generators for synthetic reasoning chains and multi-hop benchmarks.
 """
 
-from prism.benchmarks.domains.multipath_dag import (
+from benchmarks.domains.multipath_dag import (
     classify_diamond_solution,
     generate_diamond,
     generate_diamond_metta_content,
     generate_diamond_with_distractors,
     write_diamond_metta_file,
 )
-from prism.benchmarks.domains.transitive_chain import (
+from benchmarks.domains.transitive_chain import (
     generate_chain,
     generate_metta_content,
     generate_with_distractors,
     write_metta_file,
 )
-from prism.benchmarks.domains.semantic_gap import generate_semantic_gap
-from prism.benchmarks.domains.tree_dag import (
+from benchmarks.domains.semantic_gap import generate_semantic_gap
+from benchmarks.domains.tree_dag import (
     generate_tree_conjunction,
     generate_tree_metta_content,
     generate_tree_with_distractors,

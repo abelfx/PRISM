@@ -10,7 +10,7 @@ import heapq
 import time
 from typing import Any, Callable, Dict, List, Optional, Sequence, Set, Tuple
 
-from prism.benchmarks.utils.trace_logger import ProofTraceSession
+from prism.observability.tracing import ProofTraceSession
 from prism.core.cache import ScoreCache
 from prism.core.config import DEFAULT_CONFIG, SearchConfig, Tier1Config
 from prism.search.rules import apply_candidate, generate_forward_candidates, parse_sentence
@@ -182,7 +182,7 @@ class AStarSearchEngine:
         """
         t0 = time.perf_counter()
         generator = candidate_generator or generate_forward_candidates
-        from prism.search.pln_runtime import infer_concept_stvs
+        from prism.adapters.petta.runtime import infer_concept_stvs
 
         stvs = dict(concept_stvs or {})
         inferred = infer_concept_stvs(list(initial_tasks) + list(initial_beliefs))
@@ -440,7 +440,7 @@ class AStarSearchEngine:
         it with PLN.Apply. Never insert a fabricated axiom.
         """
         from prism.search.backward import backward_step
-        from prism.search.pln_runtime import apply_pln_sentences
+        from prism.adapters.petta.runtime import apply_pln_sentences
 
         target = subgoal_res.subgoal
         for decomp in backward_step(target, beliefs):

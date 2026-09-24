@@ -1,0 +1,28 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "prism-pln"
+version = "0.1.0"
+description = "Programmable Reduction & Inference Search Manager for PLN"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "Research prototype" }
+authors = [{ name = "PRISM contributors" }]
+dependencies = []
+
+[project.optional-dependencies]
+test = ["pytest>=7"]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+"prism.adapters.petta" = ["*.pl"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src", "."]
+addopts = "-ra"
+

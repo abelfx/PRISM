@@ -1,6 +1,6 @@
 """Unit tests for live MeTTa PLN.Apply used by PRISM search."""
 
-from prism.search.pln_runtime import (
+from prism.adapters.petta.runtime import (
     apply_pln_pair,
     parse_stv_declarations,
     stamp_disjoint,

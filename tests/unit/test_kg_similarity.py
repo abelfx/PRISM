@@ -1,13 +1,13 @@
 from pathlib import Path
 
-from prism.benchmarks.domains.kg_similarity import (
+from benchmarks.domains.kg_similarity import (
     concept_stvs,
     held_out_queries,
     load_similarity_kg,
     select_bipartite_slice,
     to_pln_sentences,
 )
-from prism.search.pln_runtime import apply_pln_sentences
+from prism.adapters.petta.runtime import apply_pln_sentences
 
 
 KG_PATH = Path(__file__).resolve().parents[3] / "kgadexp.metta"

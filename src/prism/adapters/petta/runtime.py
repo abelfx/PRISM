@@ -7,6 +7,7 @@ Python search owns the agenda. MeTTa PLN owns one-step deduction.
 from __future__ import annotations
 
 import os
+from pathlib import Path
 import re
 import subprocess
 import threading
@@ -17,9 +18,10 @@ if TYPE_CHECKING:
 
 ConceptSTV = Dict[str, Tuple[float, float]]
 
-_REPO_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), os.pardir, os.pardir))
-_DEFAULT_PETTA = os.path.join(_REPO_ROOT, "PeTTa")
-_SERVER_PL = os.path.join(_REPO_ROOT, "prism", "ffi", "pln_apply_server.pl")
+_PROJECT_ROOT = Path(__file__).resolve().parents[4]
+_SOURCE_ROOT = _PROJECT_ROOT / "src"
+_DEFAULT_PETTA = str(_PROJECT_ROOT.parent / "PeTTa")
+_SERVER_PL = str(Path(__file__).with_name("pln_apply_server.pl"))
 
 _SENTENCE_RE = re.compile(
     r"\(Sentence\s+\(\(([A-Za-z0-9_\-]+)\s+([A-Za-z0-9_\-]+)\s+([A-Za-z0-9_\-]+)\)"
@@ -120,9 +122,9 @@ class PeTTaPLNSession:
         env = os.environ.copy()
         env["PETTA_HOME"] = self.petta_home
         pythonpath = [
+            str(_SOURCE_ROOT),
             self.petta_home,
             os.path.join(self.petta_home, ".."),
-            os.path.join(self.petta_home, "prism"),
             os.path.join(self.petta_home, "repos", "PLN"),
             env.get("PYTHONPATH", ""),
         ]

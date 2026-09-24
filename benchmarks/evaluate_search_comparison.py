@@ -8,9 +8,9 @@ state space expansion, avoid distractors, and discover optimal proof paths.
 import time
 from typing import Any, Dict, List
 
-from prism.benchmarks.domains.multipath_dag import generate_diamond_with_distractors
-from prism.benchmarks.domains.transitive_chain import generate_with_distractors
-from prism.benchmarks.domains.tree_dag import generate_tree_with_distractors
+from benchmarks.domains.multipath_dag import generate_diamond_with_distractors
+from benchmarks.domains.transitive_chain import generate_with_distractors
+from benchmarks.domains.tree_dag import generate_tree_with_distractors
 from prism.core.config import SearchConfig
 from prism.search.engine import AStarSearchEngine, SearchResult
 
@@ -44,7 +44,7 @@ def format_spec_facts(spec: Dict[str, Any]) -> List[Any]:
 
 def format_spec_stvs(spec: Dict[str, Any]) -> Dict[str, tuple]:
     """Parse domain `(STV ...)` declarations for PLN.Apply concept priors."""
-    from prism.search.pln_runtime import parse_stv_declarations
+    from prism.adapters.petta.runtime import parse_stv_declarations
 
     return parse_stv_declarations(spec.get("stv_declarations", []))
 

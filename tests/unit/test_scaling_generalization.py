@@ -1,5 +1,5 @@
-from prism.benchmarks.domains.transitive_chain import generate_with_distractors
-from prism.benchmarks.evaluate_scaling_generalization import (
+from benchmarks.domains.transitive_chain import generate_with_distractors
+from benchmarks.evaluate_scaling_generalization import (
     _search_metrics,
     aggregate_trials,
     scaling_exponent,
@@ -7,7 +7,7 @@ from prism.benchmarks.evaluate_scaling_generalization import (
 )
 from prism.search.engine import SearchResult
 from prism.search.state import SearchNode
-from prism.benchmarks.evaluate_search_comparison import format_spec_facts
+from benchmarks.evaluate_search_comparison import format_spec_facts
 
 
 def test_stage0_pair_frontier_reduces_cartesian_pairs():

@@ -7,7 +7,7 @@ goal recognition, proof path reconstruction, and cycle prevention.
 import heapq
 from prism.core.config import SearchConfig, Tier1Config
 from prism.search.engine import AStarSearchEngine, SearchResult
-from prism.search.pln_runtime import apply_pln_pair
+from prism.adapters.petta.runtime import apply_pln_pair
 from prism.search.rules import (
     apply_candidate,
     generate_forward_candidates,
@@ -200,7 +200,7 @@ def test_astar_search_diamond_shortcut_preference():
 
 def test_astar_search_with_trace_logging():
     """GATE-5.5: Test A* search streaming and retroactively attributing traces."""
-    from prism.benchmarks.utils.trace_logger import ProofTraceSession
+    from prism.observability.tracing import ProofTraceSession
 
     f1 = ["Sentence", [["Inheritance", "A", "B"], ["stv", 0.9, 0.9]], ["1"]]
     f2 = ["Sentence", [["Inheritance", "B", "Z"], ["stv", 0.9, 0.9]], ["2"]]
@@ -245,12 +245,12 @@ def test_astar_search_stall_detection():
 
 def test_generate_forward_candidates_stage0_filtering():
     """GATE-6.1: Verify Stage 0 candidate generation reduces candidate count by >= 70%."""
-    from prism.benchmarks.domains.transitive_chain import generate_with_distractors
-    from prism.benchmarks.evaluate_search_comparison import format_spec_facts
+    from benchmarks.domains.transitive_chain import generate_with_distractors
+    from benchmarks.evaluate_search_comparison import format_spec_facts
 
     spec = generate_with_distractors(depth=6, n_distractors=25, seed=42)
     facts = format_spec_facts(spec)
-    from prism.benchmarks.evaluate_search_comparison import format_spec_stvs
+    from benchmarks.evaluate_search_comparison import format_spec_stvs
     stvs = format_spec_stvs(spec)
     goal = spec["goal"]
 
@@ -267,12 +267,12 @@ def test_generate_forward_candidates_stage0_filtering():
 
 def test_astar_search_high_noise_chain_rescue():
     """GATE-6.2: Verify PRISM A* rescues D=6 chain with 25 distractors in < 35 steps."""
-    from prism.benchmarks.domains.transitive_chain import generate_with_distractors
-    from prism.benchmarks.evaluate_search_comparison import format_spec_facts
+    from benchmarks.domains.transitive_chain import generate_with_distractors
+    from benchmarks.evaluate_search_comparison import format_spec_facts
 
     spec = generate_with_distractors(depth=6, n_distractors=25, seed=42)
     facts = format_spec_facts(spec)
-    from prism.benchmarks.evaluate_search_comparison import format_spec_stvs
+    from benchmarks.evaluate_search_comparison import format_spec_stvs
     stvs = format_spec_stvs(spec)
     goal = spec["goal"]
 
@@ -287,12 +287,12 @@ def test_astar_search_high_noise_chain_rescue():
 
 def test_astar_search_tree_conjunction_rescue():
     """GATE-6.3: Verify PRISM A* rescues L(3,3) tree conjunction with 20 distractors in < 30 steps."""
-    from prism.benchmarks.domains.tree_dag import generate_tree_with_distractors
-    from prism.benchmarks.evaluate_search_comparison import format_spec_facts
+    from benchmarks.domains.tree_dag import generate_tree_with_distractors
+    from benchmarks.evaluate_search_comparison import format_spec_facts
 
     spec = generate_tree_with_distractors(depth_left=3, depth_right=3, n_distractors=20, seed=42)
     facts = format_spec_facts(spec)
-    from prism.benchmarks.evaluate_search_comparison import format_spec_stvs
+    from benchmarks.evaluate_search_comparison import format_spec_stvs
     stvs = format_spec_stvs(spec)
     goal = spec["goal"]
 

@@ -5,7 +5,7 @@ and solution path classification.
 """
 
 import pytest
-from prism.benchmarks.domains.multipath_dag import (
+from benchmarks.domains.multipath_dag import (
     classify_diamond_solution,
     generate_diamond,
     generate_diamond_metta_content,
