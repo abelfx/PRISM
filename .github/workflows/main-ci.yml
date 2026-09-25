@@ -43,8 +43,8 @@ jobs:
       - name: Check out pinned PLN
         uses: actions/checkout@v4
         with:
-          repository: trueagi-io/PLN
-          ref: a026bac72caa6f3a64600ac9600c4a6aacd511dd
+          repository: abelfx/PLN
+          ref: aefb0f327579794af3df1c545546adaf69f58edd
           path: PeTTa/repos/PLN
           persist-credentials: false
 
@@ -56,13 +56,7 @@ jobs:
           cache-dependency-path: prism/requirements.txt
 
       - name: Connect PRISM to the PeTTa workspace
-        shell: bash
-        run: |
-          set -euo pipefail
-          mkdir -p PeTTa/prism
-          ln -s ../../prism/src PeTTa/prism/src
-          # The pinned PLN revision predates PRISM's src-layout refactor.
-          ln -s ../../prism/src/prism/adapters/petta PeTTa/prism/ffi
+        run: ln -s ../prism PeTTa/prism
 
       - name: Install PRISM and test dependencies
         working-directory: prism
