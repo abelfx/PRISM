@@ -202,3 +202,18 @@ This streams the three supplied MeTTa exports, maps only `isa` to PLN
 transitive goals, and evaluates 100-, 1,000-, and 5,000-edge slices. Raw files
 are never changed. Missing TVs use the explicit recorded default `(0.8, 0.9)`;
 uniform source TVs are retained.
+
+### 5. Run Week 10 Soundness and Robustness Evaluation
+
+```bash
+cd <prism-repo>
+python3 -m benchmarks.evaluate_soundness_robustness \
+  --output benchmarks/results/reference/week10_soundness_robustness.json
+```
+
+The runner independently replays proof actions through pinned `PLN.Apply` for
+chain, diamond, tree, semantic-gap, bidirectional and all three bounded
+external-KG source families. It also injects deterministic Tier 1, cache,
+Tier 2, empty-frontier and kernel failures, then runs the PRISM tests, MeTTa
+integrations and seven PLN rule tests. Timing is informational: every semantic,
+fallback and regression gate must be `true`.

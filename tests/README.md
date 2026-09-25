@@ -27,18 +27,25 @@ The test suite is partitioned into two tiers:
 | `test_prism_hook.metta` | **GATE-1.4** | Tests that `PriorityRankGoal` actively steers candidate selection toward goal-relevant tasks over competing high-confidence distractors | Selects goal-relevant premise ($c=0.80$) over distractor ($c=0.95$) |
 | `test_depth_penalty.metta` | **GATE-3.1** | Verifies geometric depth discounting: ensures that a shallow premise receives a higher priority score than an otherwise identical deep premise | Returns `"PASS"` (shallow 0.733 > deep 0.714) |
 | `test_stage0_metta.metta` | **GATE-3.2** | Verifies MeTTa FFI invocation of Stage 0 `PremiseIndex`: excludes distractors while preserving on-path candidate premises | Both sub-tests return `"PASS"` |
-| *(Week 10)* `test_soundness.py` | Release Gate | Re-evaluates final derived conclusions against unmodified PLN formulas to guarantee 100% truth-value soundness | 100% equivalence on all proofs |
+| `test_soundness.py` | Week 10 soundness | Independently replays recorded actions through pinned `PLN.Apply`; rejects term, STV, evidence, cycle, source and kernel failures |
+| `test_fallback.py` | Week 10 robustness | Injects scorer, cache, Stage 0, Tier 2 and kernel failures and checks safe fallback or fail-closed behavior |
 
 ---
 
 ## 2. How to Run the Tests
 
 ### 2.1 Running All Python Unit Tests
-From the workspace root (`/home/abel/Desktop/icog_labs/pln`):
+From the PRISM repository root:
 ```bash
 python3 -m pytest
 ```
-Expected outcome: **24/24 passed in < 0.05s**.
+Measured Week 10 outcome: **121/121 passed**.
+
+Run only the Week 10 deterministic gate with:
+
+```bash
+python3 -m pytest -q tests/unit/test_soundness.py tests/unit/test_fallback.py
+```
 
 ### 2.2 Running MeTTa Integration Tests
 From the PeTTa directory (`/home/abel/Desktop/icog_labs/pln/PeTTa`):
@@ -78,6 +85,11 @@ done
 - `inversion.metta` [PASS]
 - `memberDeductionA.metta` [PASS]
 - `transitiveSimilarity.metta` [PASS]
+
+The broader upstream `test.sh` also executes examples. In this checkout it
+currently fails in `examples/Direct.metta` because `father/3` is undefined;
+that pre-existing example issue is not part of the seven pinned PLN rule tests
+used by the Week 10 regression gate.
 
 ### 3.2 Standard PLN Examples
 ```bash

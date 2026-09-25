@@ -104,7 +104,7 @@ prism/
 │   ├── search/                        # Forward, backward and bidirectional search
 │   ├── adapters/petta/                # PeTTa/PLN runtime and Prolog bridges
 │   ├── observability/                 # Proof tracing and diagnostics
-│   └── verification/                  # Reserved for future verification work
+│   └── verification/                  # Independent PLN proof replay and soundness checks
 │
 ├── benchmarks/                        # Evaluation code; never imported by runtime
 │   ├── run_benchmark.py               # CLI benchmark driver
