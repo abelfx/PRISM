@@ -48,6 +48,14 @@ jobs:
           path: PeTTa/repos/PLN
           persist-credentials: false
 
+      - name: Install runner prerequisites
+        env:
+          DEBIAN_FRONTEND: noninteractive
+        run: |
+          apt-get update
+          apt-get install --yes --no-install-recommends lsb-release
+          rm -rf /var/lib/apt/lists/*
+
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
