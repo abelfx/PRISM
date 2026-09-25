@@ -48,20 +48,20 @@ jobs:
           path: PeTTa/repos/PLN
           persist-credentials: false
 
-      - name: Install runner prerequisites
+      - name: Install Python runtime prerequisites
         env:
           DEBIAN_FRONTEND: noninteractive
         run: |
           apt-get update
-          apt-get install --yes --no-install-recommends lsb-release
+          apt-get install --yes --no-install-recommends python3 python3-pip python3-venv
           rm -rf /var/lib/apt/lists/*
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.12"
-          cache: pip
-          cache-dependency-path: prism/requirements.txt
+      - name: Create Python virtual environment
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -m venv prism/.venv
+          echo "${GITHUB_WORKSPACE}/prism/.venv/bin" >> "${GITHUB_PATH}"
 
       - name: Connect PRISM to the PeTTa workspace
         run: ln -s ../prism PeTTa/prism
