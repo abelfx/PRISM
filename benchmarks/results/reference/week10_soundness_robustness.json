@@ -1,0 +1,326 @@
+{
+  "schema_version": 1,
+  "reproducibility": {
+    "python": "3.12.3",
+    "prism_revision": "9a58ad390a43a73cb4bce0936a5790a8ee62cff2",
+    "prism_dirty": true,
+    "prism_source_tree_sha256": "e54f1aeb163405d1cd25a57f6a412021b436bf28a17a2402deda54348ee72020",
+    "petta_revision": "ae66fa8e41dcd5539d614706bd4e5cfb34f9608d",
+    "petta_dirty": true,
+    "pln_revision": "a026bac72caa6f3a64600ac9600c4a6aacd511dd",
+    "pln_dirty": true,
+    "pln_lib_sha256": "6be9fbf58f3192a2195b2ffa10abce13967ffaab20f317f62cbd3054879204b3",
+    "parameters": {
+      "external_size": 100,
+      "max_steps": 80,
+      "seed": 42,
+      "stv_tolerance": 1e-06
+    }
+  },
+  "soundness": {
+    "cases": [
+      {
+        "case_id": "chain_d4",
+        "domain": "chain",
+        "search_mode": "forward_astar",
+        "success": true,
+        "steps_recorded": 3,
+        "steps_replayed": 3,
+        "term_match": true,
+        "stv_match": true,
+        "evidence_match": true,
+        "first_failure": null
+      },
+      {
+        "case_id": "diamond_2_4",
+        "domain": "diamond",
+        "search_mode": "forward_astar",
+        "success": true,
+        "steps_recorded": 1,
+        "steps_replayed": 1,
+        "term_match": true,
+        "stv_match": true,
+        "evidence_match": true,
+        "first_failure": null
+      },
+      {
+        "case_id": "tree_2_2",
+        "domain": "tree",
+        "search_mode": "forward_astar",
+        "success": true,
+        "steps_recorded": 3,
+        "steps_replayed": 3,
+        "term_match": true,
+        "stv_match": true,
+        "evidence_match": true,
+        "first_failure": null
+      },
+      {
+        "case_id": "semantic_gap_tier2",
+        "domain": "semantic_gap",
+        "search_mode": "tier2_assisted",
+        "success": true,
+        "steps_recorded": 5,
+        "steps_replayed": 5,
+        "term_match": true,
+        "stv_match": true,
+        "evidence_match": true,
+        "first_failure": null
+      },
+      {
+        "case_id": "bidirectional_d5",
+        "domain": "chain",
+        "search_mode": "bidirectional",
+        "success": true,
+        "steps_recorded": 4,
+        "steps_replayed": 4,
+        "term_match": true,
+        "stv_match": true,
+        "evidence_match": true,
+        "first_failure": null
+      },
+      {
+        "case_id": "external_wordnet_stv_clean_100",
+        "domain": "external_kg",
+        "search_mode": "source_path_replay",
+        "success": true,
+        "steps_recorded": 2,
+        "steps_replayed": 2,
+        "term_match": true,
+        "stv_match": true,
+        "evidence_match": true,
+        "first_failure": null
+      },
+      {
+        "case_id": "external_output_prolog_ready_100",
+        "domain": "external_kg",
+        "search_mode": "source_path_replay",
+        "success": true,
+        "steps_recorded": 2,
+        "steps_replayed": 2,
+        "term_match": true,
+        "stv_match": true,
+        "evidence_match": true,
+        "first_failure": null
+      },
+      {
+        "case_id": "external_kg_100",
+        "domain": "external_kg",
+        "search_mode": "source_path_replay",
+        "success": true,
+        "steps_recorded": 2,
+        "steps_replayed": 2,
+        "term_match": true,
+        "stv_match": true,
+        "evidence_match": true,
+        "first_failure": null
+      }
+    ],
+    "sound_cases": 8,
+    "total_cases": 8
+  },
+  "fallback": {
+    "cases": [
+      {
+        "case_id": "tier1_exception",
+        "injected_failure": "tier1_exception",
+        "expected_policy": "tier1_confidence_fallback",
+        "observed_policy": "tier1_confidence_fallback",
+        "unhandled_exception": false,
+        "unsupported_beliefs_added": 0
+      },
+      {
+        "case_id": "tier1_nonfinite",
+        "injected_failure": "tier1_nonfinite",
+        "expected_policy": "tier1_confidence_fallback",
+        "observed_policy": "tier1_confidence_fallback",
+        "unhandled_exception": false,
+        "unsupported_beliefs_added": 0
+      },
+      {
+        "case_id": "tier1_out_of_range",
+        "injected_failure": "tier1_out_of_range",
+        "expected_policy": "tier1_confidence_fallback",
+        "observed_policy": "tier1_confidence_fallback",
+        "unhandled_exception": false,
+        "unsupported_beliefs_added": 0
+      },
+      {
+        "case_id": "tier1_malformed",
+        "injected_failure": "tier1_malformed",
+        "expected_policy": "tier1_confidence_fallback",
+        "observed_policy": "tier1_confidence_fallback",
+        "unhandled_exception": false,
+        "unsupported_beliefs_added": 0
+      },
+      {
+        "case_id": "tier2_no_api_key",
+        "injected_failure": "tier2_no_api_key",
+        "expected_policy": "tier2_search_fallback",
+        "observed_policy": "tier2_search_fallback",
+        "unhandled_exception": false,
+        "unsupported_beliefs_added": 0
+      },
+      {
+        "case_id": "tier2_timeout",
+        "injected_failure": "tier2_timeout",
+        "expected_policy": "tier2_search_fallback",
+        "observed_policy": "tier2_search_fallback",
+        "unhandled_exception": false,
+        "unsupported_beliefs_added": 0
+      },
+      {
+        "case_id": "tier2_http_error",
+        "injected_failure": "tier2_http_error",
+        "expected_policy": "tier2_search_fallback",
+        "observed_policy": "tier2_search_fallback",
+        "unhandled_exception": false,
+        "unsupported_beliefs_added": 0
+      },
+      {
+        "case_id": "tier2_provider_error",
+        "injected_failure": "tier2_provider_error",
+        "expected_policy": "tier2_search_fallback",
+        "observed_policy": "tier2_search_fallback",
+        "unhandled_exception": false,
+        "unsupported_beliefs_added": 0
+      },
+      {
+        "case_id": "tier2_malformed_json",
+        "injected_failure": "tier2_malformed_json",
+        "expected_policy": "tier2_search_fallback",
+        "observed_policy": "tier2_search_fallback",
+        "unhandled_exception": false,
+        "unsupported_beliefs_added": 0
+      },
+      {
+        "case_id": "tier2_invalid_atom",
+        "injected_failure": "tier2_invalid_atom",
+        "expected_policy": "tier2_search_fallback",
+        "observed_policy": "tier2_search_fallback",
+        "unhandled_exception": false,
+        "unsupported_beliefs_added": 0
+      },
+      {
+        "case_id": "stage0_exception",
+        "injected_failure": "stage0_exception",
+        "expected_policy": "stage0_full_belief_fallback",
+        "observed_policy": "stage0_full_belief_fallback",
+        "unhandled_exception": false,
+        "unsupported_beliefs_added": 0
+      },
+      {
+        "case_id": "stage0_empty",
+        "injected_failure": "stage0_empty",
+        "expected_policy": "stage0_full_belief_fallback",
+        "observed_policy": "stage0_full_belief_fallback",
+        "unhandled_exception": false,
+        "unsupported_beliefs_added": 0
+      },
+      {
+        "case_id": "tier2_underivable_lemma",
+        "injected_failure": "grounded but underivable Tier 2 waypoint",
+        "expected_policy": "tier2_search_fallback",
+        "observed_policy": "tier2_search_fallback",
+        "unhandled_exception": false,
+        "unsupported_beliefs_added": 0
+      },
+      {
+        "case_id": "pln_kernel_failure",
+        "injected_failure": "candidate generator raises kernel error",
+        "expected_policy": "fail_closed",
+        "observed_policy": "fail_closed",
+        "unhandled_exception": false,
+        "unsupported_beliefs_added": 0
+      },
+      {
+        "case_id": "bidirectional_invalid_seam",
+        "injected_failure": "unreplayable stitched seam",
+        "expected_policy": "bidirectional_forward_fallback",
+        "observed_policy": "bidirectional_forward_fallback",
+        "unhandled_exception": false,
+        "unsupported_beliefs_added": 0
+      },
+      {
+        "case_id": "empty_frontier_budget",
+        "injected_failure": "empty candidate frontier",
+        "expected_policy": "controlled_failure",
+        "observed_policy": "controlled_failure",
+        "unhandled_exception": false,
+        "unsupported_beliefs_added": 0
+      }
+    ],
+    "passed_cases": 16,
+    "total_cases": 16
+  },
+  "regression": {
+    "prism": {
+      "command": "python3 -m pytest -q",
+      "passed": true
+    },
+    "metta_integration": {
+      "cases": [
+        {
+          "case": "test_depth_penalty.metta",
+          "passed": true
+        },
+        {
+          "case": "test_fallback.metta",
+          "passed": true
+        },
+        {
+          "case": "test_prism_hook.metta",
+          "passed": true
+        },
+        {
+          "case": "test_stage0_metta.metta",
+          "passed": true
+        }
+      ],
+      "passed": true
+    },
+    "pln_ruletests": {
+      "cases": [
+        {
+          "case": "RuleTester.metta",
+          "passed": true
+        },
+        {
+          "case": "equivalenceToImplication.metta",
+          "passed": true
+        },
+        {
+          "case": "evaluationImplicationRuleA.metta",
+          "passed": true
+        },
+        {
+          "case": "evaluationWithNegationAndInheritanceInversion.metta",
+          "passed": true
+        },
+        {
+          "case": "inversion.metta",
+          "passed": true
+        },
+        {
+          "case": "memberDeductionA.metta",
+          "passed": true
+        },
+        {
+          "case": "transitiveSimilarity.metta",
+          "passed": true
+        }
+      ],
+      "passed": true
+    }
+  },
+  "gates": {
+    "GATE-10.1_step_replay": true,
+    "GATE-10.2_final_equivalence": true,
+    "GATE-10.3_evidence_integrity": true,
+    "GATE-10.4_graceful_fallback": true,
+    "GATE-10.5_kernel_fail_closed": true,
+    "GATE-10.6_tier2_containment": true,
+    "GATE-10.7_zero_regression": true,
+    "GATE-10.8_reproducibility": true
+  }
+}
