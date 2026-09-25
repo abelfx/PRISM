@@ -263,4 +263,5 @@ class BidirectionalSearchResult:
     stalled: bool = False
     proof_trace: List[Any] = field(default_factory=list)
     subgoals_proposed: List[Any] = field(default_factory=list)
-
+    fallback_events: List[str] = field(default_factory=list)
+    failure_reason: Optional[str] = None

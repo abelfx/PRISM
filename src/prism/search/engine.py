@@ -13,6 +13,7 @@ from typing import Any, Callable, Dict, List, Optional, Sequence, Set, Tuple
 from prism.observability.tracing import ProofTraceSession
 from prism.core.cache import ScoreCache
 from prism.core.config import DEFAULT_CONFIG, SearchConfig, Tier1Config
+from prism.core.safety import safe_cached_score
 from prism.search.rules import apply_candidate, generate_forward_candidates, parse_sentence
 from prism.search.state import (
     SearchNode,
@@ -114,6 +115,8 @@ class SearchResult:
     stalled: bool = False
     proof_trace: List[Any] = field(default_factory=list)
     subgoals_proposed: List[Any] = field(default_factory=list)
+    fallback_events: List[str] = field(default_factory=list)
+    failure_reason: Optional[str] = None
 
 
 class AStarSearchEngine:
@@ -200,6 +203,7 @@ class AStarSearchEngine:
         search_stalled = False
         subgoals_proposed: List[Any] = []
         strategic_subgoals: List[Any] = []
+        fallback_events: List[str] = []
 
         if self.tier2_reasoner:
             self.tier2_reasoner.reset()
@@ -208,9 +212,12 @@ class AStarSearchEngine:
         if self.config.guided:
             initial_h = 1.0
             for b in initial_beliefs:
-                s = self.cache.get_or_compute(
+                s, event = safe_cached_score(
+                    self.cache,
                     b, goal, lambda c, g: compute_v1_score(c, g, self.tier1_config)
                 )
+                if event:
+                    fallback_events.append(event)
                 initial_h = min(initial_h, max(0.0, 1.0 - s))
         else:
             initial_h = 0.0
@@ -263,20 +270,53 @@ class AStarSearchEngine:
                         stalled=search_stalled,
                         proof_trace=trace_session.steps if trace_session else [],
                         subgoals_proposed=subgoals_proposed,
+                        fallback_events=fallback_events,
                     )
 
             # 2. Candidate generation
             if generator == generate_forward_candidates:
-                candidates = generator(
-                    current_node.tasks,
-                    current_node.beliefs,
-                    goal=goal,
-                    use_stage0=self.config.use_stage0_filter,
-                    task_selection_k=self.config.task_selection_k,
-                    concept_stvs=self._concept_stvs,
-                )
+                try:
+                    candidates = generator(
+                        current_node.tasks,
+                        current_node.beliefs,
+                        goal=goal,
+                        use_stage0=self.config.use_stage0_filter,
+                        task_selection_k=self.config.task_selection_k,
+                        concept_stvs=self._concept_stvs,
+                    )
+                except Exception as exc:
+                    elapsed = time.perf_counter() - t0
+                    return SearchResult(
+                        goal_found=False,
+                        final_node=None,
+                        proof_path=[],
+                        goal_sentence=None,
+                        steps_expanded=steps_expanded,
+                        nodes_generated=nodes_generated,
+                        visited_states_count=len(visited_states),
+                        wall_clock_seconds=round(elapsed, 4),
+                        stalled=True,
+                        fallback_events=fallback_events,
+                        failure_reason=f"pln_kernel_failure: {type(exc).__name__}: {exc}",
+                    )
             else:
-                candidates = generator(current_node.tasks, current_node.beliefs)
+                try:
+                    candidates = generator(current_node.tasks, current_node.beliefs)
+                except Exception as exc:
+                    elapsed = time.perf_counter() - t0
+                    return SearchResult(
+                        goal_found=False,
+                        final_node=None,
+                        proof_path=[],
+                        goal_sentence=None,
+                        steps_expanded=steps_expanded,
+                        nodes_generated=nodes_generated,
+                        visited_states_count=len(visited_states),
+                        wall_clock_seconds=round(elapsed, 4),
+                        stalled=True,
+                        fallback_events=fallback_events,
+                        failure_reason=f"candidate_generation_failure: {type(exc).__name__}: {exc}",
+                    )
 
             if not candidates:
                 search_stalled = True
@@ -290,6 +330,8 @@ class AStarSearchEngine:
                         recent_derivations=[current_node.action] if current_node.action else None,
                         domain_concepts=domain_concepts,
                     )
+                    if subgoal_res is None and getattr(self.tier2_reasoner, "last_failure", None):
+                        fallback_events.append(f"tier2_search_fallback: {self.tier2_reasoner.last_failure}")
                     if subgoal_res:
                         subgoals_proposed.append(subgoal_res)
                         strategic_subgoals.append(subgoal_res.subgoal)
@@ -305,11 +347,14 @@ class AStarSearchEngine:
             if self.config.guided:
                 scored_candidates = []
                 for candidate in candidates:
-                    score = self.cache.get_or_compute(
+                    score, event = safe_cached_score(
+                        self.cache,
                         candidate,
                         goal,
                         lambda c, g: compute_v1_score(c, g, self.tier1_config),
                     )
+                    if event:
+                        fallback_events.append(event)
                     # A Tier 2 subgoal is a temporary waypoint, not an axiom.
                     # Prefer legal candidates that advance toward that waypoint
                     # while PLN remains solely responsible for deriving them.
@@ -346,6 +391,8 @@ class AStarSearchEngine:
                         recent_derivations=[current_node.action] if current_node.action else None,
                         domain_concepts=domain_concepts,
                     )
+                    if subgoal_res is None and getattr(self.tier2_reasoner, "last_failure", None):
+                        fallback_events.append(f"tier2_search_fallback: {self.tier2_reasoner.last_failure}")
                     if subgoal_res:
                         subgoals_proposed.append(subgoal_res)
                         strategic_subgoals.append(subgoal_res.subgoal)
@@ -432,6 +479,7 @@ class AStarSearchEngine:
             stalled=search_stalled,
             proof_trace=trace_session.steps if trace_session else [],
             subgoals_proposed=subgoals_proposed,
+            fallback_events=fallback_events,
         )
 
     def _pln_derive_subgoal(self, subgoal_res: Any, beliefs: Sequence[Any]) -> Optional[Any]:

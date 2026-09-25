@@ -6,8 +6,11 @@ updates task/belief buffers. Truth-value arithmetic lives in lib_pln.metta.
 """
 
 from dataclasses import dataclass
+import logging
 import re
 from typing import Any, Dict, List, Optional, Sequence, Set, Tuple
+
+logger = logging.getLogger(__name__)
 
 
 @dataclass(frozen=True)
@@ -221,7 +224,13 @@ def generate_forward_candidates(
             connected_tasks = parsed_tasks
 
         for t in connected_tasks:
-            filtered_raw = filter_beliefs(t.raw, goal, beliefs)
+            try:
+                filtered_raw = filter_beliefs(t.raw, goal, beliefs)
+                if not filtered_raw:
+                    raise ValueError("Stage 0 returned no usable premises")
+            except Exception as exc:
+                logger.warning("stage0_full_belief_fallback: %s", exc)
+                filtered_raw = list(beliefs)
             filtered_parsed = [
                 p for p in (parse_sentence(b) for b in filtered_raw if b) if p
             ]

@@ -10,6 +10,7 @@ and stitches dual proof paths into a unified, forward-executable PLN proof trace
 """
 
 from collections import deque
+from dataclasses import replace
 import heapq
 import time
 from typing import Any, Callable, Dict, List, Optional, Sequence, Set, Tuple
@@ -25,7 +26,7 @@ from prism.search.backward import (
     check_connection,
     compute_backward_score,
 )
-from prism.search.engine import SearchResult
+from prism.search.engine import AStarSearchEngine, SearchResult
 from prism.search.rules import (
     apply_candidate,
     generate_forward_candidates,
@@ -43,6 +44,7 @@ from prism.search.state import (
     normalize_term_str,
 )
 from prism.core.cache import ScoreCache
+from prism.core.safety import safe_cached_score
 from prism.tier1.heuristic_v1 import compute_v1_score, extract_confidence
 from prism.tier2.reasoner import Tier2Reasoner
 
@@ -319,6 +321,7 @@ class BidirectionalSearchEngine:
         nodes_generated = 2
         search_stalled = False
         subgoals_proposed: List[Any] = []
+        fallback_events: List[str] = []
 
         # Interleaving turn counter (ratio of forward to backward)
         fwd_turns = 0
@@ -346,14 +349,32 @@ class BidirectionalSearchEngine:
                 check_meet = self._should_check_connection(steps_expanded)
 
                 # Generate forward candidate deductions
-                candidates = generate_forward_candidates(
-                    current_fwd.tasks,
-                    current_fwd.beliefs,
-                    goal=goal,
-                    use_stage0=self.config.use_stage0_filter,
-                    task_selection_k=self.search_config.task_selection_k,
-                    concept_stvs=self._concept_stvs,
-                )
+                try:
+                    candidates = generate_forward_candidates(
+                        current_fwd.tasks,
+                        current_fwd.beliefs,
+                        goal=goal,
+                        use_stage0=self.config.use_stage0_filter,
+                        task_selection_k=self.search_config.task_selection_k,
+                        concept_stvs=self._concept_stvs,
+                    )
+                except Exception as exc:
+                    elapsed = time.perf_counter() - start_time
+                    return BidirectionalSearchResult(
+                        goal_found=False,
+                        meeting_point=None,
+                        proof_path=[],
+                        goal_sentence=None,
+                        steps_expanded=steps_expanded,
+                        forward_steps=forward_steps,
+                        backward_steps=backward_steps,
+                        nodes_generated=nodes_generated,
+                        visited_states_count=len(forward_visited) + len(backward_visited),
+                        wall_clock_seconds=round(elapsed, 4),
+                        stalled=True,
+                        fallback_events=fallback_events,
+                        failure_reason=f"pln_kernel_failure: {type(exc).__name__}: {exc}",
+                    )
 
                 if not candidates:
                     if self.tier2_reasoner and self.tier2_reasoner.check_stall(
@@ -381,11 +402,14 @@ class BidirectionalSearchEngine:
                 # Score candidates with Tier 1
                 scored_candidates = []
                 for cand in candidates:
-                    score = self.cache.get_or_compute(
+                    score, event = safe_cached_score(
+                        self.cache,
                         cand,
                         goal,
                         lambda c, g: compute_v1_score(c, g, self.tier1_config),
                     )
+                    if event:
+                        fallback_events.append(event)
                     scored_candidates.append((score, cand))
 
                 scored_candidates.sort(key=lambda x: -x[0])
@@ -447,6 +471,7 @@ class BidirectionalSearchEngine:
                             wall_clock_seconds=round(elapsed, 4),
                             stalled=search_stalled,
                             subgoals_proposed=subgoals_proposed,
+                            fallback_events=fallback_events,
                         )
 
                     # 2. Check Connection with Active Backward Subgoals
@@ -490,6 +515,17 @@ class BidirectionalSearchEngine:
                             goal,
                             concept_stvs=self._concept_stvs,
                         )
+                        verified = self._validate_stitch_or_fallback(
+                            stitched,
+                            final_goal_sent,
+                            goal,
+                            initial_tasks,
+                            initial_beliefs,
+                            step_budget - steps_expanded,
+                            concept_stvs=self._concept_stvs,
+                        )
+                        if verified is not None:
+                            return verified
                         elapsed = time.perf_counter() - start_time
                         return BidirectionalSearchResult(
                             goal_found=True,
@@ -504,6 +540,7 @@ class BidirectionalSearchEngine:
                             wall_clock_seconds=round(elapsed, 4),
                             stalled=search_stalled,
                             subgoals_proposed=subgoals_proposed,
+                            fallback_events=fallback_events,
                         )
 
                     # Form forward child node
@@ -651,6 +688,17 @@ class BidirectionalSearchEngine:
                                     goal,
                                     concept_stvs=self._concept_stvs,
                                 )
+                                verified = self._validate_stitch_or_fallback(
+                                    stitched,
+                                    final_goal_sent,
+                                    goal,
+                                    initial_tasks,
+                                    initial_beliefs,
+                                    step_budget - steps_expanded,
+                                    concept_stvs=self._concept_stvs,
+                                )
+                                if verified is not None:
+                                    return verified
                                 elapsed = time.perf_counter() - start_time
                                 return BidirectionalSearchResult(
                                     goal_found=True,
@@ -665,6 +713,7 @@ class BidirectionalSearchEngine:
                                     wall_clock_seconds=round(elapsed, 4),
                                     stalled=search_stalled,
                                     subgoals_proposed=subgoals_proposed,
+                                    fallback_events=fallback_events,
                                 )
 
                             heapq.heappush(backward_open, bwd_child)
@@ -683,6 +732,64 @@ class BidirectionalSearchEngine:
             wall_clock_seconds=round(elapsed, 4),
             stalled=search_stalled,
             subgoals_proposed=subgoals_proposed,
+            fallback_events=fallback_events,
+        )
+
+    def _validate_stitch_or_fallback(
+        self,
+        stitched: Sequence[SearchNode],
+        goal_sentence: Any,
+        goal: Any,
+        initial_tasks: Sequence[Any],
+        initial_beliefs: Sequence[Any],
+        remaining_steps: int,
+        *,
+        concept_stvs: Optional[Dict[str, Tuple[float, float]]] = None,
+    ) -> Optional[BidirectionalSearchResult]:
+        """Reject an invalid seam and use a verified forward-search fallback."""
+        from prism.verification import verify_proof
+
+        replay = verify_proof(
+            initial_beliefs,
+            stitched,
+            goal,
+            concept_stvs=concept_stvs,
+        )
+        if replay.valid and goal_sentence is not None and matches_goal(goal_sentence, goal):
+            return None
+
+        reason = (
+            replay.first_failure.code
+            if replay.first_failure is not None
+            else "stitched goal sentence is invalid"
+        )
+        config = replace(self.search_config, max_steps=max(1, remaining_steps))
+        fallback = AStarSearchEngine(
+            config=config,
+            tier1_config=self.tier1_config,
+            tier2_reasoner=self.tier2_reasoner,
+        ).search(
+            initial_tasks,
+            initial_beliefs,
+            goal,
+            concept_stvs=concept_stvs,
+        )
+        return BidirectionalSearchResult(
+            goal_found=fallback.goal_found,
+            meeting_point=None,
+            proof_path=fallback.proof_path,
+            goal_sentence=fallback.goal_sentence,
+            steps_expanded=fallback.steps_expanded,
+            forward_steps=fallback.steps_expanded,
+            backward_steps=0,
+            nodes_generated=fallback.nodes_generated,
+            visited_states_count=fallback.visited_states_count,
+            wall_clock_seconds=fallback.wall_clock_seconds,
+            stalled=fallback.stalled,
+            proof_trace=fallback.proof_trace,
+            subgoals_proposed=fallback.subgoals_proposed,
+            fallback_events=[f"bidirectional_forward_fallback: {reason}", *fallback.fallback_events],
+            failure_reason=fallback.failure_reason,
         )
 
     def _should_check_connection(self, steps_expanded: int) -> bool:
@@ -759,4 +866,3 @@ class BidirectionalSearchEngine:
                     break
 
         return derived_sentence
-
