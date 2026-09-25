@@ -1,0 +1,126 @@
+name: Main CI
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+concurrency:
+  group: main-ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    name: Build, test, and verify
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    container:
+      image: ghcr.io/patham9/petta-ci:latest
+
+    env:
+      PETTA_HOME: ${{ github.workspace }}/PeTTa
+      PYTHONPATH: ${{ github.workspace }}/prism/src
+      PIP_DISABLE_PIP_VERSION_CHECK: "1"
+
+    steps:
+      - name: Check out PRISM
+        uses: actions/checkout@v4
+        with:
+          path: prism
+          persist-credentials: false
+
+      - name: Check out pinned PeTTa
+        uses: actions/checkout@v4
+        with:
+          repository: trueagi-io/PeTTa
+          ref: ae66fa8e41dcd5539d614706bd4e5cfb34f9608d
+          path: PeTTa
+          persist-credentials: false
+
+      - name: Check out pinned PLN
+        uses: actions/checkout@v4
+        with:
+          repository: trueagi-io/PLN
+          ref: a026bac72caa6f3a64600ac9600c4a6aacd511dd
+          path: PeTTa/repos/PLN
+          persist-credentials: false
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: prism/requirements.txt
+
+      - name: Connect PRISM to the PeTTa workspace
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p PeTTa/prism
+          ln -s ../../prism/src PeTTa/prism/src
+          # The pinned PLN revision predates PRISM's src-layout refactor.
+          ln -s ../../prism/src/prism/adapters/petta PeTTa/prism/ffi
+
+      - name: Install PRISM and test dependencies
+        working-directory: prism
+        run: python -m pip install -r requirements.txt
+
+      - name: Build distribution wheel
+        working-directory: prism
+        run: python -m pip wheel --no-deps --no-build-isolation --wheel-dir /tmp/prism-wheel .
+
+      - name: Compile Python sources
+        working-directory: prism
+        run: python -m compileall -q src benchmarks tests
+
+      - name: Run Python test suite
+        working-directory: prism
+        run: python -m pytest -q
+
+      - name: Run MeTTa integration suite
+        working-directory: PeTTa
+        shell: bash
+        run: |
+          set -euo pipefail
+          for test_file in ../prism/tests/integration/*.metta; do
+            echo "Running ${test_file}"
+            output="$(sh run.sh --silent "${test_file}")"
+            printf '%s\n' "${output}"
+            if grep -q '"FAIL"' <<<"${output}"; then
+              echo "MeTTa integration failed: ${test_file}" >&2
+              exit 1
+            fi
+          done
+
+      - name: Run pinned PLN rule tests
+        working-directory: PeTTa
+        shell: bash
+        run: |
+          set -euo pipefail
+          for test_file in repos/PLN/ruletests/*.metta; do
+            echo "Running ${test_file}"
+            output="$(sh run.sh --silent "${test_file}")"
+            printf '%s\n' "${output}"
+            if grep -q '❌' <<<"${output}" || ! grep -q '✅' <<<"${output}"; then
+              echo "PLN rule test failed: ${test_file}" >&2
+              exit 1
+            fi
+          done
+
+      - name: Validate Week 10 reference artifact
+        working-directory: prism
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          artifact = Path("benchmarks/results/reference/week10_soundness_robustness.json")
+          result = json.loads(artifact.read_text(encoding="utf-8"))
+          failed = [name for name, passed in result["gates"].items() if passed is not True]
+          if failed:
+              raise SystemExit(f"Week 10 reference artifact has failed gates: {failed}")
+          print("Week 10 reference artifact: all gates passed")
+          PY
