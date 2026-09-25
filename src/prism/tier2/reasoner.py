@@ -33,6 +33,7 @@ class Tier2Reasoner:
         self.client: LLMClient = client or create_llm_client(self.config)
         self.total_proposals: int = 0
         self.successful_subgoals: int = 0
+        self.last_failure: Optional[str] = None
 
     def check_stall(self, top_score: float, current_depth: int = 0) -> bool:
         """
@@ -62,6 +63,7 @@ class Tier2Reasoner:
             Optional[SubgoalResult]: Parsed and validated subgoal, or None if failed.
         """
         self.total_proposals += 1
+        self.last_failure = None
         # Cool down after every provider attempt, including malformed responses
         # and network failures. Otherwise one outage causes an API call per
         # search expansion.
@@ -89,10 +91,12 @@ class Tier2Reasoner:
                 return subgoal_res
 
             logger.warning("[PRISM Tier 2] Subgoal response failed syntax or grounding validation.")
+            self.last_failure = "response failed syntax or grounding validation"
             return None
 
         except Exception as e:
             logger.warning(f"[PRISM Tier 2] Subgoal generation failed gracefully: {e}")
+            self.last_failure = f"{type(e).__name__}: {e}"
             return None
 
     def reset(self) -> None:
@@ -100,3 +104,4 @@ class Tier2Reasoner:
         self.stall_detector.reset()
         self.total_proposals = 0
         self.successful_subgoals = 0
+        self.last_failure = None
