@@ -217,3 +217,37 @@ external-KG source families. It also injects deterministic Tier 1, cache,
 Tier 2, empty-frontier and kernel failures, then runs the PRISM tests, MeTTa
 integrations and seven PLN rule tests. Timing is informational: every semantic,
 fallback and regression gate must be `true`.
+
+### 6. Train and Evaluate Tier 1 v2 (Week 11)
+
+```bash
+cd <prism-repo>
+python3 -m benchmarks.evaluate_tier1_v2
+```
+
+This command collects fresh, finalized proof traces across chain, diamond and
+tree runs, holds out complete runs, trains the learned-embedding 128/64 MLP,
+records per-epoch training/validation loss and accuracy, reports classification,
+ranking and calibration metrics, runs a queue-position ablation and four-fold
+grouped cross-validation, then compares v1 and v2 shortlist hit rates. It exits
+non-zero when v2 top-1 shortlist accuracy is below v1. The generated model stays under
+`artifacts/`; reproducible metrics are written to
+`benchmarks/results/reference/week11_tier1_v2.json`.
+
+The current perfect synthetic metrics are a corpus limitation, not evidence of
+universal performance: the held-out runs reuse the same domain templates and
+v1 is already perfect on every eligible decision. Interpret Week 11 as a
+training-pipeline and non-regression gate, not as proof that v2 improves on v1.
+
+Run the post-gate out-of-distribution and adversarial comparison with:
+
+```bash
+python3 -m benchmarks.evaluate_tier1_v2_stress
+```
+
+It compares v1 and the frozen v2 checkpoint under unseen atom names, an unseen
+predicate, source-derived frontiers from all three supplied external KGs,
+frontiers constructed to expose v1 ranking errors, and 5-30% training-label
+noise. The recorded artifact concludes `performance_boost_proven: false`;
+v2 does not repair v1's adversarial ranking failures and loses absolute
+classification quality under vocabulary and KG distribution shift.

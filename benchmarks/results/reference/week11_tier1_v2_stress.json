@@ -1,0 +1,394 @@
+{
+  "schema_version": 1,
+  "purpose": "Tier 1 v1 versus v2 out-of-distribution and adversarial stress test",
+  "checkpoint": "artifacts/models/tier1_v2.npz",
+  "checkpoint_sha256": "9205b3d642ca94022040361981b8933bd902fb413fbe3ea494fd7f5cef02fd36",
+  "baseline_held_out": {
+    "examples": 215,
+    "runs": 4,
+    "v1_ranking": {
+      "eligible_decisions": 43,
+      "top1_hit_rate": 1.0,
+      "top3_hit_rate": 1.0,
+      "mean_reciprocal_rank": 1.0
+    },
+    "v2_ranking": {
+      "eligible_decisions": 43,
+      "top1_hit_rate": 1.0,
+      "top3_hit_rate": 1.0,
+      "mean_reciprocal_rank": 1.0
+    },
+    "v2_classification": {
+      "examples": 215,
+      "positives": 139,
+      "negatives": 76,
+      "accuracy": 1.0,
+      "balanced_accuracy": 1.0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "specificity": 1.0,
+      "f1": 1.0,
+      "roc_auc": 1.0,
+      "average_precision": 1.0,
+      "log_loss": 4.7e-05,
+      "brier_score": 0.0,
+      "expected_calibration_error_10_bin": 4.7e-05,
+      "confusion_matrix": {
+        "true_positive": 139,
+        "true_negative": 76,
+        "false_positive": 0,
+        "false_negative": 0
+      }
+    }
+  },
+  "unseen_atom_vocabulary": {
+    "examples": 215,
+    "runs": 4,
+    "v1_ranking": {
+      "eligible_decisions": 43,
+      "top1_hit_rate": 1.0,
+      "top3_hit_rate": 1.0,
+      "mean_reciprocal_rank": 1.0
+    },
+    "v2_ranking": {
+      "eligible_decisions": 43,
+      "top1_hit_rate": 1.0,
+      "top3_hit_rate": 1.0,
+      "mean_reciprocal_rank": 1.0
+    },
+    "v2_classification": {
+      "examples": 215,
+      "positives": 139,
+      "negatives": 76,
+      "accuracy": 0.581395,
+      "balanced_accuracy": 0.676259,
+      "precision": 1.0,
+      "recall": 0.352518,
+      "specificity": 1.0,
+      "f1": 0.521277,
+      "roc_auc": 0.977187,
+      "average_precision": 0.984155,
+      "log_loss": 0.97778,
+      "brier_score": 0.320047,
+      "expected_calibration_error_10_bin": 0.411493,
+      "confusion_matrix": {
+        "true_positive": 49,
+        "true_negative": 76,
+        "false_positive": 0,
+        "false_negative": 90
+      }
+    }
+  },
+  "unseen_predicate_and_atoms": {
+    "examples": 215,
+    "runs": 4,
+    "v1_ranking": {
+      "eligible_decisions": 43,
+      "top1_hit_rate": 1.0,
+      "top3_hit_rate": 1.0,
+      "mean_reciprocal_rank": 1.0
+    },
+    "v2_ranking": {
+      "eligible_decisions": 43,
+      "top1_hit_rate": 1.0,
+      "top3_hit_rate": 1.0,
+      "mean_reciprocal_rank": 1.0
+    },
+    "v2_classification": {
+      "examples": 215,
+      "positives": 139,
+      "negatives": 76,
+      "accuracy": 0.893023,
+      "balanced_accuracy": 0.905339,
+      "precision": 0.967742,
+      "recall": 0.863309,
+      "specificity": 0.947368,
+      "f1": 0.912548,
+      "roc_auc": 0.975861,
+      "average_precision": 0.982868,
+      "log_loss": 0.264687,
+      "brier_score": 0.079167,
+      "expected_calibration_error_10_bin": 0.134375,
+      "confusion_matrix": {
+        "true_positive": 120,
+        "true_negative": 72,
+        "false_positive": 4,
+        "false_negative": 19
+      }
+    }
+  },
+  "external_kg_frontiers": {
+    "provenance": [
+      {
+        "source": "wordnet_stv_clean.metta",
+        "source_sha256": "89136fea59ef20a19975035e7bd61a33b7c18c0e336edbbeaec8a623838da9e6",
+        "proof_chain": [
+          [
+            "a-list_n_01",
+            "list_n_01"
+          ],
+          [
+            "list_n_01",
+            "database_n_01"
+          ],
+          [
+            "database_n_01",
+            "information_n_01"
+          ]
+        ],
+        "candidates": 23
+      },
+      {
+        "source": "output_prolog_ready.metta",
+        "source_sha256": "e0e4d3ac19f8881901aaecc7f80a9a8580e7be3e31c2835c977198738cbe7686",
+        "proof_chain": [
+          [
+            "a-scan_ultrasonography_n_01",
+            "sonography_n_01"
+          ],
+          [
+            "sonography_n_01",
+            "imaging_n_02"
+          ],
+          [
+            "imaging_n_02",
+            "pictorial_representation_n_01"
+          ]
+        ],
+        "candidates": 23
+      },
+      {
+        "source": "kg.metta",
+        "source_sha256": "3d44cbc5a3bad106da43a8fb8690cc41288c6b9d1779d590516c92b573739f90",
+        "proof_chain": [
+          [
+            "a60_n",
+            "austin_car_n"
+          ],
+          [
+            "austin_car_n",
+            "car_n"
+          ],
+          [
+            "car_n",
+            "motor_vehicle_n"
+          ]
+        ],
+        "candidates": 23
+      }
+    ],
+    "examples": 69,
+    "runs": 3,
+    "v1_ranking": {
+      "eligible_decisions": 3,
+      "top1_hit_rate": 1.0,
+      "top3_hit_rate": 1.0,
+      "mean_reciprocal_rank": 1.0
+    },
+    "v2_ranking": {
+      "eligible_decisions": 3,
+      "top1_hit_rate": 1.0,
+      "top3_hit_rate": 1.0,
+      "mean_reciprocal_rank": 1.0
+    },
+    "v2_classification": {
+      "examples": 69,
+      "positives": 9,
+      "negatives": 60,
+      "accuracy": 0.869565,
+      "balanced_accuracy": 0.5,
+      "precision": 0.0,
+      "recall": 0.0,
+      "specificity": 1.0,
+      "f1": 0.0,
+      "roc_auc": 1.0,
+      "average_precision": 1.0,
+      "log_loss": 0.238182,
+      "brier_score": 0.088172,
+      "expected_calibration_error_10_bin": 0.116466,
+      "confusion_matrix": {
+        "true_positive": 0,
+        "true_negative": 60,
+        "false_positive": 0,
+        "false_negative": 9
+      }
+    }
+  },
+  "adversarial_v1_failure_frontiers": {
+    "examples": 300,
+    "runs": 100,
+    "v1_ranking": {
+      "eligible_decisions": 100,
+      "top1_hit_rate": 0.0,
+      "top3_hit_rate": 1.0,
+      "mean_reciprocal_rank": 0.333333
+    },
+    "v2_ranking": {
+      "eligible_decisions": 100,
+      "top1_hit_rate": 0.0,
+      "top3_hit_rate": 1.0,
+      "mean_reciprocal_rank": 0.333333
+    },
+    "v2_classification": {
+      "examples": 300,
+      "positives": 100,
+      "negatives": 200,
+      "accuracy": 0.333333,
+      "balanced_accuracy": 0.25,
+      "precision": 0.0,
+      "recall": 0.0,
+      "specificity": 0.5,
+      "f1": 0.0,
+      "roc_auc": 0.0,
+      "average_precision": 0.190734,
+      "log_loss": 3.054962,
+      "brier_score": 0.604631,
+      "expected_calibration_error_10_bin": 0.600187,
+      "confusion_matrix": {
+        "true_positive": 0,
+        "true_negative": 100,
+        "false_positive": 100,
+        "false_negative": 100
+      }
+    }
+  },
+  "training_label_noise": [
+    {
+      "label_flip_rate": 0.05,
+      "flipped_labels": 28,
+      "best_epoch": 35,
+      "clean_validation": {
+        "examples": 215,
+        "positives": 139,
+        "negatives": 76,
+        "accuracy": 0.995349,
+        "balanced_accuracy": 0.993421,
+        "precision": 0.992857,
+        "recall": 1.0,
+        "specificity": 0.986842,
+        "f1": 0.996416,
+        "roc_auc": 1.0,
+        "average_precision": 1.0,
+        "log_loss": 0.060381,
+        "brier_score": 0.006717,
+        "expected_calibration_error_10_bin": 0.055842,
+        "confusion_matrix": {
+          "true_positive": 139,
+          "true_negative": 75,
+          "false_positive": 1,
+          "false_negative": 0
+        }
+      },
+      "ranking": {
+        "eligible_decisions": 43,
+        "top1_hit_rate": 1.0,
+        "top3_hit_rate": 1.0,
+        "mean_reciprocal_rank": 1.0
+      }
+    },
+    {
+      "label_flip_rate": 0.1,
+      "flipped_labels": 57,
+      "best_epoch": 32,
+      "clean_validation": {
+        "examples": 215,
+        "positives": 139,
+        "negatives": 76,
+        "accuracy": 0.995349,
+        "balanced_accuracy": 0.993421,
+        "precision": 0.992857,
+        "recall": 1.0,
+        "specificity": 0.986842,
+        "f1": 0.996416,
+        "roc_auc": 0.999905,
+        "average_precision": 0.999949,
+        "log_loss": 0.120076,
+        "brier_score": 0.020018,
+        "expected_calibration_error_10_bin": 0.102775,
+        "confusion_matrix": {
+          "true_positive": 139,
+          "true_negative": 75,
+          "false_positive": 1,
+          "false_negative": 0
+        }
+      },
+      "ranking": {
+        "eligible_decisions": 43,
+        "top1_hit_rate": 1.0,
+        "top3_hit_rate": 1.0,
+        "mean_reciprocal_rank": 1.0
+      }
+    },
+    {
+      "label_flip_rate": 0.2,
+      "flipped_labels": 114,
+      "best_epoch": 38,
+      "clean_validation": {
+        "examples": 215,
+        "positives": 139,
+        "negatives": 76,
+        "accuracy": 1.0,
+        "balanced_accuracy": 1.0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "specificity": 1.0,
+        "f1": 1.0,
+        "roc_auc": 1.0,
+        "average_precision": 1.0,
+        "log_loss": 0.21355,
+        "brier_score": 0.039456,
+        "expected_calibration_error_10_bin": 0.189991,
+        "confusion_matrix": {
+          "true_positive": 139,
+          "true_negative": 76,
+          "false_positive": 0,
+          "false_negative": 0
+        }
+      },
+      "ranking": {
+        "eligible_decisions": 43,
+        "top1_hit_rate": 1.0,
+        "top3_hit_rate": 1.0,
+        "mean_reciprocal_rank": 1.0
+      }
+    },
+    {
+      "label_flip_rate": 0.3,
+      "flipped_labels": 171,
+      "best_epoch": 11,
+      "clean_validation": {
+        "examples": 215,
+        "positives": 139,
+        "negatives": 76,
+        "accuracy": 0.953488,
+        "balanced_accuracy": 0.952101,
+        "precision": 0.970803,
+        "recall": 0.956835,
+        "specificity": 0.947368,
+        "f1": 0.963768,
+        "roc_auc": 0.982677,
+        "average_precision": 0.98709,
+        "log_loss": 0.425463,
+        "brier_score": 0.123208,
+        "expected_calibration_error_10_bin": 0.317789,
+        "confusion_matrix": {
+          "true_positive": 133,
+          "true_negative": 72,
+          "false_positive": 4,
+          "false_negative": 6
+        }
+      },
+      "ranking": {
+        "eligible_decisions": 43,
+        "top1_hit_rate": 1.0,
+        "top3_hit_rate": 1.0,
+        "mean_reciprocal_rank": 1.0
+      }
+    }
+  ],
+  "interpretation_contract": {
+    "boost_requires": "v2 top-1 hit rate strictly greater than v1 on at least one held-out stress family without regressing the others",
+    "broad_generalization_requires": "nontrivial v2 ranking on unseen vocabulary, unseen predicates, external KG frontiers, and adversarial v1 failures"
+  },
+  "performance_boost_proven": false
+}
