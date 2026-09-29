@@ -9,5 +9,8 @@ Agents/
 *.egg-info/
 dist/
 build/
-artifacts/
+artifacts/*
+!artifacts/models/
+artifacts/models/*
+!artifacts/models/tier1_v2.npz
 benchmarks/results/generated/

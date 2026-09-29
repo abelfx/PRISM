@@ -125,9 +125,6 @@ prism/
 └── scripts/check.sh                   # Local regression entry point
 ```
 
-For layer ownership, invariants, and where new work should go, see
-[`docs/architecture.md`](docs/architecture.md).
-
 ---
 
 ## 5. Design Guarantees
@@ -191,7 +188,21 @@ This project's documentation is split by purpose — each document below covers 
 |---|---|
 | `docs/papers/PRISM_PLN_Inference_Control_Proposal_final.pdf` | The what and why — problem, gaps, AGI relevance and proposed solution |
 | `docs/papers/PRISM_Implementation_Specification.md` | The how — file-level changes, formulas and training objectives |
-| `docs/milestones/milestone_week*.md` | Per-week deliverables, gates and measured results |
-| `docs/architecture.md` | Runtime ownership, dependency direction and artifact policy |
+| `../milestones/milestone_week*.md` | Per-week deliverables, gates and measured results |
 | `benchmarks/README.md` | Benchmark commands, baselines and result interpretation |
 | `tests/README.md` | Test coverage and integration commands |
+
+### Week 11: learned Tier 1 v2
+
+Week 11 trains the paper's learned-embedding MLP from finalized proof traces
+and compares its shortlist accuracy with Tier 1 v1 on whole held-out search
+runs. Tier 1 v1 remains the runtime default because the measured result is
+parity rather than an improvement. Run the end-to-end collection, training and
+evaluation with:
+
+```bash
+python3 -m benchmarks.evaluate_tier1_v2
+```
+
+The detailed scope and acceptance gates are in
+`../milestones/milestone_week11.md`.

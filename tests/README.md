@@ -29,6 +29,7 @@ The test suite is partitioned into two tiers:
 | `test_stage0_metta.metta` | **GATE-3.2** | Verifies MeTTa FFI invocation of Stage 0 `PremiseIndex`: excludes distractors while preserving on-path candidate premises | Both sub-tests return `"PASS"` |
 | `test_soundness.py` | Week 10 soundness | Independently replays recorded actions through pinned `PLN.Apply`; rejects term, STV, evidence, cycle, source and kernel failures |
 | `test_fallback.py` | Week 10 robustness | Injects scorer, cache, Stage 0, Tier 2 and kernel failures and checks safe fallback or fail-closed behavior |
+| `test_tier1_v2.py` | Week 11 training | Validates trace rows, run-grouped splits, optimization and checkpoint equivalence |
 
 ---
 
@@ -39,7 +40,7 @@ From the PRISM repository root:
 ```bash
 python3 -m pytest
 ```
-Measured Week 10 outcome: **121/121 passed**.
+Current measured outcome after Week 11: **126/126 passed**.
 
 Run only the Week 10 deterministic gate with:
 
