@@ -17,13 +17,15 @@ def test_trace_record_step_feature_extraction():
     session = ProofTraceSession("test_domain", goal)
 
     step1 = ["Sentence", [["Inheritance", "A", "B"], ["stv", 0.9, 0.85]], [1]]
-    trace = session.record_step(1, step1, candidate_pool_size=5)
+    trace = session.record_step(1, step1, candidate_pool_size=5, queue_position=2)
 
     assert isinstance(trace, ProofStepTrace)
     assert trace.step == 1
     assert trace.confidence == 0.85
     assert trace.depth == 0  # stamp [1] has len 1 -> depth 0
     assert trace.evidence_stamp == ["1"]
+    assert trace.candidate_pool_size == 5
+    assert trace.queue_position == 2
     assert trace.atom_overlap > 0.0  # shares 'A' with goal
     assert trace.heuristic_score > 0.0
     assert trace.on_proof_path is None  # not finalized yet
@@ -95,6 +97,17 @@ def test_trace_export_jsonl():
         assert record["step"] == 1
         assert record["on_proof_path"] is True
         assert record["domain_name"] == "test_domain"
+        assert record["queue_position"] == 0
     finally:
         if os.path.exists(filepath):
             os.remove(filepath)
+
+
+def test_string_sentence_depth_matches_native_sentence():
+    """Serialized benchmark traces must retain evidence-derived depth."""
+    session = ProofTraceSession("serialized", ["Inheritance", "A", "Z"])
+    trace = session.record_step(
+        1,
+        "(Sentence ((Inheritance A C) (stv 0.8 0.7)) (1 2 3))",
+    )
+    assert trace.depth == 2
