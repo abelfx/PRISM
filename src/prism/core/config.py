@@ -35,6 +35,8 @@ class Tier1Config:
     gamma: float = 0.90
     default_confidence: float = 0.5
     empty_score: float = -99999.0
+    version: str = "v1"
+    model_path: Optional[str] = None
 
 
 @dataclass(frozen=True)

@@ -14,6 +14,16 @@ from prism.core.cache import ScoreCache
 from prism.stage0.index import PremiseIndex
 from prism.tier1.heuristic_v1 import compute_v1_score, extract_confidence
 
+
+def _configured_score(sentence: Any, goal: Any) -> float:
+    """Dispatch to the configured scorer; v1 remains the release default."""
+    if DEFAULT_CONFIG.tier1.version == "v2":
+        if not DEFAULT_CONFIG.tier1.model_path:
+            raise ValueError("Tier 1 v2 requires model_path")
+        from prism.tier1.learned_v2 import compute_v2_score
+        return compute_v2_score(sentence, goal, DEFAULT_CONFIG.tier1.model_path)
+    return compute_v1_score(sentence, goal, DEFAULT_CONFIG.tier1)
+
 logger = logging.getLogger("prism.scorer")
 
 _cache: ScoreCache = ScoreCache()
@@ -42,7 +52,7 @@ def score_candidate(sentence: Any, goal: Any) -> Union[float, str]:
         return _cache.get_or_compute(
             sentence,
             goal,
-            lambda s, g: compute_v1_score(s, g, DEFAULT_CONFIG.tier1),
+            _configured_score,
         )
     except Exception as exc:
         try:
