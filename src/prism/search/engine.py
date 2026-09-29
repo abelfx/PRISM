@@ -151,6 +151,15 @@ class AStarSearchEngine:
         else:
             self.tier2_reasoner = None
 
+    def _tier1_score(self, candidate: Any, goal: Any) -> float:
+        """Use the selected Tier 1 implementation behind one safe boundary."""
+        if self.tier1_config.version == "v2":
+            if not self.tier1_config.model_path:
+                raise ValueError("Tier 1 v2 requires model_path")
+            from prism.tier1.learned_v2 import compute_v2_score
+            return compute_v2_score(candidate, goal, self.tier1_config.model_path)
+        return compute_v1_score(candidate, goal, self.tier1_config)
+
     def search(
         self,
         initial_tasks: Sequence[Any],
@@ -214,7 +223,7 @@ class AStarSearchEngine:
             for b in initial_beliefs:
                 s, event = safe_cached_score(
                     self.cache,
-                    b, goal, lambda c, g: compute_v1_score(c, g, self.tier1_config)
+                    b, goal, self._tier1_score
                 )
                 if event:
                     fallback_events.append(event)
@@ -346,12 +355,30 @@ class AStarSearchEngine:
             # 3. Score and prioritize candidates
             if self.config.guided:
                 scored_candidates = []
+                queue_ranks: Dict[int, int] = {}
+                if self.tier1_config.version == "v2":
+                    preliminary = sorted(
+                        candidates,
+                        key=lambda item: compute_v1_score(item, goal, self.tier1_config),
+                        reverse=True,
+                    )
+                    queue_ranks = {id(item): rank for rank, item in enumerate(preliminary)}
                 for candidate in candidates:
+                    score_fn = self._tier1_score
+                    cache_goal = goal
+                    if self.tier1_config.version == "v2":
+                        from prism.tier1.learned_v2 import compute_v2_score
+
+                        rank = queue_ranks[id(candidate)]
+                        cache_goal = (goal, "__prism_queue__", rank, len(candidates))
+                        score_fn = lambda c, _g, rank=rank: compute_v2_score(
+                            c, goal, self.tier1_config.model_path or "", rank, len(candidates)
+                        )
                     score, event = safe_cached_score(
                         self.cache,
                         candidate,
-                        goal,
-                        lambda c, g: compute_v1_score(c, g, self.tier1_config),
+                        cache_goal,
+                        score_fn,
                     )
                     if event:
                         fallback_events.append(event)
@@ -414,12 +441,13 @@ class AStarSearchEngine:
                 top_k = [(0.0, c) for c in candidates[: self.config.beam_width]]
 
             # 4. Expand top-k beam candidates
-            for score, candidate in top_k:
+            for queue_position, (score, candidate) in enumerate(top_k):
                 if trace_session:
                     trace_session.record_step(
                         step=steps_expanded,
                         sentence_expr=candidate,
                         candidate_pool_size=len(candidates),
+                        queue_position=queue_position,
                     )
 
                 new_tasks, new_beliefs = apply_candidate(

@@ -94,6 +94,13 @@ def extract_depth(sentence: Any) -> int:
             if isinstance(stamp, (list, tuple)):
                 # Base fact has 1 premise index -> depth 0. Two premises resolved -> length 2 -> depth 1.
                 return max(0, len(stamp) - 1)
+        if isinstance(sentence, str):
+            # The benchmark bridge serializes sentences before tracing.  Keep
+            # its evidence-derived depth equivalent to the native list form.
+            match = re.search(r"\)\s+\(([^()]*)\)\s*\)\s*$", sentence.strip())
+            if match:
+                stamp = match.group(1).split()
+                return max(0, len(stamp) - 1)
     except (TypeError, IndexError):
         pass
     return 0

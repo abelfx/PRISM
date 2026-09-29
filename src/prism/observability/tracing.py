@@ -44,6 +44,9 @@ class ProofStepTrace:
         String representation of the active query goal.
     candidate_pool_size : int
         Size of the active task frontier at the time of selection.
+    queue_position : int
+        Zero-based rank of this candidate after the active scorer sorted the
+        candidate pool.
     depth : int
         Derivation depth inferred from the evidence stamp length.
     atom_overlap : float
@@ -64,6 +67,7 @@ class ProofStepTrace:
     evidence_stamp: List[str]
     goal: str
     candidate_pool_size: int = 1
+    queue_position: int = 0
     depth: int = 0
     atom_overlap: float = 0.0
     depth_discount: float = 0.0
@@ -102,6 +106,7 @@ class ProofTraceSession:
         step: int,
         sentence_expr: Any,
         candidate_pool_size: int = 1,
+        queue_position: int = 0,
     ) -> ProofStepTrace:
         """
         Record a single task selection step and compute its feature vector.
@@ -114,6 +119,8 @@ class ProofTraceSession:
             Sentence S-expression (e.g. ['Sentence', [['Inheritance', 'A', 'B'], ['stv', s, c]], [1]]).
         candidate_pool_size : int
             Number of eligible tasks in the queue.
+        queue_position : int
+            Zero-based rank assigned by the active scorer.
 
         Returns
         -------
@@ -173,6 +180,7 @@ class ProofTraceSession:
             evidence_stamp=stamp,
             goal=self.goal_str,
             candidate_pool_size=candidate_pool_size,
+            queue_position=queue_position,
             depth=depth,
             atom_overlap=round(overlap, 4),
             depth_discount=round(depth_disc, 4),
