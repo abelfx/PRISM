@@ -2,6 +2,14 @@
 
 ## Use case
 
+PRISM's target is **better planning/search control**, not a general increase
+in OpenPsi agent performance. Judge it primarily by whether it selects legal
+steps and finds valid goal-reaching plans within a given budget, plus its
+runtime cost. OpenPsi remains responsible for executing actions and updating
+demands and affect. Real task success is a useful downstream test when there
+is an executor, but a one-step tie does not negate a harder planning benefit;
+nor does a planning gain by itself establish better agent outcomes.
+
 PeTTa-OpenPSI's `action-planner-v2.metta` produces applicable actions from its
 actual cognitive-schema rule space, applies them to get successor states, and
 chooses a successor by its existing `distance` function. In a branching rule
@@ -104,33 +112,122 @@ This is a concrete second-backend integration, **not** PLN feature parity.
 It covers Stage-0-like applicable-rule selection, deterministic goal-aware
 ranking, bounded plan traversal, a native fallback, and a live MeTTa test.
 It does not yet integrate Tier 1 v2, Tier 2, bidirectional planning, demand
-selection, rewards, or stochastic action outcomes. The optional feedback-loop
-entry point is dispatch-tested and has one noninteractive smoke check below,
-but its full demand/emotion cycle has not been validated end to end. The
+selection, rewards, or real stochastic action outcomes. The optional feedback-loop
+entry point is dispatch-tested and has noninteractive checks below,
+but its real user-facing demand/emotion cycle has not been validated. The
 reachability map reflects current *schema* links; a
 path in that map is not a guarantee that real-world action execution will
 succeed. The controlled evaluation includes one repository-owned conversation
 graph and constructed branching workloads. It is not a generalization claim
-across OpenPsi agents: the actual v1 feedback-loop planner has only the two
-replayed diagnostic goals above; the alternative OpenPsi A* schema and real
-action execution have not been compared.
+across OpenPsi agents: the alternative OpenPsi A* schema and real
+action execution have not been compared. A later 21-goal, fresh-process v1
+comparison is described below.
 
-### Full feedback-loop smoke check
+### Original feedback-loop smoke check, before local correction
 
 Run `PYTHONPATH=src python3 -m benchmarks.evaluate_openpsi_full_cycle` from
 `prism/`. This executes the actual PeTTa-OpenPSI `psi-agent-loop` and opt-in
 `psi-agent-loop-prism` in separate fresh PeTTa processes on the same
 noninteractive three-rule fixture. It is a constructed graph, not a deployed
-agent. The fixture explicitly imports OpenPsi's normalization module, which
-the feedback-loop source does not import itself.
+agent. At the time of this first run, the fixture had to explicitly import
+OpenPsi's normalization module.
 
 Native v1 returned `(idle finish)`, which fails replay through OpenPsi's own
 `applyCurrentActions`; PRISM returned `(explore finish)`, which replays to the
 target. **Both** loops nevertheless printed `goalMet true`, identical emotion
 values, and an unchanged competence demand of `0.1`. Thus this test supports
 better *plan validity* on the fixture but **not** improved demand satisfaction
-or affective behavior. The loop's `isGoalMet?` checks a rule for only the last
+or affective behavior. The loop's former `isGoalMet?` checked a rule for only the last
 action, not the entire plan, so the invalid native path is falsely reported
 as successful. The demand-update path also did not modify the demand in this
-fixture. These are existing OpenPsi feedback-loop limitations, not evidence
-that PRISM fixes end-to-end agent behavior.
+fixture. These were OpenPsi feedback-loop limitations, not evidence
+that PRISM fixed end-to-end agent behavior. The local corrections and new
+results below supersede this smoke check; it remains here as the pre-fix
+baseline.
+
+### Follow-up: path-valid demand update and fresh planner comparison
+
+The local PeTTa-OpenPSI checkout now replays the entire proposed route using
+its native rule matcher and only treats it as successful when it ends at the
+target. A separate bounded-demand updater preserves the five-field demand
+form, removes stale demand atoms when syncing back to the KB, and the feedback
+loop imports its normalization dependency. These are
+OpenPsi-side local changes, not PRISM features or an upstream release.
+
+Run the corrected paired loops in separate fresh PeTTa processes:
+
+```bash
+PYTHONPATH=src python3 -m benchmarks.evaluate_openpsi_full_cycle \
+  --output benchmarks/results/reference/openpsi_full_cycle_constructed.json
+PYTHONPATH=src python3 -m benchmarks.evaluate_openpsi_full_cycle \
+  --scenario conversation \
+  --output benchmarks/results/reference/openpsi_full_cycle_conversation.json
+```
+
+On the constructed three-rule fixture, native v1 returns invalid
+`(idle finish)` and competence stays at `0.10`; PRISM returns valid
+`(explore finish)` and competence becomes `0.55`. On the repository's
+conversation rules with `Understand-User-Interests` as the demand goal,
+native v1's four-action route is invalid and leaves competence at `0.10`;
+PRISM's eight-action route is valid and raises it to `0.55`. A second cycle
+on the constructed case increases one selected PRISM demand, while the KB
+retains only current bounded demands; native remains unchanged. Second-cycle
+demand selection is stochastic: competence sometimes reaches `0.775`, while
+another `0.90` demand may instead reach `0.95`. Emotion outputs
+differ after the valid update. This establishes a symbolic feedback-loop difference
+under the corrected local code, not real action execution. The saved outputs
+are `benchmarks/results/reference/openpsi_full_cycle_constructed.json` and
+`benchmarks/results/reference/openpsi_full_cycle_conversation.json`.
+
+For the same 21 conversation goals, the fresh-process runner compares the
+default v1 planner, native v2 selection, and PRISM with a 15-action returned
+plan limit and action replay:
+
+```bash
+PYTHONPATH=src python3 -m benchmarks.evaluate_openpsi_fresh \
+  --output benchmarks/results/reference/openpsi_fresh_eval.json
+```
+
+V1 replayed successfully for **1/21** goals, v2 for **3/21**, and PRISM for
+**20/21**. Each goal/mode uses a new PeTTa process and rule space; the two
+calls inside that process provide cold and warm timings. Median cold/warm
+planner-call times were about `0.423/0.184 ms` (v1), `0.496/0.326 ms` (v2),
+and `26.823/3.236 ms` (PRISM). V1's internal search is unbounded, so the
+15-action output limit is **not** an equal search-work budget. All 21 goals
+still belong to one repository rule graph.
+
+The repository ping-pong test schema, including nested `(ball ...)` goals,
+also runs through PeTTa. Both selectors choose the same direct `act-ping`
+action, and PRISM falls back to native selection for an unreachable target.
+This is a rule-level probe, not a full ping-pong game run. A separate live
+negative-compatibility probe loads all 24 repository `metta-trader` rules:
+OpenPsi v2 produces no candidates under its different schema, and PRISM
+returns no pick. That is **unsupported schema**, not a PRISM task failure.
+
+Finally, `benchmarks.evaluate_openpsi_stochastic` applies explicitly
+hypothetical independent action-success rates to the PeTTa-validated plans.
+At 90% per-action success and 1,000 seeded episodes per goal, completion was
+3.81% (v1), 11.64% (v2), and 49.07% (PRISM); at 70%, it was 2.36%, 7.38%,
+and 16.72%. These are simulated outcomes under assumed probabilities, **not**
+measured OpenPsi action reliability or field task success. See
+`benchmarks/results/reference/openpsi_stochastic_eval.json` and the
+workspace's `milestones/openpsi_evaluation.md` for the full protocol.
+
+### Effectful OpenPsi action check
+
+`benchmarks.evaluate_openpsi_action_execution` runs both selectors against
+the repository ping-pong game's real `executePlan`/`ping` action functions,
+which mutate ball and motivation state. Both select `act-ping`: from motivation
+`1.0`, both return the ball and finish at `0.8`; from `0.1`, both miss. PRISM
+has **no measured task-outcome advantage** in this actual-action case. The
+game's pre-existing `sleep-t` call mismatch was fixed locally to make the
+action executable. Run:
+
+```bash
+PYTHONPATH=src python3 -m benchmarks.evaluate_openpsi_action_execution \
+  --output benchmarks/results/reference/openpsi_action_execution.json
+```
+
+This is one turn in one use case. The conversation graph has no action
+executor; its replay/demand result remains symbolic, and the stochastic
+numbers above remain assumptions rather than observed environment outcomes.
