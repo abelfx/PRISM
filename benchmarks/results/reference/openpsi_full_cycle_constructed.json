@@ -1,0 +1,27 @@
+{
+  "backend": "iCog PeTTa-OpenPSI port through trueagi PeTTa",
+  "fixture": "constructed three-rule graph with a fixed competence demand; fresh process per mode",
+  "native": {
+    "plan": "(idle finish)",
+    "plan_replays_to_goal": false,
+    "demand_after": "(demand competence 0.3 0.5 0.1)",
+    "kb_demands_after": "((demand competence 0.3 0.5 0.1) (demand affiliation 0.3 0.5 0.9) (demand energy 0.3 0.5 0.9))",
+    "loop_reported_goal_met": false,
+    "emotion_output": "happinessValue 0.11147849326351836 sadnessValue 0.5350877192982456 angerValue 0.30101746954094266 fearValue 0.5343110537821946 gratitudeValue 0.19109748604164264",
+    "second_demand_after": "(demand competence 0.3 0.5 0.1)",
+    "second_kb_demands_after": "((demand competence 0.3 0.5 0.1) (demand affiliation 0.3 0.5 0.9) (demand energy 0.3 0.5 0.9))",
+    "second_updated_demand": null
+  },
+  "prism": {
+    "plan": "(explore finish)",
+    "plan_replays_to_goal": true,
+    "demand_after": "(demand competence 0.3 0.5 0.55)",
+    "kb_demands_after": "((demand affiliation 0.3 0.5 0.9) (demand energy 0.3 0.5 0.9) (demand competence 0.3 0.5 0.55))",
+    "loop_reported_goal_met": true,
+    "emotion_output": "happinessValue 0.1868727770222704 sadnessValue 0.28979896595594723 angerValue 0.3663648859695071 fearValue 0.3208319908488244 gratitudeValue 0.21119122070201785",
+    "second_demand_after": "(demand competence 0.3 0.5 0.775)",
+    "second_kb_demands_after": "((demand affiliation 0.3 0.5 0.9) (demand energy 0.3 0.5 0.9) (demand competence 0.3 0.5 0.775))",
+    "second_updated_demand": "competence"
+  },
+  "interpretation": "After local path-validation and bounded-demand fixes, only PRISM's replay-valid plan updates demand and changes downstream emotion values. The action outcomes are still symbolic, not real-world execution."
+}

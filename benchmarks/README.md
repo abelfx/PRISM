@@ -280,8 +280,38 @@ PYTHONPATH=src python3 -m benchmarks.evaluate_openpsi_full_cycle
 ```
 
 This runs native and PRISM feedback-loop entries in separate fresh PeTTa
-processes against the same three-rule fixture. It replays each action list
-through OpenPsi's own transitions and reports the loop's goal flag, emotion
-values, and demand after execution. It demonstrates improved plan validity in
-this fixture, **not** improved demand or emotion outcomes; see
-`docs/openpsi-integration.md` for the full limitations.
+processes against the same three-rule fixture. Under the locally corrected
+path-valid feedback loop, only PRISM's valid route updates competence from
+0.10 to 0.55; this is a symbolic outcome, not actual action execution. Add
+`--scenario conversation` to run the same check on OpenPsi's repository
+conversation rules. See `docs/openpsi-integration.md` for limits.
+
+### 9. Compare all planners per goal and simulate action failure
+
+```bash
+PYTHONPATH=src python3 -m benchmarks.evaluate_openpsi_fresh \
+  --output benchmarks/results/reference/openpsi_fresh_eval.json
+PYTHONPATH=src python3 -m benchmarks.evaluate_openpsi_stochastic \
+  --output benchmarks/results/reference/openpsi_stochastic_eval.json
+```
+
+The fresh comparison uses a separate PeTTa process for each of 21 goals and
+each planner (default v1, native v2 selector, PRISM), replays returned plans,
+and records cold/warm calls and total process cost. V1 has no internal search
+budget, so only returned plan length is capped equally. The seeded simulator
+then assumes declared per-action success probabilities; it is not OpenPsi's
+real action executor. The separate `evaluate_openpsi_pingpong.metta` probes
+the repository's nested-goal ping-pong test rules without running its game
+loop.
+
+### 10. Execute a repository-owned action
+
+```bash
+PYTHONPATH=src python3 -m benchmarks.evaluate_openpsi_action_execution \
+  --output benchmarks/results/reference/openpsi_action_execution.json
+```
+
+This invokes the real PeTTa-OpenPSI ping-pong `executePlan`/`ping` action
+path and checks its changed ball/motivation state in healthy and low-energy
+conditions. Native v2 and PRISM tie on both; it is not evidence of improved
+agent outcomes. It does not execute the conversation-rule actions.

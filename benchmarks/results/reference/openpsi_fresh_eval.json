@@ -1,0 +1,1851 @@
+{
+  "protocol": {
+    "backend": "iCog PeTTa-OpenPSI",
+    "same_goals": [
+      "Send-Greeting",
+      "Receive-User-Response",
+      "Understand-Initial-Mood",
+      "Understand-Initial-Context",
+      "Explore-Mood-Details",
+      "Ask-Daily-Activities",
+      "Learn-Activity-Details",
+      "Understand-Hobby-Preferences",
+      "Understand-Future-Goals",
+      "Summarize-User-Preferences",
+      "Understand-User-Interests",
+      "Ask-Recent-Events",
+      "Learn-Recent-Event-Details",
+      "Understand-Event-Impact",
+      "Explore-Event-Emotions",
+      "Understand-Event-Significance",
+      "Propose-Related-Topics",
+      "Receive-Topic-Choice",
+      "Discuss-Chosen-Topic",
+      "Off-Topic-Discussion",
+      "Irrelevant-Topic"
+    ],
+    "max_returned_actions": 15,
+    "fresh_process_per_goal_and_mode": true,
+    "costs": "cold/warm planner call in ms, and fresh total process ms",
+    "caveat": "v1 planner has no internal search budget; only returned plan length and a five-second process timeout are bounded"
+  },
+  "totals": {
+    "V1": {
+      "goals": 21,
+      "solved": 1,
+      "invalid": 20,
+      "timeouts_or_errors": 0
+    },
+    "V2": {
+      "goals": 21,
+      "solved": 3,
+      "invalid": 0,
+      "timeouts_or_errors": 0
+    },
+    "PRISM": {
+      "goals": 21,
+      "solved": 20,
+      "invalid": 0,
+      "timeouts_or_errors": 0
+    }
+  },
+  "observations": [
+    {
+      "goal": "Send-Greeting",
+      "mode": "V1",
+      "process_ms": 136.15554900025018,
+      "cold": {
+        "outcome": "Invalid",
+        "steps": 4,
+        "actions": [
+          "initiate-dialogue",
+          "elicit-response",
+          "discuss-random-topic",
+          "share-joke"
+        ],
+        "elapsed_ms": 0.42609799857018515
+      },
+      "warm": {
+        "outcome": "Invalid",
+        "steps": 4,
+        "actions": [
+          "initiate-dialogue",
+          "elicit-response",
+          "discuss-random-topic",
+          "share-joke"
+        ],
+        "elapsed_ms": 0.19631000031949952
+      }
+    },
+    {
+      "goal": "Send-Greeting",
+      "mode": "V2",
+      "process_ms": 129.9320730031468,
+      "cold": {
+        "outcome": "Success",
+        "steps": 1,
+        "actions": [
+          "initiate-dialogue"
+        ],
+        "elapsed_ms": 0.22519299818668514
+      },
+      "warm": {
+        "outcome": "Success",
+        "steps": 1,
+        "actions": [
+          "initiate-dialogue"
+        ],
+        "elapsed_ms": 0.06985199433984235
+      }
+    },
+    {
+      "goal": "Send-Greeting",
+      "mode": "PRISM",
+      "process_ms": 156.33309000259032,
+      "cold": {
+        "outcome": "Success",
+        "steps": 1,
+        "actions": [
+          "initiate-dialogue"
+        ],
+        "elapsed_ms": 25.546379998559132
+      },
+      "warm": {
+        "outcome": "Success",
+        "steps": 1,
+        "actions": [
+          "initiate-dialogue"
+        ],
+        "elapsed_ms": 0.6271439997362904
+      }
+    },
+    {
+      "goal": "Receive-User-Response",
+      "mode": "V1",
+      "process_ms": 135.28284399944823,
+      "cold": {
+        "outcome": "Success",
+        "steps": 2,
+        "actions": [
+          "initiate-dialogue",
+          "elicit-response"
+        ],
+        "elapsed_ms": 0.280343992926646
+      },
+      "warm": {
+        "outcome": "Success",
+        "steps": 2,
+        "actions": [
+          "initiate-dialogue",
+          "elicit-response"
+        ],
+        "elapsed_ms": 0.0819910055724904
+      }
+    },
+    {
+      "goal": "Receive-User-Response",
+      "mode": "V2",
+      "process_ms": 164.92201299843146,
+      "cold": {
+        "outcome": "Success",
+        "steps": 2,
+        "actions": [
+          "initiate-dialogue",
+          "elicit-response"
+        ],
+        "elapsed_ms": 0.4080400030943565
+      },
+      "warm": {
+        "outcome": "Success",
+        "steps": 2,
+        "actions": [
+          "initiate-dialogue",
+          "elicit-response"
+        ],
+        "elapsed_ms": 0.17995599773712456
+      }
+    },
+    {
+      "goal": "Receive-User-Response",
+      "mode": "PRISM",
+      "process_ms": 154.89869700104464,
+      "cold": {
+        "outcome": "Success",
+        "steps": 2,
+        "actions": [
+          "initiate-dialogue",
+          "elicit-response"
+        ],
+        "elapsed_ms": 22.80409100058023
+      },
+      "warm": {
+        "outcome": "Success",
+        "steps": 2,
+        "actions": [
+          "initiate-dialogue",
+          "elicit-response"
+        ],
+        "elapsed_ms": 0.8972390060080215
+      }
+    },
+    {
+      "goal": "Understand-Initial-Mood",
+      "mode": "V1",
+      "process_ms": 131.44601099338615,
+      "cold": {
+        "outcome": "Invalid",
+        "steps": 4,
+        "actions": [
+          "initiate-dialogue",
+          "elicit-response",
+          "discuss-random-topic",
+          "share-joke"
+        ],
+        "elapsed_ms": 0.43671100138453767
+      },
+      "warm": {
+        "outcome": "Invalid",
+        "steps": 4,
+        "actions": [
+          "initiate-dialogue",
+          "elicit-response",
+          "discuss-random-topic",
+          "share-joke"
+        ],
+        "elapsed_ms": 0.23718999727861956
+      }
+    },
+    {
+      "goal": "Understand-Initial-Mood",
+      "mode": "V2",
+      "process_ms": 136.74938699841732,
+      "cold": {
+        "outcome": "DeadEnd",
+        "steps": 3,
+        "actions": [
+          "initiate-dialogue",
+          "elicit-response",
+          "discuss-random-topic"
+        ],
+        "elapsed_ms": 0.4687039981945418
+      },
+      "warm": {
+        "outcome": "DeadEnd",
+        "steps": 3,
+        "actions": [
+          "initiate-dialogue",
+          "elicit-response",
+          "discuss-random-topic"
+        ],
+        "elapsed_ms": 0.31333800143329427
+      }
+    },
+    {
+      "goal": "Understand-Initial-Mood",
+      "mode": "PRISM",
+      "process_ms": 190.5441599956248,
+      "cold": {
+        "outcome": "Success",
+        "steps": 3,
+        "actions": [
+          "initiate-dialogue",
+          "elicit-response",
+          "interpret-mood"
+        ],
+        "elapsed_ms": 30.676351001602598
+      },
+      "warm": {
+        "outcome": "Success",
+        "steps": 3,
+        "actions": [
+          "initiate-dialogue",
+          "elicit-response",
+          "interpret-mood"
+        ],
+        "elapsed_ms": 1.8897269983426668
+      }
+    },
+    {
+      "goal": "Understand-Initial-Context",
+      "mode": "V1",
+      "process_ms": 131.7591029946925,
+      "cold": {
+        "outcome": "Invalid",
+        "steps": 4,
+        "actions": [
+          "initiate-dialogue",
+          "elicit-response",
+          "discuss-random-topic",
+          "share-joke"
+        ],
+        "elapsed_ms": 0.3694080005516298
+      },
+      "warm": {
+        "outcome": "Invalid",
+        "steps": 4,
+        "actions": [
+          "initiate-dialogue",
+          "elicit-response",
+          "discuss-random-topic",
+          "share-joke"
+        ],
+        "elapsed_ms": 0.16521100042155012
+      }
+    },
+    {
+      "goal": "Understand-Initial-Context",
+      "mode": "V2",
+      "process_ms": 135.16607800556812,
+      "cold": {
+        "outcome": "DeadEnd",
+        "steps": 3,
+        "actions": [
+          "initiate-dialogue",
+          "elicit-response",
+          "discuss-random-topic"
+        ],
+        "elapsed_ms": 0.47798099694773555
+      },
+      "warm": {
+        "outcome": "DeadEnd",
+        "steps": 3,
+        "actions": [
+          "initiate-dialogue",
+          "elicit-response",
+          "discuss-random-topic"
+        ],
+        "elapsed_ms": 0.3108550008619204
+      }
+    },
+    {
+      "goal": "Understand-Initial-Context",
+      "mode": "PRISM",
+      "process_ms": 161.36897000251338,
+      "cold": {
+        "outcome": "Success",
+        "steps": 3,
+        "actions": [
+          "initiate-dialogue",
+          "elicit-response",
+          "interpret-context"
+        ],
+        "elapsed_ms": 25.487398001132533
+      },
+      "warm": {
+        "outcome": "Success",
+        "steps": 3,
+        "actions": [
+          "initiate-dialogue",
+          "elicit-response",
+          "interpret-context"
+        ],
+        "elapsed_ms": 2.544265997130424
+      }
+    },
+    {
+      "goal": "Explore-Mood-Details",
+      "mode": "V1",
+      "process_ms": 156.02798300096765,
+      "cold": {
+        "outcome": "Invalid",
+        "steps": 4,
+        "actions": [
+          "initiate-dialogue",
+          "elicit-response",
+          "discuss-random-topic",
+          "share-joke"
+        ],
+        "elapsed_ms": 0.38404799852287397
+      },
+      "warm": {
+        "outcome": "Invalid",
+        "steps": 4,
+        "actions": [
+          "initiate-dialogue",
+          "elicit-response",
+          "discuss-random-topic",
+          "share-joke"
+        ],
+        "elapsed_ms": 0.18424299923935905
+      }
+    },
+    {
+      "goal": "Explore-Mood-Details",
+      "mode": "V2",
+      "process_ms": 133.12083599885227,
+      "cold": {
+        "outcome": "DeadEnd",
+        "steps": 3,
+        "actions": [
+          "initiate-dialogue",
+          "elicit-response",
+          "discuss-random-topic"
+        ],
+        "elapsed_ms": 0.6788979953853413
+      },
+      "warm": {
+        "outcome": "DeadEnd",
+        "steps": 3,
+        "actions": [
+          "initiate-dialogue",
+          "elicit-response",
+          "discuss-random-topic"
+        ],
+        "elapsed_ms": 0.4705259998445399
+      }
+    },
+    {
+      "goal": "Explore-Mood-Details",
+      "mode": "PRISM",
+      "process_ms": 156.9828419960686,
+      "cold": {
+        "outcome": "Success",
+        "steps": 4,
+        "actions": [
+          "initiate-dialogue",
+          "elicit-response",
+          "interpret-mood",
+          "probe-mood"
+        ],
+        "elapsed_ms": 24.35081200383138
+      },
+      "warm": {
+        "outcome": "Success",
+        "steps": 4,
+        "actions": [
+          "initiate-dialogue",
+          "elicit-response",
+          "interpret-mood",
+          "probe-mood"
+        ],
+        "elapsed_ms": 1.9996580012957565
+      }
+    },
+    {
+      "goal": "Ask-Daily-Activities",
+      "mode": "V1",
+      "process_ms": 126.84331299533369,
+      "cold": {
+        "outcome": "Invalid",
+        "steps": 4,
+        "actions": [
+          "initiate-dialogue",
+          "elicit-response",
+          "discuss-random-topic",
+          "share-joke"
+        ],
+        "elapsed_ms": 0.358837001840584
+      },
+      "warm": {
+        "outcome": "Invalid",
+        "steps": 4,
+        "actions": [
+          "initiate-dialogue",
+          "elicit-response",
+          "discuss-random-topic",
+          "share-joke"
+        ],
+        "elapsed_ms": 0.17795200255932286
+      }
+    },
+    {
+      "goal": "Ask-Daily-Activities",
+      "mode": "V2",
+      "process_ms": 143.31242100161035,
+      "cold": {
+        "outcome": "DeadEnd",
+        "steps": 3,
+        "actions": [
+          "initiate-dialogue",
+          "elicit-response",
+          "discuss-random-topic"
+        ],
+        "elapsed_ms": 0.556544000573922
+      },
+      "warm": {
+        "outcome": "DeadEnd",
+        "steps": 3,
+        "actions": [
+          "initiate-dialogue",
+          "elicit-response",
+          "discuss-random-topic"
+        ],
+        "elapsed_ms": 0.3183640001225285
+      }
+    },
+    {
+      "goal": "Ask-Daily-Activities",
+      "mode": "PRISM",
+      "process_ms": 206.89000799757196,
+      "cold": {
+        "outcome": "Success",
+        "steps": 4,
+        "actions": [
+          "initiate-dialogue",
+          "elicit-response",
+          "interpret-context",
+          "request-activities"
+        ],
+        "elapsed_ms": 25.705651001771912
+      },
+      "warm": {
+        "outcome": "Success",
+        "steps": 4,
+        "actions": [
+          "initiate-dialogue",
+          "elicit-response",
+          "interpret-context",
+          "request-activities"
+        ],
+        "elapsed_ms": 2.4620699987281114
+      }
+    },
+    {
+      "goal": "Learn-Activity-Details",
+      "mode": "V1",
+      "process_ms": 133.63826199929463,
+      "cold": {
+        "outcome": "Invalid",
+        "steps": 4,
+        "actions": [
+          "initiate-dialogue",
+          "elicit-response",
+          "discuss-random-topic",
+          "share-joke"
+        ],
+        "elapsed_ms": 0.7098330024746247
+      },
+      "warm": {
+        "outcome": "Invalid",
+        "steps": 4,
+        "actions": [
+          "initiate-dialogue",
+          "elicit-response",
+          "discuss-random-topic",
+          "share-joke"
+        ],
+        "elapsed_ms": 0.20612700609490275
+      }
+    },
+    {
+      "goal": "Learn-Activity-Details",
+      "mode": "V2",
+      "process_ms": 127.6955840003211,
+      "cold": {
+        "outcome": "DeadEnd",
+        "steps": 3,
+        "actions": [
+          "initiate-dialogue",
+          "elicit-response",
+          "discuss-random-topic"
+        ],
+        "elapsed_ms": 0.4597830047714524
+      },
+      "warm": {
+        "outcome": "DeadEnd",
+        "steps": 3,
+        "actions": [
+          "initiate-dialogue",
+          "elicit-response",
+          "discuss-random-topic"
+        ],
+        "elapsed_ms": 0.32426699908683077
+      }
+    },
+    {
+      "goal": "Learn-Activity-Details",
+      "mode": "PRISM",
+      "process_ms": 188.1637909973506,
+      "cold": {
+        "outcome": "Success",
+        "steps": 5,
+        "actions": [
+          "initiate-dialogue",
+          "elicit-response",
+          "interpret-context",
+          "request-activities",
+          "collect-activity-details"
+        ],
+        "elapsed_ms": 25.739390002854634
+      },
+      "warm": {
+        "outcome": "Success",
+        "steps": 5,
+        "actions": [
+          "initiate-dialogue",
+          "elicit-response",
+          "interpret-context",
+          "request-activities",
+          "collect-activity-details"
+        ],
+        "elapsed_ms": 1.9696620001923293
+      }
+    },
+    {
+      "goal": "Understand-Hobby-Preferences",
+      "mode": "V1",
+      "process_ms": 127.1335170022212,
+      "cold": {
+        "outcome": "Invalid",
+        "steps": 4,
+        "actions": [
+          "initiate-dialogue",
+          "elicit-response",
+          "discuss-random-topic",
+          "share-joke"
+        ],
+        "elapsed_ms": 0.3635460016084835
+      },
+      "warm": {
+        "outcome": "Invalid",
+        "steps": 4,
+        "actions": [
+          "initiate-dialogue",
+          "elicit-response",
+          "discuss-random-topic",
+          "share-joke"
+        ],
+        "elapsed_ms": 0.1609439932508394
+      }
+    },
+    {
+      "goal": "Understand-Hobby-Preferences",
+      "mode": "V2",
+      "process_ms": 127.38593600079184,
+      "cold": {
+        "outcome": "DeadEnd",
+        "steps": 3,
+        "actions": [
+          "initiate-dialogue",
+          "elicit-response",
+          "discuss-random-topic"
+        ],
+        "elapsed_ms": 0.4955889962729998
+      },
+      "warm": {
+        "outcome": "DeadEnd",
+        "steps": 3,
+        "actions": [
+          "initiate-dialogue",
+          "elicit-response",
+          "discuss-random-topic"
+        ],
+        "elapsed_ms": 0.3875170004903339
+      }
+    },
+    {
+      "goal": "Understand-Hobby-Preferences",
+      "mode": "PRISM",
+      "process_ms": 159.59785399900284,
+      "cold": {
+        "outcome": "Success",
+        "steps": 6,
+        "actions": [
+          "initiate-dialogue",
+          "elicit-response",
+          "interpret-context",
+          "request-activities",
+          "collect-activity-details",
+          "explore-hobbies"
+        ],
+        "elapsed_ms": 25.35194500524085
+      },
+      "warm": {
+        "outcome": "Success",
+        "steps": 6,
+        "actions": [
+          "initiate-dialogue",
+          "elicit-response",
+          "interpret-context",
+          "request-activities",
+          "collect-activity-details",
+          "explore-hobbies"
+        ],
+        "elapsed_ms": 2.5238300004275516
+      }
+    },
+    {
+      "goal": "Understand-Future-Goals",
+      "mode": "V1",
+      "process_ms": 151.70324299833737,
+      "cold": {
+        "outcome": "Invalid",
+        "steps": 4,
+        "actions": [
+          "initiate-dialogue",
+          "elicit-response",
+          "discuss-random-topic",
+          "share-joke"
+        ],
+        "elapsed_ms": 0.4640560000552796
+      },
+      "warm": {
+        "outcome": "Invalid",
+        "steps": 4,
+        "actions": [
+          "initiate-dialogue",
+          "elicit-response",
+          "discuss-random-topic",
+          "share-joke"
+        ],
+        "elapsed_ms": 0.18232200091006234
+      }
+    },
+    {
+      "goal": "Understand-Future-Goals",
+      "mode": "V2",
+      "process_ms": 130.37908700061962,
+      "cold": {
+        "outcome": "DeadEnd",
+        "steps": 3,
+        "actions": [
+          "initiate-dialogue",
+          "elicit-response",
+          "discuss-random-topic"
+        ],
+        "elapsed_ms": 0.467543002741877
+      },
+      "warm": {
+        "outcome": "DeadEnd",
+        "steps": 3,
+        "actions": [
+          "initiate-dialogue",
+          "elicit-response",
+          "discuss-random-topic"
+        ],
+        "elapsed_ms": 0.3297160001238808
+      }
+    },
+    {
+      "goal": "Understand-Future-Goals",
+      "mode": "PRISM",
+      "process_ms": 165.2488350009662,
+      "cold": {
+        "outcome": "Success",
+        "steps": 6,
+        "actions": [
+          "initiate-dialogue",
+          "elicit-response",
+          "interpret-context",
+          "request-activities",
+          "collect-activity-details",
+          "explore-goals"
+        ],
+        "elapsed_ms": 26.566378997813445
+      },
+      "warm": {
+        "outcome": "Success",
+        "steps": 6,
+        "actions": [
+          "initiate-dialogue",
+          "elicit-response",
+          "interpret-context",
+          "request-activities",
+          "collect-activity-details",
+          "explore-goals"
+        ],
+        "elapsed_ms": 2.642859995830804
+      }
+    },
+    {
+      "goal": "Summarize-User-Preferences",
+      "mode": "V1",
+      "process_ms": 138.04408900614362,
+      "cold": {
+        "outcome": "Invalid",
+        "steps": 4,
+        "actions": [
+          "initiate-dialogue",
+          "elicit-response",
+          "discuss-random-topic",
+          "share-joke"
+        ],
+        "elapsed_ms": 0.4745269980048761
+      },
+      "warm": {
+        "outcome": "Invalid",
+        "steps": 4,
+        "actions": [
+          "initiate-dialogue",
+          "elicit-response",
+          "discuss-random-topic",
+          "share-joke"
+        ],
+        "elapsed_ms": 0.2131000001099892
+      }
+    },
+    {
+      "goal": "Summarize-User-Preferences",
+      "mode": "V2",
+      "process_ms": 155.3101589961443,
+      "cold": {
+        "outcome": "DeadEnd",
+        "steps": 3,
+        "actions": [
+          "initiate-dialogue",
+          "elicit-response",
+          "discuss-random-topic"
+        ],
+        "elapsed_ms": 0.8903000052669086
+      },
+      "warm": {
+        "outcome": "DeadEnd",
+        "steps": 3,
+        "actions": [
+          "initiate-dialogue",
+          "elicit-response",
+          "discuss-random-topic"
+        ],
+        "elapsed_ms": 0.5906229998799972
+      }
+    },
+    {
+      "goal": "Summarize-User-Preferences",
+      "mode": "PRISM",
+      "process_ms": 174.4127850033692,
+      "cold": {
+        "outcome": "Success",
+        "steps": 7,
+        "actions": [
+          "initiate-dialogue",
+          "elicit-response",
+          "interpret-context",
+          "request-activities",
+          "collect-activity-details",
+          "explore-goals",
+          "synthesize-preferences"
+        ],
+        "elapsed_ms": 26.092947999131866
+      },
+      "warm": {
+        "outcome": "Success",
+        "steps": 7,
+        "actions": [
+          "initiate-dialogue",
+          "elicit-response",
+          "interpret-context",
+          "request-activities",
+          "collect-activity-details",
+          "explore-goals",
+          "synthesize-preferences"
+        ],
+        "elapsed_ms": 3.2362869969801977
+      }
+    },
+    {
+      "goal": "Understand-User-Interests",
+      "mode": "V1",
+      "process_ms": 132.2648509958526,
+      "cold": {
+        "outcome": "Invalid",
+        "steps": 4,
+        "actions": [
+          "initiate-dialogue",
+          "elicit-response",
+          "discuss-random-topic",
+          "share-joke"
+        ],
+        "elapsed_ms": 0.402808997023385
+      },
+      "warm": {
+        "outcome": "Invalid",
+        "steps": 4,
+        "actions": [
+          "initiate-dialogue",
+          "elicit-response",
+          "discuss-random-topic",
+          "share-joke"
+        ],
+        "elapsed_ms": 0.1843860009103082
+      }
+    },
+    {
+      "goal": "Understand-User-Interests",
+      "mode": "V2",
+      "process_ms": 135.55313400138402,
+      "cold": {
+        "outcome": "DeadEnd",
+        "steps": 3,
+        "actions": [
+          "initiate-dialogue",
+          "elicit-response",
+          "discuss-random-topic"
+        ],
+        "elapsed_ms": 0.5024349957238883
+      },
+      "warm": {
+        "outcome": "DeadEnd",
+        "steps": 3,
+        "actions": [
+          "initiate-dialogue",
+          "elicit-response",
+          "discuss-random-topic"
+        ],
+        "elapsed_ms": 0.30513799720210955
+      }
+    },
+    {
+      "goal": "Understand-User-Interests",
+      "mode": "PRISM",
+      "process_ms": 192.32336500135716,
+      "cold": {
+        "outcome": "Success",
+        "steps": 8,
+        "actions": [
+          "initiate-dialogue",
+          "elicit-response",
+          "interpret-context",
+          "request-activities",
+          "collect-activity-details",
+          "explore-goals",
+          "synthesize-preferences",
+          "finalize-understanding"
+        ],
+        "elapsed_ms": 29.451160997268744
+      },
+      "warm": {
+        "outcome": "Success",
+        "steps": 8,
+        "actions": [
+          "initiate-dialogue",
+          "elicit-response",
+          "interpret-context",
+          "request-activities",
+          "collect-activity-details",
+          "explore-goals",
+          "synthesize-preferences",
+          "finalize-understanding"
+        ],
+        "elapsed_ms": 3.786337998462841
+      }
+    },
+    {
+      "goal": "Ask-Recent-Events",
+      "mode": "V1",
+      "process_ms": 128.89478499710094,
+      "cold": {
+        "outcome": "Invalid",
+        "steps": 4,
+        "actions": [
+          "initiate-dialogue",
+          "elicit-response",
+          "discuss-random-topic",
+          "share-joke"
+        ],
+        "elapsed_ms": 0.45002000115346164
+      },
+      "warm": {
+        "outcome": "Invalid",
+        "steps": 4,
+        "actions": [
+          "initiate-dialogue",
+          "elicit-response",
+          "discuss-random-topic",
+          "share-joke"
+        ],
+        "elapsed_ms": 0.24180499895010144
+      }
+    },
+    {
+      "goal": "Ask-Recent-Events",
+      "mode": "V2",
+      "process_ms": 136.3201290005236,
+      "cold": {
+        "outcome": "DeadEnd",
+        "steps": 3,
+        "actions": [
+          "initiate-dialogue",
+          "elicit-response",
+          "discuss-random-topic"
+        ],
+        "elapsed_ms": 0.5041690019425005
+      },
+      "warm": {
+        "outcome": "DeadEnd",
+        "steps": 3,
+        "actions": [
+          "initiate-dialogue",
+          "elicit-response",
+          "discuss-random-topic"
+        ],
+        "elapsed_ms": 0.7873340000514872
+      }
+    },
+    {
+      "goal": "Ask-Recent-Events",
+      "mode": "PRISM",
+      "process_ms": 164.40420800063293,
+      "cold": {
+        "outcome": "Success",
+        "steps": 9,
+        "actions": [
+          "initiate-dialogue",
+          "elicit-response",
+          "interpret-context",
+          "request-activities",
+          "collect-activity-details",
+          "explore-goals",
+          "synthesize-preferences",
+          "finalize-understanding",
+          "inquire-recent-events"
+        ],
+        "elapsed_ms": 27.395790995797142
+      },
+      "warm": {
+        "outcome": "Success",
+        "steps": 9,
+        "actions": [
+          "initiate-dialogue",
+          "elicit-response",
+          "interpret-context",
+          "request-activities",
+          "collect-activity-details",
+          "explore-goals",
+          "synthesize-preferences",
+          "finalize-understanding",
+          "inquire-recent-events"
+        ],
+        "elapsed_ms": 4.53113199910149
+      }
+    },
+    {
+      "goal": "Learn-Recent-Event-Details",
+      "mode": "V1",
+      "process_ms": 160.7450550000067,
+      "cold": {
+        "outcome": "Invalid",
+        "steps": 4,
+        "actions": [
+          "initiate-dialogue",
+          "elicit-response",
+          "discuss-random-topic",
+          "share-joke"
+        ],
+        "elapsed_ms": 0.43151399586349726
+      },
+      "warm": {
+        "outcome": "Invalid",
+        "steps": 4,
+        "actions": [
+          "initiate-dialogue",
+          "elicit-response",
+          "discuss-random-topic",
+          "share-joke"
+        ],
+        "elapsed_ms": 0.20134900114499032
+      }
+    },
+    {
+      "goal": "Learn-Recent-Event-Details",
+      "mode": "V2",
+      "process_ms": 133.7068300053943,
+      "cold": {
+        "outcome": "DeadEnd",
+        "steps": 3,
+        "actions": [
+          "initiate-dialogue",
+          "elicit-response",
+          "discuss-random-topic"
+        ],
+        "elapsed_ms": 0.48795900511322543
+      },
+      "warm": {
+        "outcome": "DeadEnd",
+        "steps": 3,
+        "actions": [
+          "initiate-dialogue",
+          "elicit-response",
+          "discuss-random-topic"
+        ],
+        "elapsed_ms": 0.32482400274602696
+      }
+    },
+    {
+      "goal": "Learn-Recent-Event-Details",
+      "mode": "PRISM",
+      "process_ms": 165.1853570001549,
+      "cold": {
+        "outcome": "Success",
+        "steps": 10,
+        "actions": [
+          "initiate-dialogue",
+          "elicit-response",
+          "interpret-context",
+          "request-activities",
+          "collect-activity-details",
+          "explore-goals",
+          "synthesize-preferences",
+          "finalize-understanding",
+          "inquire-recent-events",
+          "collect-event-details"
+        ],
+        "elapsed_ms": 26.97428499959642
+      },
+      "warm": {
+        "outcome": "Success",
+        "steps": 10,
+        "actions": [
+          "initiate-dialogue",
+          "elicit-response",
+          "interpret-context",
+          "request-activities",
+          "collect-activity-details",
+          "explore-goals",
+          "synthesize-preferences",
+          "finalize-understanding",
+          "inquire-recent-events",
+          "collect-event-details"
+        ],
+        "elapsed_ms": 4.246680997312069
+      }
+    },
+    {
+      "goal": "Understand-Event-Impact",
+      "mode": "V1",
+      "process_ms": 126.08811099926243,
+      "cold": {
+        "outcome": "Invalid",
+        "steps": 4,
+        "actions": [
+          "initiate-dialogue",
+          "elicit-response",
+          "discuss-random-topic",
+          "share-joke"
+        ],
+        "elapsed_ms": 0.42292900616303086
+      },
+      "warm": {
+        "outcome": "Invalid",
+        "steps": 4,
+        "actions": [
+          "initiate-dialogue",
+          "elicit-response",
+          "discuss-random-topic",
+          "share-joke"
+        ],
+        "elapsed_ms": 0.16696799866622314
+      }
+    },
+    {
+      "goal": "Understand-Event-Impact",
+      "mode": "V2",
+      "process_ms": 153.05588600313058,
+      "cold": {
+        "outcome": "DeadEnd",
+        "steps": 3,
+        "actions": [
+          "initiate-dialogue",
+          "elicit-response",
+          "discuss-random-topic"
+        ],
+        "elapsed_ms": 0.6129619941930287
+      },
+      "warm": {
+        "outcome": "DeadEnd",
+        "steps": 3,
+        "actions": [
+          "initiate-dialogue",
+          "elicit-response",
+          "discuss-random-topic"
+        ],
+        "elapsed_ms": 0.3591540007619187
+      }
+    },
+    {
+      "goal": "Understand-Event-Impact",
+      "mode": "PRISM",
+      "process_ms": 169.1775800063624,
+      "cold": {
+        "outcome": "Success",
+        "steps": 11,
+        "actions": [
+          "initiate-dialogue",
+          "elicit-response",
+          "interpret-context",
+          "request-activities",
+          "collect-activity-details",
+          "explore-goals",
+          "synthesize-preferences",
+          "finalize-understanding",
+          "inquire-recent-events",
+          "collect-event-details",
+          "explore-event-impact"
+        ],
+        "elapsed_ms": 27.635662001557648
+      },
+      "warm": {
+        "outcome": "Success",
+        "steps": 11,
+        "actions": [
+          "initiate-dialogue",
+          "elicit-response",
+          "interpret-context",
+          "request-activities",
+          "collect-activity-details",
+          "explore-goals",
+          "synthesize-preferences",
+          "finalize-understanding",
+          "inquire-recent-events",
+          "collect-event-details",
+          "explore-event-impact"
+        ],
+        "elapsed_ms": 4.934600998240057
+      }
+    },
+    {
+      "goal": "Explore-Event-Emotions",
+      "mode": "V1",
+      "process_ms": 129.0988139953697,
+      "cold": {
+        "outcome": "Invalid",
+        "steps": 4,
+        "actions": [
+          "initiate-dialogue",
+          "elicit-response",
+          "discuss-random-topic",
+          "share-joke"
+        ],
+        "elapsed_ms": 0.6550239995704032
+      },
+      "warm": {
+        "outcome": "Invalid",
+        "steps": 4,
+        "actions": [
+          "initiate-dialogue",
+          "elicit-response",
+          "discuss-random-topic",
+          "share-joke"
+        ],
+        "elapsed_ms": 0.2525149975554086
+      }
+    },
+    {
+      "goal": "Explore-Event-Emotions",
+      "mode": "V2",
+      "process_ms": 143.81879499705974,
+      "cold": {
+        "outcome": "DeadEnd",
+        "steps": 3,
+        "actions": [
+          "initiate-dialogue",
+          "elicit-response",
+          "discuss-random-topic"
+        ],
+        "elapsed_ms": 0.5787170011899434
+      },
+      "warm": {
+        "outcome": "DeadEnd",
+        "steps": 3,
+        "actions": [
+          "initiate-dialogue",
+          "elicit-response",
+          "discuss-random-topic"
+        ],
+        "elapsed_ms": 0.36812399775953963
+      }
+    },
+    {
+      "goal": "Explore-Event-Emotions",
+      "mode": "PRISM",
+      "process_ms": 205.6255549978232,
+      "cold": {
+        "outcome": "Success",
+        "steps": 12,
+        "actions": [
+          "initiate-dialogue",
+          "elicit-response",
+          "interpret-context",
+          "request-activities",
+          "collect-activity-details",
+          "explore-goals",
+          "synthesize-preferences",
+          "finalize-understanding",
+          "inquire-recent-events",
+          "collect-event-details",
+          "explore-event-impact",
+          "probe-emotions"
+        ],
+        "elapsed_ms": 32.85331799997948
+      },
+      "warm": {
+        "outcome": "Success",
+        "steps": 12,
+        "actions": [
+          "initiate-dialogue",
+          "elicit-response",
+          "interpret-context",
+          "request-activities",
+          "collect-activity-details",
+          "explore-goals",
+          "synthesize-preferences",
+          "finalize-understanding",
+          "inquire-recent-events",
+          "collect-event-details",
+          "explore-event-impact",
+          "probe-emotions"
+        ],
+        "elapsed_ms": 5.665115000738297
+      }
+    },
+    {
+      "goal": "Understand-Event-Significance",
+      "mode": "V1",
+      "process_ms": 130.63877800595947,
+      "cold": {
+        "outcome": "Invalid",
+        "steps": 4,
+        "actions": [
+          "initiate-dialogue",
+          "elicit-response",
+          "discuss-random-topic",
+          "share-joke"
+        ],
+        "elapsed_ms": 0.3922549949493259
+      },
+      "warm": {
+        "outcome": "Invalid",
+        "steps": 4,
+        "actions": [
+          "initiate-dialogue",
+          "elicit-response",
+          "discuss-random-topic",
+          "share-joke"
+        ],
+        "elapsed_ms": 0.17390499851899222
+      }
+    },
+    {
+      "goal": "Understand-Event-Significance",
+      "mode": "V2",
+      "process_ms": 129.69907899969257,
+      "cold": {
+        "outcome": "DeadEnd",
+        "steps": 3,
+        "actions": [
+          "initiate-dialogue",
+          "elicit-response",
+          "discuss-random-topic"
+        ],
+        "elapsed_ms": 0.49381500139134005
+      },
+      "warm": {
+        "outcome": "DeadEnd",
+        "steps": 3,
+        "actions": [
+          "initiate-dialogue",
+          "elicit-response",
+          "discuss-random-topic"
+        ],
+        "elapsed_ms": 0.3452539967838675
+      }
+    },
+    {
+      "goal": "Understand-Event-Significance",
+      "mode": "PRISM",
+      "process_ms": 175.91925500164507,
+      "cold": {
+        "outcome": "Success",
+        "steps": 13,
+        "actions": [
+          "initiate-dialogue",
+          "elicit-response",
+          "interpret-context",
+          "request-activities",
+          "collect-activity-details",
+          "explore-goals",
+          "synthesize-preferences",
+          "finalize-understanding",
+          "inquire-recent-events",
+          "collect-event-details",
+          "explore-event-impact",
+          "probe-emotions",
+          "assess-significance"
+        ],
+        "elapsed_ms": 29.711855997447856
+      },
+      "warm": {
+        "outcome": "Success",
+        "steps": 13,
+        "actions": [
+          "initiate-dialogue",
+          "elicit-response",
+          "interpret-context",
+          "request-activities",
+          "collect-activity-details",
+          "explore-goals",
+          "synthesize-preferences",
+          "finalize-understanding",
+          "inquire-recent-events",
+          "collect-event-details",
+          "explore-event-impact",
+          "probe-emotions",
+          "assess-significance"
+        ],
+        "elapsed_ms": 6.938938997336663
+      }
+    },
+    {
+      "goal": "Propose-Related-Topics",
+      "mode": "V1",
+      "process_ms": 137.87534900620813,
+      "cold": {
+        "outcome": "Invalid",
+        "steps": 4,
+        "actions": [
+          "initiate-dialogue",
+          "elicit-response",
+          "discuss-random-topic",
+          "share-joke"
+        ],
+        "elapsed_ms": 0.4427069943631068
+      },
+      "warm": {
+        "outcome": "Invalid",
+        "steps": 4,
+        "actions": [
+          "initiate-dialogue",
+          "elicit-response",
+          "discuss-random-topic",
+          "share-joke"
+        ],
+        "elapsed_ms": 0.18359800014877692
+      }
+    },
+    {
+      "goal": "Propose-Related-Topics",
+      "mode": "V2",
+      "process_ms": 131.5405319983256,
+      "cold": {
+        "outcome": "DeadEnd",
+        "steps": 3,
+        "actions": [
+          "initiate-dialogue",
+          "elicit-response",
+          "discuss-random-topic"
+        ],
+        "elapsed_ms": 0.6677939963992685
+      },
+      "warm": {
+        "outcome": "DeadEnd",
+        "steps": 3,
+        "actions": [
+          "initiate-dialogue",
+          "elicit-response",
+          "discuss-random-topic"
+        ],
+        "elapsed_ms": 0.42265700176358223
+      }
+    },
+    {
+      "goal": "Propose-Related-Topics",
+      "mode": "PRISM",
+      "process_ms": 170.07299899705686,
+      "cold": {
+        "outcome": "Success",
+        "steps": 14,
+        "actions": [
+          "initiate-dialogue",
+          "elicit-response",
+          "interpret-context",
+          "request-activities",
+          "collect-activity-details",
+          "explore-goals",
+          "synthesize-preferences",
+          "finalize-understanding",
+          "inquire-recent-events",
+          "collect-event-details",
+          "explore-event-impact",
+          "probe-emotions",
+          "assess-significance",
+          "suggest-related-topics"
+        ],
+        "elapsed_ms": 29.607875003421213
+      },
+      "warm": {
+        "outcome": "Success",
+        "steps": 14,
+        "actions": [
+          "initiate-dialogue",
+          "elicit-response",
+          "interpret-context",
+          "request-activities",
+          "collect-activity-details",
+          "explore-goals",
+          "synthesize-preferences",
+          "finalize-understanding",
+          "inquire-recent-events",
+          "collect-event-details",
+          "explore-event-impact",
+          "probe-emotions",
+          "assess-significance",
+          "suggest-related-topics"
+        ],
+        "elapsed_ms": 6.329527997877449
+      }
+    },
+    {
+      "goal": "Receive-Topic-Choice",
+      "mode": "V1",
+      "process_ms": 132.34412899328163,
+      "cold": {
+        "outcome": "Invalid",
+        "steps": 4,
+        "actions": [
+          "initiate-dialogue",
+          "elicit-response",
+          "discuss-random-topic",
+          "share-joke"
+        ],
+        "elapsed_ms": 0.35960200330009684
+      },
+      "warm": {
+        "outcome": "Invalid",
+        "steps": 4,
+        "actions": [
+          "initiate-dialogue",
+          "elicit-response",
+          "discuss-random-topic",
+          "share-joke"
+        ],
+        "elapsed_ms": 0.1666999960434623
+      }
+    },
+    {
+      "goal": "Receive-Topic-Choice",
+      "mode": "V2",
+      "process_ms": 154.4176379975397,
+      "cold": {
+        "outcome": "DeadEnd",
+        "steps": 3,
+        "actions": [
+          "initiate-dialogue",
+          "elicit-response",
+          "discuss-random-topic"
+        ],
+        "elapsed_ms": 0.6871139994473197
+      },
+      "warm": {
+        "outcome": "DeadEnd",
+        "steps": 3,
+        "actions": [
+          "initiate-dialogue",
+          "elicit-response",
+          "discuss-random-topic"
+        ],
+        "elapsed_ms": 0.3257669959566556
+      }
+    },
+    {
+      "goal": "Receive-Topic-Choice",
+      "mode": "PRISM",
+      "process_ms": 168.97790599614382,
+      "cold": {
+        "outcome": "Success",
+        "steps": 15,
+        "actions": [
+          "initiate-dialogue",
+          "elicit-response",
+          "interpret-context",
+          "request-activities",
+          "collect-activity-details",
+          "explore-goals",
+          "synthesize-preferences",
+          "finalize-understanding",
+          "inquire-recent-events",
+          "collect-event-details",
+          "explore-event-impact",
+          "probe-emotions",
+          "assess-significance",
+          "suggest-related-topics",
+          "elicit-topic-choice"
+        ],
+        "elapsed_ms": 28.88105600140989
+      },
+      "warm": {
+        "outcome": "Success",
+        "steps": 15,
+        "actions": [
+          "initiate-dialogue",
+          "elicit-response",
+          "interpret-context",
+          "request-activities",
+          "collect-activity-details",
+          "explore-goals",
+          "synthesize-preferences",
+          "finalize-understanding",
+          "inquire-recent-events",
+          "collect-event-details",
+          "explore-event-impact",
+          "probe-emotions",
+          "assess-significance",
+          "suggest-related-topics",
+          "elicit-topic-choice"
+        ],
+        "elapsed_ms": 6.532867999339942
+      }
+    },
+    {
+      "goal": "Discuss-Chosen-Topic",
+      "mode": "V1",
+      "process_ms": 129.34010900062276,
+      "cold": {
+        "outcome": "Invalid",
+        "steps": 4,
+        "actions": [
+          "initiate-dialogue",
+          "elicit-response",
+          "discuss-random-topic",
+          "share-joke"
+        ],
+        "elapsed_ms": 0.39547900087200105
+      },
+      "warm": {
+        "outcome": "Invalid",
+        "steps": 4,
+        "actions": [
+          "initiate-dialogue",
+          "elicit-response",
+          "discuss-random-topic",
+          "share-joke"
+        ],
+        "elapsed_ms": 0.17094999930122867
+      }
+    },
+    {
+      "goal": "Discuss-Chosen-Topic",
+      "mode": "V2",
+      "process_ms": 128.09264799579978,
+      "cold": {
+        "outcome": "DeadEnd",
+        "steps": 3,
+        "actions": [
+          "initiate-dialogue",
+          "elicit-response",
+          "discuss-random-topic"
+        ],
+        "elapsed_ms": 0.4791870014742017
+      },
+      "warm": {
+        "outcome": "DeadEnd",
+        "steps": 3,
+        "actions": [
+          "initiate-dialogue",
+          "elicit-response",
+          "discuss-random-topic"
+        ],
+        "elapsed_ms": 0.31347599724540487
+      }
+    },
+    {
+      "goal": "Discuss-Chosen-Topic",
+      "mode": "PRISM",
+      "process_ms": 203.60733500274364,
+      "cold": {
+        "outcome": "Budget",
+        "steps": 15,
+        "actions": [
+          "initiate-dialogue",
+          "elicit-response",
+          "interpret-context",
+          "request-activities",
+          "collect-activity-details",
+          "explore-goals",
+          "synthesize-preferences",
+          "finalize-understanding",
+          "inquire-recent-events",
+          "collect-event-details",
+          "explore-event-impact",
+          "probe-emotions",
+          "assess-significance",
+          "suggest-related-topics",
+          "elicit-topic-choice"
+        ],
+        "elapsed_ms": 36.47610500047449
+      },
+      "warm": {
+        "outcome": "Budget",
+        "steps": 15,
+        "actions": [
+          "initiate-dialogue",
+          "elicit-response",
+          "interpret-context",
+          "request-activities",
+          "collect-activity-details",
+          "explore-goals",
+          "synthesize-preferences",
+          "finalize-understanding",
+          "inquire-recent-events",
+          "collect-event-details",
+          "explore-event-impact",
+          "probe-emotions",
+          "assess-significance",
+          "suggest-related-topics",
+          "elicit-topic-choice"
+        ],
+        "elapsed_ms": 7.401513998047449
+      }
+    },
+    {
+      "goal": "Off-Topic-Discussion",
+      "mode": "V1",
+      "process_ms": 128.72660100401845,
+      "cold": {
+        "outcome": "Invalid",
+        "steps": 4,
+        "actions": [
+          "initiate-dialogue",
+          "elicit-response",
+          "discuss-random-topic",
+          "share-joke"
+        ],
+        "elapsed_ms": 0.3973220009356737
+      },
+      "warm": {
+        "outcome": "Invalid",
+        "steps": 4,
+        "actions": [
+          "initiate-dialogue",
+          "elicit-response",
+          "discuss-random-topic",
+          "share-joke"
+        ],
+        "elapsed_ms": 0.18181600171374157
+      }
+    },
+    {
+      "goal": "Off-Topic-Discussion",
+      "mode": "V2",
+      "process_ms": 137.2548880026443,
+      "cold": {
+        "outcome": "Success",
+        "steps": 3,
+        "actions": [
+          "initiate-dialogue",
+          "elicit-response",
+          "discuss-random-topic"
+        ],
+        "elapsed_ms": 0.4744140023831278
+      },
+      "warm": {
+        "outcome": "Success",
+        "steps": 3,
+        "actions": [
+          "initiate-dialogue",
+          "elicit-response",
+          "discuss-random-topic"
+        ],
+        "elapsed_ms": 0.3192529984517023
+      }
+    },
+    {
+      "goal": "Off-Topic-Discussion",
+      "mode": "PRISM",
+      "process_ms": 156.60401299828663,
+      "cold": {
+        "outcome": "Success",
+        "steps": 3,
+        "actions": [
+          "initiate-dialogue",
+          "elicit-response",
+          "discuss-random-topic"
+        ],
+        "elapsed_ms": 24.379316993872635
+      },
+      "warm": {
+        "outcome": "Success",
+        "steps": 3,
+        "actions": [
+          "initiate-dialogue",
+          "elicit-response",
+          "discuss-random-topic"
+        ],
+        "elapsed_ms": 1.4945200018701144
+      }
+    },
+    {
+      "goal": "Irrelevant-Topic",
+      "mode": "V1",
+      "process_ms": 159.56156400352484,
+      "cold": {
+        "outcome": "Invalid",
+        "steps": 4,
+        "actions": [
+          "initiate-dialogue",
+          "elicit-response",
+          "discuss-random-topic",
+          "share-joke"
+        ],
+        "elapsed_ms": 0.5044680001446977
+      },
+      "warm": {
+        "outcome": "Invalid",
+        "steps": 4,
+        "actions": [
+          "initiate-dialogue",
+          "elicit-response",
+          "discuss-random-topic",
+          "share-joke"
+        ],
+        "elapsed_ms": 0.23113200586521998
+      }
+    },
+    {
+      "goal": "Irrelevant-Topic",
+      "mode": "V2",
+      "process_ms": 129.63261100230739,
+      "cold": {
+        "outcome": "DeadEnd",
+        "steps": 3,
+        "actions": [
+          "initiate-dialogue",
+          "elicit-response",
+          "discuss-random-topic"
+        ],
+        "elapsed_ms": 0.7906149985501543
+      },
+      "warm": {
+        "outcome": "DeadEnd",
+        "steps": 3,
+        "actions": [
+          "initiate-dialogue",
+          "elicit-response",
+          "discuss-random-topic"
+        ],
+        "elapsed_ms": 0.4113060058443807
+      }
+    },
+    {
+      "goal": "Irrelevant-Topic",
+      "mode": "PRISM",
+      "process_ms": 160.7469270020374,
+      "cold": {
+        "outcome": "Success",
+        "steps": 7,
+        "actions": [
+          "initiate-dialogue",
+          "elicit-response",
+          "interpret-context",
+          "request-activities",
+          "collect-activity-details",
+          "explore-goals",
+          "ask-irrelevant-question"
+        ],
+        "elapsed_ms": 26.822813000762835
+      },
+      "warm": {
+        "outcome": "Success",
+        "steps": 7,
+        "actions": [
+          "initiate-dialogue",
+          "elicit-response",
+          "interpret-context",
+          "request-activities",
+          "collect-activity-details",
+          "explore-goals",
+          "ask-irrelevant-question"
+        ],
+        "elapsed_ms": 3.2825419984874316
+      }
+    }
+  ]
+}

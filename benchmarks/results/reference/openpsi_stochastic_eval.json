@@ -1,0 +1,87 @@
+{
+  "protocol": {
+    "input": "fresh-process, PeTTa-replayed OpenPsi action plans",
+    "goal_count": 21,
+    "episodes_per_goal_per_mode": 1000,
+    "seed": 20261008,
+    "independent_per_action_success_probabilities": [
+      1.0,
+      0.9,
+      0.7
+    ],
+    "failure": "episode terminates; no replanning or side effects",
+    "reward": "on completed route, competence demand 0.1 -> 0.55; otherwise 0.1",
+    "warning": "hypothetical simulator, not actual OpenPsi action execution or calibrated action success"
+  },
+  "results": {
+    "1.0": {
+      "V1": {
+        "completed": 1000,
+        "trials": 21000,
+        "completion_rate": 0.047619047619047616,
+        "mean_demand_after": 0.12142857142857144,
+        "analytic_expected_rate": 0.047619047619047616
+      },
+      "V2": {
+        "completed": 3000,
+        "trials": 21000,
+        "completion_rate": 0.14285714285714285,
+        "mean_demand_after": 0.16428571428571428,
+        "analytic_expected_rate": 0.14285714285714285
+      },
+      "PRISM": {
+        "completed": 20000,
+        "trials": 21000,
+        "completion_rate": 0.9523809523809523,
+        "mean_demand_after": 0.5285714285714286,
+        "analytic_expected_rate": 0.9523809523809523
+      }
+    },
+    "0.9": {
+      "V1": {
+        "completed": 800,
+        "trials": 21000,
+        "completion_rate": 0.0380952380952381,
+        "mean_demand_after": 0.11714285714285715,
+        "analytic_expected_rate": 0.038571428571428576
+      },
+      "V2": {
+        "completed": 2444,
+        "trials": 21000,
+        "completion_rate": 0.11638095238095238,
+        "mean_demand_after": 0.15237142857142857,
+        "analytic_expected_rate": 0.11614285714285714
+      },
+      "PRISM": {
+        "completed": 10304,
+        "trials": 21000,
+        "completion_rate": 0.49066666666666664,
+        "mean_demand_after": 0.3208,
+        "analytic_expected_rate": 0.4890865576737219
+      }
+    },
+    "0.7": {
+      "V1": {
+        "completed": 496,
+        "trials": 21000,
+        "completion_rate": 0.02361904761904762,
+        "mean_demand_after": 0.11062857142857144,
+        "analytic_expected_rate": 0.02333333333333333
+      },
+      "V2": {
+        "completed": 1549,
+        "trials": 21000,
+        "completion_rate": 0.07376190476190476,
+        "mean_demand_after": 0.13319285714285717,
+        "analytic_expected_rate": 0.073
+      },
+      "PRISM": {
+        "completed": 3511,
+        "trials": 21000,
+        "completion_rate": 0.1671904761904762,
+        "mean_demand_after": 0.1752357142857143,
+        "analytic_expected_rate": 0.16420757094333963
+      }
+    }
+  }
+}

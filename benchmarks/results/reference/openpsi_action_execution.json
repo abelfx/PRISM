@@ -1,0 +1,44 @@
+{
+  "environment": "repository PeTTa-OpenPSI ping-pong-v3 executePlan/ping, fresh process per selector",
+  "conditions": {
+    "healthy": "initial motivation 1.0",
+    "tired": "initial motivation 0.1"
+  },
+  "native_v2": {
+    "healthy": {
+      "plan": "(act-ping)",
+      "executor_completed": true,
+      "ball_at_opponent": 1.0,
+      "ball_lost": 0.0,
+      "motivation_after": 0.8,
+      "task_completed": true
+    },
+    "tired": {
+      "plan": "(act-ping)",
+      "executor_completed": false,
+      "ball_at_opponent": 0.0,
+      "ball_lost": 1.0,
+      "motivation_after": 0.1,
+      "task_completed": false
+    }
+  },
+  "prism": {
+    "healthy": {
+      "plan": "(act-ping)",
+      "executor_completed": true,
+      "ball_at_opponent": 1.0,
+      "ball_lost": 0.0,
+      "motivation_after": 0.8,
+      "task_completed": true
+    },
+    "tired": {
+      "plan": "(act-ping)",
+      "executor_completed": false,
+      "ball_at_opponent": 0.0,
+      "ball_lost": 1.0,
+      "motivation_after": 0.1,
+      "task_completed": false
+    }
+  },
+  "interpretation": "Real one-turn action effects are equal; no demonstrated PRISM outcome gain in this use case."
+}
