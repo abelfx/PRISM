@@ -1,0 +1,607 @@
+{
+  "schema_version": 2,
+  "purpose": "hand-written OOD, one-token contrast and confidence probes",
+  "checkpoint": "artifacts/models/tier1_v2.npz",
+  "checkpoint_sha256": "9205b3d642ca94022040361981b8933bd902fb413fbe3ea494fd7f5cef02fd36",
+  "fixed_numeric_features": {
+    "strength": 0.8,
+    "confidence": 0.8,
+    "depth": 1,
+    "candidate_pool_size": 2,
+    "queue_position": 0
+  },
+  "ood": {
+    "summary": {
+      "all_inputs": 20,
+      "valid_pln_inputs": 18,
+      "invalid_or_typo_inputs": 2,
+      "accuracy_on_valid_inputs": 0.5,
+      "accuracy_if_invalid_inputs_are_expected_negative": 0.45,
+      "mean_prediction_confidence_on_valid_inputs": 0.7523334880263248,
+      "mean_unknown_token_fraction": 0.8583333333333334,
+      "overconfident_errors_at_0_90": 4,
+      "errors": 9
+    },
+    "cases": [
+      {
+        "probe_id": "ood-01",
+        "candidate": "(Inheritance kestrel raptor)",
+        "goal": "(Inheritance kestrel animal)",
+        "label": 1,
+        "category": "unseen-taxonomy",
+        "valid_pln_shape": true,
+        "note": "",
+        "probability_positive": 0.44192541905469634,
+        "prediction": 0,
+        "correct": false,
+        "prediction_confidence": 0.5580745809453036,
+        "unknown_token_fraction": 0.6666666666666666,
+        "unknown_tokens": [
+          "animal",
+          "kestrel",
+          "raptor"
+        ]
+      },
+      {
+        "probe_id": "ood-02",
+        "candidate": "(Inheritance salmon fish)",
+        "goal": "(Inheritance salmon organism)",
+        "label": 1,
+        "category": "unseen-taxonomy",
+        "valid_pln_shape": true,
+        "note": "",
+        "probability_positive": 0.44192541905469634,
+        "prediction": 0,
+        "correct": false,
+        "prediction_confidence": 0.5580745809453036,
+        "unknown_token_fraction": 0.6666666666666666,
+        "unknown_tokens": [
+          "fish",
+          "organism",
+          "salmon"
+        ]
+      },
+      {
+        "probe_id": "ood-03",
+        "candidate": "(Implication fever dehydration)",
+        "goal": "(Implication infection dehydration)",
+        "label": 1,
+        "category": "unseen-predicate",
+        "valid_pln_shape": true,
+        "note": "",
+        "probability_positive": 0.9050817444079212,
+        "prediction": 1,
+        "correct": true,
+        "prediction_confidence": 0.9050817444079212,
+        "unknown_token_fraction": 1.0,
+        "unknown_tokens": [
+          "Implication",
+          "dehydration",
+          "fever",
+          "infection"
+        ]
+      },
+      {
+        "probe_id": "ood-04",
+        "candidate": "(Similarity sedan automobile)",
+        "goal": "(Similarity sedan vehicle)",
+        "label": 1,
+        "category": "synonym",
+        "valid_pln_shape": true,
+        "note": "",
+        "probability_positive": 0.9050817444079212,
+        "prediction": 1,
+        "correct": true,
+        "prediction_confidence": 0.9050817444079212,
+        "unknown_token_fraction": 1.0,
+        "unknown_tokens": [
+          "Similarity",
+          "automobile",
+          "sedan",
+          "vehicle"
+        ]
+      },
+      {
+        "probe_id": "ood-05",
+        "candidate": "(Evaluation (Predicate edible) (List mushroom))",
+        "goal": "(Evaluation (Predicate edible) (List mushroom))",
+        "label": 1,
+        "category": "nested-exact",
+        "valid_pln_shape": true,
+        "note": "",
+        "probability_positive": 0.9050817444079212,
+        "prediction": 1,
+        "correct": true,
+        "prediction_confidence": 0.9050817444079212,
+        "unknown_token_fraction": 1.0,
+        "unknown_tokens": [
+          "Evaluation",
+          "edible",
+          "mushroom"
+        ]
+      },
+      {
+        "probe_id": "ood-06",
+        "candidate": "(Member cobalt transition-metal)",
+        "goal": "(Inheritance cobalt element)",
+        "label": 1,
+        "category": "unseen-relation",
+        "valid_pln_shape": true,
+        "note": "",
+        "probability_positive": 0.7448725090927156,
+        "prediction": 1,
+        "correct": true,
+        "prediction_confidence": 0.7448725090927156,
+        "unknown_token_fraction": 0.8333333333333334,
+        "unknown_tokens": [
+          "Member",
+          "cobalt",
+          "element",
+          "transition-metal"
+        ]
+      },
+      {
+        "probe_id": "ood-07",
+        "candidate": "(Inheritance solar-panel energy-device)",
+        "goal": "(Inheritance solar-panel technology)",
+        "label": 1,
+        "category": "hyphenated-atoms",
+        "valid_pln_shape": true,
+        "note": "",
+        "probability_positive": 0.44192541905469634,
+        "prediction": 0,
+        "correct": false,
+        "prediction_confidence": 0.5580745809453036,
+        "unknown_token_fraction": 0.6666666666666666,
+        "unknown_tokens": [
+          "energy-device",
+          "solar-panel",
+          "technology"
+        ]
+      },
+      {
+        "probe_id": "ood-08",
+        "candidate": "(Implication rainfall soil-moisture)",
+        "goal": "(Implication monsoon soil-moisture)",
+        "label": 1,
+        "category": "alternate-cause",
+        "valid_pln_shape": true,
+        "note": "",
+        "probability_positive": 0.9050817444079212,
+        "prediction": 1,
+        "correct": true,
+        "prediction_confidence": 0.9050817444079212,
+        "unknown_token_fraction": 1.0,
+        "unknown_tokens": [
+          "Implication",
+          "monsoon",
+          "rainfall",
+          "soil-moisture"
+        ]
+      },
+      {
+        "probe_id": "ood-09",
+        "candidate": "(Similarity physician doctor)",
+        "goal": "(Similarity physician professional)",
+        "label": 1,
+        "category": "synonym",
+        "valid_pln_shape": true,
+        "note": "",
+        "probability_positive": 0.9050817444079212,
+        "prediction": 1,
+        "correct": true,
+        "prediction_confidence": 0.9050817444079212,
+        "unknown_token_fraction": 1.0,
+        "unknown_tokens": [
+          "Similarity",
+          "doctor",
+          "physician",
+          "professional"
+        ]
+      },
+      {
+        "probe_id": "ood-10",
+        "candidate": "(Inheritance oak tree)",
+        "goal": "(Inheritance oak organism)",
+        "label": 1,
+        "category": "unseen-taxonomy",
+        "valid_pln_shape": true,
+        "note": "",
+        "probability_positive": 0.44192541905469634,
+        "prediction": 0,
+        "correct": false,
+        "prediction_confidence": 0.5580745809453036,
+        "unknown_token_fraction": 0.6666666666666666,
+        "unknown_tokens": [
+          "oak",
+          "organism",
+          "tree"
+        ]
+      },
+      {
+        "probe_id": "ood-11",
+        "candidate": "(Inheritance kestrel kitchen-appliance)",
+        "goal": "(Inheritance kestrel animal)",
+        "label": 0,
+        "category": "semantic-distractor",
+        "valid_pln_shape": true,
+        "note": "",
+        "probability_positive": 0.44192541905469634,
+        "prediction": 0,
+        "correct": true,
+        "prediction_confidence": 0.5580745809453036,
+        "unknown_token_fraction": 0.6666666666666666,
+        "unknown_tokens": [
+          "animal",
+          "kestrel",
+          "kitchen-appliance"
+        ]
+      },
+      {
+        "probe_id": "ood-12",
+        "candidate": "(Inheritance salmon mountain)",
+        "goal": "(Inheritance salmon organism)",
+        "label": 0,
+        "category": "semantic-distractor",
+        "valid_pln_shape": true,
+        "note": "",
+        "probability_positive": 0.44192541905469634,
+        "prediction": 0,
+        "correct": true,
+        "prediction_confidence": 0.5580745809453036,
+        "unknown_token_fraction": 0.6666666666666666,
+        "unknown_tokens": [
+          "mountain",
+          "organism",
+          "salmon"
+        ]
+      },
+      {
+        "probe_id": "ood-13",
+        "candidate": "(Implication fever snowfall)",
+        "goal": "(Implication infection dehydration)",
+        "label": 0,
+        "category": "semantic-distractor",
+        "valid_pln_shape": true,
+        "note": "",
+        "probability_positive": 0.9050817444079212,
+        "prediction": 1,
+        "correct": false,
+        "prediction_confidence": 0.9050817444079212,
+        "unknown_token_fraction": 1.0,
+        "unknown_tokens": [
+          "Implication",
+          "dehydration",
+          "fever",
+          "infection",
+          "snowfall"
+        ]
+      },
+      {
+        "probe_id": "ood-14",
+        "candidate": "(Similiarity sedan automobile)",
+        "goal": "(Similarity sedan vehicle)",
+        "label": 0,
+        "category": "typo",
+        "valid_pln_shape": false,
+        "note": "Misspelled relation; should be rejected before scoring.",
+        "probability_positive": 0.9050817444079212,
+        "prediction": 1,
+        "correct": false,
+        "prediction_confidence": 0.9050817444079212,
+        "unknown_token_fraction": 1.0,
+        "unknown_tokens": [
+          "Similarity",
+          "Similiarity",
+          "automobile",
+          "sedan",
+          "vehicle"
+        ]
+      },
+      {
+        "probe_id": "ood-15",
+        "candidate": "(Not (Evaluation (Predicate edible) (List mushroom)))",
+        "goal": "(Evaluation (Predicate edible) (List mushroom))",
+        "label": 0,
+        "category": "negation",
+        "valid_pln_shape": true,
+        "note": "",
+        "probability_positive": 0.9050817444079212,
+        "prediction": 1,
+        "correct": false,
+        "prediction_confidence": 0.9050817444079212,
+        "unknown_token_fraction": 1.0,
+        "unknown_tokens": [
+          "Evaluation",
+          "Not",
+          "edible",
+          "mushroom"
+        ]
+      },
+      {
+        "probe_id": "ood-16",
+        "candidate": "(Member cobalt fruit)",
+        "goal": "(Inheritance cobalt element)",
+        "label": 0,
+        "category": "semantic-distractor",
+        "valid_pln_shape": true,
+        "note": "",
+        "probability_positive": 0.7448725090927156,
+        "prediction": 1,
+        "correct": false,
+        "prediction_confidence": 0.7448725090927156,
+        "unknown_token_fraction": 0.8333333333333334,
+        "unknown_tokens": [
+          "Member",
+          "cobalt",
+          "element",
+          "fruit"
+        ]
+      },
+      {
+        "probe_id": "ood-17",
+        "candidate": "(Inheritance solar-panel reptile)",
+        "goal": "(Inheritance solar-panel technology)",
+        "label": 0,
+        "category": "semantic-distractor",
+        "valid_pln_shape": true,
+        "note": "",
+        "probability_positive": 0.44192541905469634,
+        "prediction": 0,
+        "correct": true,
+        "prediction_confidence": 0.5580745809453036,
+        "unknown_token_fraction": 0.6666666666666666,
+        "unknown_tokens": [
+          "reptile",
+          "solar-panel",
+          "technology"
+        ]
+      },
+      {
+        "probe_id": "ood-18",
+        "candidate": "(Implication rainfall keyboard)",
+        "goal": "(Implication monsoon soil-moisture)",
+        "label": 0,
+        "category": "semantic-distractor",
+        "valid_pln_shape": true,
+        "note": "",
+        "probability_positive": 0.9050817444079212,
+        "prediction": 1,
+        "correct": false,
+        "prediction_confidence": 0.9050817444079212,
+        "unknown_token_fraction": 1.0,
+        "unknown_tokens": [
+          "Implication",
+          "keyboard",
+          "monsoon",
+          "rainfall",
+          "soil-moisture"
+        ]
+      },
+      {
+        "probe_id": "ood-19",
+        "candidate": "(Similarity physician volcano)",
+        "goal": "(Similarity physician professional)",
+        "label": 0,
+        "category": "semantic-distractor",
+        "valid_pln_shape": true,
+        "note": "",
+        "probability_positive": 0.9050817444079212,
+        "prediction": 1,
+        "correct": false,
+        "prediction_confidence": 0.9050817444079212,
+        "unknown_token_fraction": 1.0,
+        "unknown_tokens": [
+          "Similarity",
+          "physician",
+          "professional",
+          "volcano"
+        ]
+      },
+      {
+        "probe_id": "ood-20",
+        "candidate": "(Inheritence oak tree)",
+        "goal": "(Inheritance oak organism)",
+        "label": 0,
+        "category": "typo",
+        "valid_pln_shape": false,
+        "note": "Misspelled relation; should be rejected before scoring.",
+        "probability_positive": 0.7448725090927156,
+        "prediction": 1,
+        "correct": false,
+        "prediction_confidence": 0.7448725090927156,
+        "unknown_token_fraction": 0.8333333333333334,
+        "unknown_tokens": [
+          "Inheritence",
+          "oak",
+          "organism",
+          "tree"
+        ]
+      }
+    ]
+  },
+  "contrast_sets": {
+    "pairs": 10,
+    "hard_label_flip_rate": 0.0,
+    "probability_direction_accuracy": 0.0,
+    "cases": [
+      {
+        "pair_id": "contrast-01",
+        "changed_from": "(Inheritance robin bird)",
+        "changed_to": "(Inheritance robin vehicle)",
+        "goal": "(Inheritance robin animal)",
+        "positive_probability": 0.44192541905469634,
+        "negative_probability": 0.44192541905469634,
+        "prediction_flipped": false,
+        "probability_direction_correct": false,
+        "positive_unknown_fraction": 0.6666666666666666,
+        "negative_unknown_fraction": 0.6666666666666666
+      },
+      {
+        "pair_id": "contrast-02",
+        "changed_from": "(Implication smoke fire)",
+        "changed_to": "(Implication smoke snow)",
+        "goal": "(Implication smoke hazard)",
+        "positive_probability": 0.9050817444079212,
+        "negative_probability": 0.9050817444079212,
+        "prediction_flipped": false,
+        "probability_direction_correct": false,
+        "positive_unknown_fraction": 1.0,
+        "negative_unknown_fraction": 1.0
+      },
+      {
+        "pair_id": "contrast-03",
+        "changed_from": "(Similarity kitten cat)",
+        "changed_to": "(Similarity kitten mineral)",
+        "goal": "(Similarity kitten mammal)",
+        "positive_probability": 0.9050817444079212,
+        "negative_probability": 0.9050817444079212,
+        "prediction_flipped": false,
+        "probability_direction_correct": false,
+        "positive_unknown_fraction": 1.0,
+        "negative_unknown_fraction": 1.0
+      },
+      {
+        "pair_id": "contrast-04",
+        "changed_from": "(Evaluation (Predicate safe) medicine)",
+        "changed_to": "(Evaluation (Predicate unsafe) medicine)",
+        "goal": "(Evaluation (Predicate safe) treatment)",
+        "positive_probability": 0.9050817444079212,
+        "negative_probability": 0.9050817444079212,
+        "prediction_flipped": false,
+        "probability_direction_correct": false,
+        "positive_unknown_fraction": 1.0,
+        "negative_unknown_fraction": 1.0
+      },
+      {
+        "pair_id": "contrast-05",
+        "changed_from": "(Member copper metal)",
+        "changed_to": "(Member copper mammal)",
+        "goal": "(Inheritance copper element)",
+        "positive_probability": 0.7448725090927156,
+        "negative_probability": 0.7448725090927156,
+        "prediction_flipped": false,
+        "probability_direction_correct": false,
+        "positive_unknown_fraction": 0.8333333333333334,
+        "negative_unknown_fraction": 0.8333333333333334
+      },
+      {
+        "pair_id": "contrast-06",
+        "changed_from": "(Inheritance antibiotic medicine)",
+        "changed_to": "(Inheritance antibiotic vehicle)",
+        "goal": "(Inheritance antibiotic treatment)",
+        "positive_probability": 0.44192541905469634,
+        "negative_probability": 0.44192541905469634,
+        "prediction_flipped": false,
+        "probability_direction_correct": false,
+        "positive_unknown_fraction": 0.6666666666666666,
+        "negative_unknown_fraction": 0.6666666666666666
+      },
+      {
+        "pair_id": "contrast-07",
+        "changed_from": "(Implication exercise fitness)",
+        "changed_to": "(Implication exercise corrosion)",
+        "goal": "(Implication exercise health)",
+        "positive_probability": 0.9050817444079212,
+        "negative_probability": 0.9050817444079212,
+        "prediction_flipped": false,
+        "probability_direction_correct": false,
+        "positive_unknown_fraction": 1.0,
+        "negative_unknown_fraction": 1.0
+      },
+      {
+        "pair_id": "contrast-08",
+        "changed_from": "(Similarity laptop computer)",
+        "changed_to": "(Similarity laptop vegetable)",
+        "goal": "(Similarity laptop device)",
+        "positive_probability": 0.9050817444079212,
+        "negative_probability": 0.9050817444079212,
+        "prediction_flipped": false,
+        "probability_direction_correct": false,
+        "positive_unknown_fraction": 1.0,
+        "negative_unknown_fraction": 1.0
+      },
+      {
+        "pair_id": "contrast-09",
+        "changed_from": "(Inheritance tulip flower)",
+        "changed_to": "(Inheritance tulip machine)",
+        "goal": "(Inheritance tulip plant)",
+        "positive_probability": 0.44192541905469634,
+        "negative_probability": 0.44192541905469634,
+        "prediction_flipped": false,
+        "probability_direction_correct": false,
+        "positive_unknown_fraction": 0.6666666666666666,
+        "negative_unknown_fraction": 0.6666666666666666
+      },
+      {
+        "pair_id": "contrast-10",
+        "changed_from": "(Implication ice cold)",
+        "changed_to": "(Implication ice hot)",
+        "goal": "(Implication ice slippery)",
+        "positive_probability": 0.9050817444079212,
+        "negative_probability": 0.9050817444079212,
+        "prediction_flipped": false,
+        "probability_direction_correct": false,
+        "positive_unknown_fraction": 1.0,
+        "negative_unknown_fraction": 1.0
+      }
+    ]
+  },
+  "grounded_in_vocabulary_contrast_sets": {
+    "source": "artifacts/training/week11_traces.jsonl",
+    "split": "held-out runs (validation_fraction=0.25, seed=42)",
+    "pairs": 2,
+    "note": "Only unique, naturally occurring pairs with exactly one candidate-token replacement are reported; the held-out traces contain two.",
+    "hard_label_flip_rate": 1.0,
+    "probability_direction_accuracy": 1.0,
+    "mean_probability_delta": 0.9984252215752536,
+    "cases": [
+      {
+        "run_id": "diamond-s23",
+        "step": 1,
+        "goal": "(Inheritance A Z)",
+        "positive_candidate": "['Inheritance', 'A', 'Z']",
+        "negative_candidate": "['Inheritance', 'A', 'L2']",
+        "single_token_change": {
+          "removed": "Z",
+          "added": "L2"
+        },
+        "positive_probability": 0.9997750013324367,
+        "negative_probability": 0.0011486148981461719,
+        "probability_delta": 0.9986263864342905,
+        "prediction_flipped": true,
+        "probability_direction_correct": true,
+        "positive_unknown_fraction": 0.0,
+        "negative_unknown_fraction": 0.0
+      },
+      {
+        "run_id": "diamond-s23",
+        "step": 1,
+        "goal": "(Inheritance A Z)",
+        "positive_candidate": "['Inheritance', 'A', 'Z']",
+        "negative_candidate": "['Inheritance', 'L3', 'Z']",
+        "single_token_change": {
+          "removed": "A",
+          "added": "L3"
+        },
+        "positive_probability": 0.9997750013324367,
+        "negative_probability": 0.0015509446162198263,
+        "probability_delta": 0.9982240567162168,
+        "prediction_flipped": true,
+        "probability_direction_correct": true,
+        "positive_unknown_fraction": 0.0,
+        "negative_unknown_fraction": 0.0
+      }
+    ]
+  },
+  "confidence": {
+    "valid_ood_probability_bins": {
+      "p_below_0_01": 0,
+      "p_0_01_to_0_10": 0,
+      "p_0_10_to_0_90": 9,
+      "p_0_90_to_0_99": 9,
+      "p_above_0_99": 0
+    },
+    "warning": "Sigmoid values are ranking scores, not calibrated semantic probabilities on OOD inputs."
+  }
+}

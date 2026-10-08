@@ -1,0 +1,3107 @@
+{
+  "protocol": {
+    "backend": "PeTTa-OpenPSI action-planner-v2",
+    "native_selector": "findMinDistance",
+    "prism_selector": "PRISM.OpenPsi.Select",
+    "matched_loop": "OpenPsiEval.Plan",
+    "goal_budget": 15,
+    "note": "Repeated timings on fixed cases; repetitions are not independent queries. Python cold-load excluded from warm medians."
+  },
+  "goal_sweep": {
+    "distinct_goals": 21,
+    "native_solved": 3,
+    "prism_solved": 20
+  },
+  "cold_python_load_ms": 23.405482999805827,
+  "conversation_deep_actions": [
+    "initiate-dialogue",
+    "elicit-response",
+    "interpret-context",
+    "request-activities",
+    "collect-activity-details",
+    "explore-goals",
+    "synthesize-preferences",
+    "finalize-understanding"
+  ],
+  "native_v1_diagnostic": {
+    "short_plan_replays_to_goal": true,
+    "deep_plan_replays_to_goal": false,
+    "prism_deep_plan_replays_to_goal": true,
+    "plans": {
+      "OPENPSI_V1_SHORT_PLAN": [
+        "initiate-dialogue",
+        "elicit-response"
+      ],
+      "OPENPSI_V1_DEEP_PLAN": [
+        "initiate-dialogue",
+        "elicit-response",
+        "discuss-random-topic",
+        "share-joke"
+      ],
+      "OPENPSI_PRISM_DEEP_PLAN": [
+        "initiate-dialogue",
+        "elicit-response",
+        "interpret-context",
+        "request-activities",
+        "collect-activity-details",
+        "explore-goals",
+        "synthesize-preferences",
+        "finalize-understanding"
+      ]
+    },
+    "note": "Separate unbounded native v1 planner diagnostic; not part of the matched-selector timing comparison."
+  },
+  "cases": {
+    "Ask-Daily-Activities": {
+      "Native": {
+        "repeats": 3,
+        "successes": 0,
+        "outcome": "DeadEnd",
+        "steps": 3,
+        "median_ms": 0.34005400084424764
+      },
+      "PRISM": {
+        "repeats": 3,
+        "successes": 3,
+        "outcome": "Success",
+        "steps": 4,
+        "median_ms": 1.9557600026018918
+      }
+    },
+    "Ask-Recent-Events": {
+      "Native": {
+        "repeats": 3,
+        "successes": 0,
+        "outcome": "DeadEnd",
+        "steps": 3,
+        "median_ms": 0.35600800038082525
+      },
+      "PRISM": {
+        "repeats": 3,
+        "successes": 3,
+        "outcome": "Success",
+        "steps": 9,
+        "median_ms": 4.376474003947806
+      }
+    },
+    "Discuss-Chosen-Topic": {
+      "Native": {
+        "repeats": 3,
+        "successes": 0,
+        "outcome": "DeadEnd",
+        "steps": 3,
+        "median_ms": 0.39287500112550333
+      },
+      "PRISM": {
+        "repeats": 3,
+        "successes": 0,
+        "outcome": "Budget",
+        "steps": 15,
+        "median_ms": 7.309653999982402
+      }
+    },
+    "Explore-Event-Emotions": {
+      "Native": {
+        "repeats": 3,
+        "successes": 0,
+        "outcome": "DeadEnd",
+        "steps": 3,
+        "median_ms": 0.3477469945210032
+      },
+      "PRISM": {
+        "repeats": 3,
+        "successes": 3,
+        "outcome": "Success",
+        "steps": 12,
+        "median_ms": 5.577180003456306
+      }
+    },
+    "Explore-Mood-Details": {
+      "Native": {
+        "repeats": 3,
+        "successes": 0,
+        "outcome": "DeadEnd",
+        "steps": 3,
+        "median_ms": 0.35164799919584766
+      },
+      "PRISM": {
+        "repeats": 3,
+        "successes": 3,
+        "outcome": "Success",
+        "steps": 4,
+        "median_ms": 1.7831130026024766
+      }
+    },
+    "Irrelevant-Topic": {
+      "Native": {
+        "repeats": 3,
+        "successes": 0,
+        "outcome": "DeadEnd",
+        "steps": 3,
+        "median_ms": 0.34461700124666095
+      },
+      "PRISM": {
+        "repeats": 3,
+        "successes": 3,
+        "outcome": "Success",
+        "steps": 7,
+        "median_ms": 3.155779995722696
+      }
+    },
+    "Learn-Activity-Details": {
+      "Native": {
+        "repeats": 3,
+        "successes": 0,
+        "outcome": "DeadEnd",
+        "steps": 3,
+        "median_ms": 0.4123780017835088
+      },
+      "PRISM": {
+        "repeats": 3,
+        "successes": 3,
+        "outcome": "Success",
+        "steps": 5,
+        "median_ms": 2.398554999672342
+      }
+    },
+    "Learn-Recent-Event-Details": {
+      "Native": {
+        "repeats": 3,
+        "successes": 0,
+        "outcome": "DeadEnd",
+        "steps": 3,
+        "median_ms": 0.3384849987924099
+      },
+      "PRISM": {
+        "repeats": 3,
+        "successes": 3,
+        "outcome": "Success",
+        "steps": 10,
+        "median_ms": 4.676388001826126
+      }
+    },
+    "Off-Topic-Discussion": {
+      "Native": {
+        "repeats": 3,
+        "successes": 3,
+        "outcome": "Success",
+        "steps": 3,
+        "median_ms": 0.366265005141031
+      },
+      "PRISM": {
+        "repeats": 3,
+        "successes": 3,
+        "outcome": "Success",
+        "steps": 3,
+        "median_ms": 1.4826389960944653
+      }
+    },
+    "Propose-Related-Topics": {
+      "Native": {
+        "repeats": 3,
+        "successes": 0,
+        "outcome": "DeadEnd",
+        "steps": 3,
+        "median_ms": 0.3330049948999658
+      },
+      "PRISM": {
+        "repeats": 3,
+        "successes": 3,
+        "outcome": "Success",
+        "steps": 14,
+        "median_ms": 6.851145997643471
+      }
+    },
+    "Receive-Topic-Choice": {
+      "Native": {
+        "repeats": 3,
+        "successes": 0,
+        "outcome": "DeadEnd",
+        "steps": 3,
+        "median_ms": 0.34546000097179785
+      },
+      "PRISM": {
+        "repeats": 3,
+        "successes": 3,
+        "outcome": "Success",
+        "steps": 15,
+        "median_ms": 7.133450002584141
+      }
+    },
+    "Receive-User-Response": {
+      "Native": {
+        "repeats": 3,
+        "successes": 3,
+        "outcome": "Success",
+        "steps": 2,
+        "median_ms": 0.15296399942599237
+      },
+      "PRISM": {
+        "repeats": 3,
+        "successes": 3,
+        "outcome": "Success",
+        "steps": 2,
+        "median_ms": 0.8977719990070909
+      }
+    },
+    "Send-Greeting": {
+      "Native": {
+        "repeats": 3,
+        "successes": 3,
+        "outcome": "Success",
+        "steps": 1,
+        "median_ms": 0.07651399937458336
+      },
+      "PRISM": {
+        "repeats": 3,
+        "successes": 3,
+        "outcome": "Success",
+        "steps": 1,
+        "median_ms": 0.45247200614539906
+      }
+    },
+    "Summarize-User-Preferences": {
+      "Native": {
+        "repeats": 3,
+        "successes": 0,
+        "outcome": "DeadEnd",
+        "steps": 3,
+        "median_ms": 0.36936399555997923
+      },
+      "PRISM": {
+        "repeats": 3,
+        "successes": 3,
+        "outcome": "Success",
+        "steps": 7,
+        "median_ms": 3.435115999309346
+      }
+    },
+    "Understand-Event-Impact": {
+      "Native": {
+        "repeats": 3,
+        "successes": 0,
+        "outcome": "DeadEnd",
+        "steps": 3,
+        "median_ms": 0.3443909954512492
+      },
+      "PRISM": {
+        "repeats": 3,
+        "successes": 3,
+        "outcome": "Success",
+        "steps": 11,
+        "median_ms": 5.1426639984129
+      }
+    },
+    "Understand-Event-Significance": {
+      "Native": {
+        "repeats": 3,
+        "successes": 0,
+        "outcome": "DeadEnd",
+        "steps": 3,
+        "median_ms": 0.38943300023674965
+      },
+      "PRISM": {
+        "repeats": 3,
+        "successes": 3,
+        "outcome": "Success",
+        "steps": 13,
+        "median_ms": 6.770562002202496
+      }
+    },
+    "Understand-Future-Goals": {
+      "Native": {
+        "repeats": 3,
+        "successes": 0,
+        "outcome": "DeadEnd",
+        "steps": 3,
+        "median_ms": 0.36434100184123963
+      },
+      "PRISM": {
+        "repeats": 3,
+        "successes": 3,
+        "outcome": "Success",
+        "steps": 6,
+        "median_ms": 2.639881000504829
+      }
+    },
+    "Understand-Hobby-Preferences": {
+      "Native": {
+        "repeats": 3,
+        "successes": 0,
+        "outcome": "DeadEnd",
+        "steps": 3,
+        "median_ms": 0.34278700331924483
+      },
+      "PRISM": {
+        "repeats": 3,
+        "successes": 3,
+        "outcome": "Success",
+        "steps": 6,
+        "median_ms": 3.058545000385493
+      }
+    },
+    "Understand-Initial-Context": {
+      "Native": {
+        "repeats": 3,
+        "successes": 0,
+        "outcome": "DeadEnd",
+        "steps": 3,
+        "median_ms": 0.3504109990899451
+      },
+      "PRISM": {
+        "repeats": 3,
+        "successes": 3,
+        "outcome": "Success",
+        "steps": 3,
+        "median_ms": 1.3857820013072342
+      }
+    },
+    "Understand-Initial-Mood": {
+      "Native": {
+        "repeats": 3,
+        "successes": 0,
+        "outcome": "DeadEnd",
+        "steps": 3,
+        "median_ms": 0.3592970024328679
+      },
+      "PRISM": {
+        "repeats": 3,
+        "successes": 3,
+        "outcome": "Success",
+        "steps": 3,
+        "median_ms": 1.4967360039008781
+      }
+    },
+    "Understand-User-Interests": {
+      "Native": {
+        "repeats": 3,
+        "successes": 0,
+        "outcome": "DeadEnd",
+        "steps": 3,
+        "median_ms": 0.3477080026641488
+      },
+      "PRISM": {
+        "repeats": 3,
+        "successes": 3,
+        "outcome": "Success",
+        "steps": 8,
+        "median_ms": 4.7359009986394085
+      }
+    },
+    "conversation2": {
+      "Native": {
+        "repeats": 5,
+        "successes": 5,
+        "outcome": "Success",
+        "steps": 2,
+        "median_ms": 0.1463250009692274
+      },
+      "PRISM": {
+        "repeats": 5,
+        "successes": 5,
+        "outcome": "Success",
+        "steps": 2,
+        "median_ms": 0.9002880033222027
+      }
+    },
+    "conversationDeep": {
+      "Native": {
+        "repeats": 5,
+        "successes": 0,
+        "outcome": "DeadEnd",
+        "steps": 3,
+        "median_ms": 0.3741190012078732
+      },
+      "PRISM": {
+        "repeats": 5,
+        "successes": 5,
+        "outcome": "Success",
+        "steps": 8,
+        "median_ms": 3.8255079998634756
+      }
+    },
+    "direct": {
+      "Native": {
+        "repeats": 20,
+        "successes": 20,
+        "outcome": "Success",
+        "steps": 1,
+        "median_ms": 0.022985499526839703
+      },
+      "PRISM": {
+        "repeats": 20,
+        "successes": 20,
+        "outcome": "Success",
+        "steps": 1,
+        "median_ms": 0.04287650153855793
+      }
+    },
+    "missing": {
+      "Native": {
+        "repeats": 20,
+        "successes": 0,
+        "outcome": "DeadEnd",
+        "steps": 1,
+        "median_ms": 0.02940250124083832
+      },
+      "PRISM": {
+        "repeats": 20,
+        "successes": 0,
+        "outcome": "DeadEnd",
+        "steps": 1,
+        "median_ms": 0.09440300345886499
+      }
+    },
+    "noisy20": {
+      "Native": {
+        "repeats": 20,
+        "successes": 0,
+        "outcome": "DeadEnd",
+        "steps": 1,
+        "median_ms": 0.8268844976555556
+      },
+      "PRISM": {
+        "repeats": 20,
+        "successes": 20,
+        "outcome": "Success",
+        "steps": 2,
+        "median_ms": 0.5722124988096766
+      }
+    },
+    "noisy5": {
+      "Native": {
+        "repeats": 20,
+        "successes": 0,
+        "outcome": "DeadEnd",
+        "steps": 1,
+        "median_ms": 0.14811699657002464
+      },
+      "PRISM": {
+        "repeats": 20,
+        "successes": 20,
+        "outcome": "Success",
+        "steps": 2,
+        "median_ms": 0.20383049923111685
+      }
+    },
+    "noisy50": {
+      "Native": {
+        "repeats": 20,
+        "successes": 0,
+        "outcome": "DeadEnd",
+        "steps": 1,
+        "median_ms": 3.670087502541719
+      },
+      "PRISM": {
+        "repeats": 20,
+        "successes": 20,
+        "outcome": "Success",
+        "steps": 2,
+        "median_ms": 1.4747299974260386
+      }
+    },
+    "reverseDeep": {
+      "Native": {
+        "repeats": 5,
+        "successes": 5,
+        "outcome": "Success",
+        "steps": 9,
+        "median_ms": 1.3388039951678365
+      },
+      "PRISM": {
+        "repeats": 5,
+        "successes": 5,
+        "outcome": "Success",
+        "steps": 8,
+        "median_ms": 3.6251729979994707
+      }
+    },
+    "reverseOffTopic": {
+      "Native": {
+        "repeats": 5,
+        "successes": 0,
+        "outcome": "Budget",
+        "steps": 15,
+        "median_ms": 1.536404000944458
+      },
+      "PRISM": {
+        "repeats": 5,
+        "successes": 5,
+        "outcome": "Success",
+        "steps": 3,
+        "median_ms": 1.5239940039464273
+      }
+    }
+  },
+  "runs": [
+    {
+      "case": "warmup",
+      "mode": "PRISM",
+      "outcome": "Success",
+      "steps": 1,
+      "elapsed_ms": 23.405482999805827
+    },
+    {
+      "case": "direct",
+      "mode": "Native",
+      "outcome": "Success",
+      "steps": 1,
+      "elapsed_ms": 0.040424994949717075
+    },
+    {
+      "case": "direct",
+      "mode": "PRISM",
+      "outcome": "Success",
+      "steps": 1,
+      "elapsed_ms": 0.14236700371839106
+    },
+    {
+      "case": "direct",
+      "mode": "Native",
+      "outcome": "Success",
+      "steps": 1,
+      "elapsed_ms": 0.027925001631956547
+    },
+    {
+      "case": "direct",
+      "mode": "PRISM",
+      "outcome": "Success",
+      "steps": 1,
+      "elapsed_ms": 0.07702499715378508
+    },
+    {
+      "case": "direct",
+      "mode": "Native",
+      "outcome": "Success",
+      "steps": 1,
+      "elapsed_ms": 0.028110000130254775
+    },
+    {
+      "case": "direct",
+      "mode": "PRISM",
+      "outcome": "Success",
+      "steps": 1,
+      "elapsed_ms": 0.05053500353824347
+    },
+    {
+      "case": "direct",
+      "mode": "Native",
+      "outcome": "Success",
+      "steps": 1,
+      "elapsed_ms": 0.022770997020415962
+    },
+    {
+      "case": "direct",
+      "mode": "PRISM",
+      "outcome": "Success",
+      "steps": 1,
+      "elapsed_ms": 0.04570800228975713
+    },
+    {
+      "case": "direct",
+      "mode": "Native",
+      "outcome": "Success",
+      "steps": 1,
+      "elapsed_ms": 0.0222509988816455
+    },
+    {
+      "case": "direct",
+      "mode": "PRISM",
+      "outcome": "Success",
+      "steps": 1,
+      "elapsed_ms": 0.043517997255548835
+    },
+    {
+      "case": "direct",
+      "mode": "Native",
+      "outcome": "Success",
+      "steps": 1,
+      "elapsed_ms": 0.022344000171869993
+    },
+    {
+      "case": "direct",
+      "mode": "PRISM",
+      "outcome": "Success",
+      "steps": 1,
+      "elapsed_ms": 0.046115004806779325
+    },
+    {
+      "case": "direct",
+      "mode": "Native",
+      "outcome": "Success",
+      "steps": 1,
+      "elapsed_ms": 0.022427004296332598
+    },
+    {
+      "case": "direct",
+      "mode": "PRISM",
+      "outcome": "Success",
+      "steps": 1,
+      "elapsed_ms": 0.04153900226810947
+    },
+    {
+      "case": "direct",
+      "mode": "Native",
+      "outcome": "Success",
+      "steps": 1,
+      "elapsed_ms": 0.022849999368190765
+    },
+    {
+      "case": "direct",
+      "mode": "PRISM",
+      "outcome": "Success",
+      "steps": 1,
+      "elapsed_ms": 0.040929997339844704
+    },
+    {
+      "case": "direct",
+      "mode": "Native",
+      "outcome": "Success",
+      "steps": 1,
+      "elapsed_ms": 0.02313699951628223
+    },
+    {
+      "case": "direct",
+      "mode": "PRISM",
+      "outcome": "Success",
+      "steps": 1,
+      "elapsed_ms": 0.04102000093553215
+    },
+    {
+      "case": "direct",
+      "mode": "Native",
+      "outcome": "Success",
+      "steps": 1,
+      "elapsed_ms": 0.02312099968548864
+    },
+    {
+      "case": "direct",
+      "mode": "PRISM",
+      "outcome": "Success",
+      "steps": 1,
+      "elapsed_ms": 0.040364000597037375
+    },
+    {
+      "case": "direct",
+      "mode": "Native",
+      "outcome": "Success",
+      "steps": 1,
+      "elapsed_ms": 0.02284600486746058
+    },
+    {
+      "case": "direct",
+      "mode": "PRISM",
+      "outcome": "Success",
+      "steps": 1,
+      "elapsed_ms": 0.04037500184495002
+    },
+    {
+      "case": "direct",
+      "mode": "Native",
+      "outcome": "Success",
+      "steps": 1,
+      "elapsed_ms": 0.02202700125053525
+    },
+    {
+      "case": "direct",
+      "mode": "PRISM",
+      "outcome": "Success",
+      "steps": 1,
+      "elapsed_ms": 0.04048199480166659
+    },
+    {
+      "case": "direct",
+      "mode": "Native",
+      "outcome": "Success",
+      "steps": 1,
+      "elapsed_ms": 0.022465996153187007
+    },
+    {
+      "case": "direct",
+      "mode": "PRISM",
+      "outcome": "Success",
+      "steps": 1,
+      "elapsed_ms": 0.041954997868742794
+    },
+    {
+      "case": "direct",
+      "mode": "Native",
+      "outcome": "Success",
+      "steps": 1,
+      "elapsed_ms": 0.023460001102648675
+    },
+    {
+      "case": "direct",
+      "mode": "PRISM",
+      "outcome": "Success",
+      "steps": 1,
+      "elapsed_ms": 0.04101500235265121
+    },
+    {
+      "case": "direct",
+      "mode": "Native",
+      "outcome": "Success",
+      "steps": 1,
+      "elapsed_ms": 0.022405001800507307
+    },
+    {
+      "case": "direct",
+      "mode": "PRISM",
+      "outcome": "Success",
+      "steps": 1,
+      "elapsed_ms": 0.040319006075151265
+    },
+    {
+      "case": "direct",
+      "mode": "Native",
+      "outcome": "Success",
+      "steps": 1,
+      "elapsed_ms": 0.022442996851168573
+    },
+    {
+      "case": "direct",
+      "mode": "PRISM",
+      "outcome": "Success",
+      "steps": 1,
+      "elapsed_ms": 0.04223500582156703
+    },
+    {
+      "case": "direct",
+      "mode": "Native",
+      "outcome": "Success",
+      "steps": 1,
+      "elapsed_ms": 0.03846099571092054
+    },
+    {
+      "case": "direct",
+      "mode": "PRISM",
+      "outcome": "Success",
+      "steps": 1,
+      "elapsed_ms": 0.06986399966990575
+    },
+    {
+      "case": "direct",
+      "mode": "Native",
+      "outcome": "Success",
+      "steps": 1,
+      "elapsed_ms": 0.040188999264501035
+    },
+    {
+      "case": "direct",
+      "mode": "PRISM",
+      "outcome": "Success",
+      "steps": 1,
+      "elapsed_ms": 0.07232299685711041
+    },
+    {
+      "case": "direct",
+      "mode": "Native",
+      "outcome": "Success",
+      "steps": 1,
+      "elapsed_ms": 0.04028800321975723
+    },
+    {
+      "case": "direct",
+      "mode": "PRISM",
+      "outcome": "Success",
+      "steps": 1,
+      "elapsed_ms": 0.06949099770281464
+    },
+    {
+      "case": "direct",
+      "mode": "Native",
+      "outcome": "Success",
+      "steps": 1,
+      "elapsed_ms": 0.03883500176016241
+    },
+    {
+      "case": "direct",
+      "mode": "PRISM",
+      "outcome": "Success",
+      "steps": 1,
+      "elapsed_ms": 0.07591599569423124
+    },
+    {
+      "case": "missing",
+      "mode": "Native",
+      "outcome": "DeadEnd",
+      "steps": 1,
+      "elapsed_ms": 0.052736999350599945
+    },
+    {
+      "case": "missing",
+      "mode": "PRISM",
+      "outcome": "DeadEnd",
+      "steps": 1,
+      "elapsed_ms": 0.20559800032060593
+    },
+    {
+      "case": "missing",
+      "mode": "Native",
+      "outcome": "DeadEnd",
+      "steps": 1,
+      "elapsed_ms": 0.04551799793262035
+    },
+    {
+      "case": "missing",
+      "mode": "PRISM",
+      "outcome": "DeadEnd",
+      "steps": 1,
+      "elapsed_ms": 0.1507459965068847
+    },
+    {
+      "case": "missing",
+      "mode": "Native",
+      "outcome": "DeadEnd",
+      "steps": 1,
+      "elapsed_ms": 0.04418900061864406
+    },
+    {
+      "case": "missing",
+      "mode": "PRISM",
+      "outcome": "DeadEnd",
+      "steps": 1,
+      "elapsed_ms": 0.15248599811457098
+    },
+    {
+      "case": "missing",
+      "mode": "Native",
+      "outcome": "DeadEnd",
+      "steps": 1,
+      "elapsed_ms": 0.046645000111311674
+    },
+    {
+      "case": "missing",
+      "mode": "PRISM",
+      "outcome": "DeadEnd",
+      "steps": 1,
+      "elapsed_ms": 0.08773800072958693
+    },
+    {
+      "case": "missing",
+      "mode": "Native",
+      "outcome": "DeadEnd",
+      "steps": 1,
+      "elapsed_ms": 0.02639399463078007
+    },
+    {
+      "case": "missing",
+      "mode": "PRISM",
+      "outcome": "DeadEnd",
+      "steps": 1,
+      "elapsed_ms": 0.08722799975657836
+    },
+    {
+      "case": "missing",
+      "mode": "Native",
+      "outcome": "DeadEnd",
+      "steps": 1,
+      "elapsed_ms": 0.026299996534362435
+    },
+    {
+      "case": "missing",
+      "mode": "PRISM",
+      "outcome": "DeadEnd",
+      "steps": 1,
+      "elapsed_ms": 0.08869800512911752
+    },
+    {
+      "case": "missing",
+      "mode": "Native",
+      "outcome": "DeadEnd",
+      "steps": 1,
+      "elapsed_ms": 0.026656001864466816
+    },
+    {
+      "case": "missing",
+      "mode": "PRISM",
+      "outcome": "DeadEnd",
+      "steps": 1,
+      "elapsed_ms": 0.08548099867766723
+    },
+    {
+      "case": "missing",
+      "mode": "Native",
+      "outcome": "DeadEnd",
+      "steps": 1,
+      "elapsed_ms": 0.026090994651895016
+    },
+    {
+      "case": "missing",
+      "mode": "PRISM",
+      "outcome": "DeadEnd",
+      "steps": 1,
+      "elapsed_ms": 0.08587199408793822
+    },
+    {
+      "case": "missing",
+      "mode": "Native",
+      "outcome": "DeadEnd",
+      "steps": 1,
+      "elapsed_ms": 0.029789000109303743
+    },
+    {
+      "case": "missing",
+      "mode": "PRISM",
+      "outcome": "DeadEnd",
+      "steps": 1,
+      "elapsed_ms": 0.08535799861419946
+    },
+    {
+      "case": "missing",
+      "mode": "Native",
+      "outcome": "DeadEnd",
+      "steps": 1,
+      "elapsed_ms": 0.025957997422665358
+    },
+    {
+      "case": "missing",
+      "mode": "PRISM",
+      "outcome": "DeadEnd",
+      "steps": 1,
+      "elapsed_ms": 0.08505600271746516
+    },
+    {
+      "case": "missing",
+      "mode": "Native",
+      "outcome": "DeadEnd",
+      "steps": 1,
+      "elapsed_ms": 0.029476999770849943
+    },
+    {
+      "case": "missing",
+      "mode": "PRISM",
+      "outcome": "DeadEnd",
+      "steps": 1,
+      "elapsed_ms": 0.09428100020159036
+    },
+    {
+      "case": "missing",
+      "mode": "Native",
+      "outcome": "DeadEnd",
+      "steps": 1,
+      "elapsed_ms": 0.028301998099777848
+    },
+    {
+      "case": "missing",
+      "mode": "PRISM",
+      "outcome": "DeadEnd",
+      "steps": 1,
+      "elapsed_ms": 0.09404199954587966
+    },
+    {
+      "case": "missing",
+      "mode": "Native",
+      "outcome": "DeadEnd",
+      "steps": 1,
+      "elapsed_ms": 0.03179499617544934
+    },
+    {
+      "case": "missing",
+      "mode": "PRISM",
+      "outcome": "DeadEnd",
+      "steps": 1,
+      "elapsed_ms": 0.09488999785389751
+    },
+    {
+      "case": "missing",
+      "mode": "Native",
+      "outcome": "DeadEnd",
+      "steps": 1,
+      "elapsed_ms": 0.028784997994080186
+    },
+    {
+      "case": "missing",
+      "mode": "PRISM",
+      "outcome": "DeadEnd",
+      "steps": 1,
+      "elapsed_ms": 0.09498100553173572
+    },
+    {
+      "case": "missing",
+      "mode": "Native",
+      "outcome": "DeadEnd",
+      "steps": 1,
+      "elapsed_ms": 0.029563998396042734
+    },
+    {
+      "case": "missing",
+      "mode": "PRISM",
+      "outcome": "DeadEnd",
+      "steps": 1,
+      "elapsed_ms": 0.09841800056165084
+    },
+    {
+      "case": "missing",
+      "mode": "Native",
+      "outcome": "DeadEnd",
+      "steps": 1,
+      "elapsed_ms": 0.029328002710826695
+    },
+    {
+      "case": "missing",
+      "mode": "PRISM",
+      "outcome": "DeadEnd",
+      "steps": 1,
+      "elapsed_ms": 0.09443700400879607
+    },
+    {
+      "case": "missing",
+      "mode": "Native",
+      "outcome": "DeadEnd",
+      "steps": 1,
+      "elapsed_ms": 0.030178001907188445
+    },
+    {
+      "case": "missing",
+      "mode": "PRISM",
+      "outcome": "DeadEnd",
+      "steps": 1,
+      "elapsed_ms": 0.09436900290893391
+    },
+    {
+      "case": "missing",
+      "mode": "Native",
+      "outcome": "DeadEnd",
+      "steps": 1,
+      "elapsed_ms": 0.029167000320740044
+    },
+    {
+      "case": "missing",
+      "mode": "PRISM",
+      "outcome": "DeadEnd",
+      "steps": 1,
+      "elapsed_ms": 0.09590000263415277
+    },
+    {
+      "case": "missing",
+      "mode": "Native",
+      "outcome": "DeadEnd",
+      "steps": 1,
+      "elapsed_ms": 0.03323800046928227
+    },
+    {
+      "case": "missing",
+      "mode": "PRISM",
+      "outcome": "DeadEnd",
+      "steps": 1,
+      "elapsed_ms": 0.09642299846746027
+    },
+    {
+      "case": "missing",
+      "mode": "Native",
+      "outcome": "DeadEnd",
+      "steps": 1,
+      "elapsed_ms": 0.02865900023607537
+    },
+    {
+      "case": "missing",
+      "mode": "PRISM",
+      "outcome": "DeadEnd",
+      "steps": 1,
+      "elapsed_ms": 0.09505799971520901
+    },
+    {
+      "case": "noisy5",
+      "mode": "Native",
+      "outcome": "DeadEnd",
+      "steps": 1,
+      "elapsed_ms": 0.18598699534777552
+    },
+    {
+      "case": "noisy5",
+      "mode": "PRISM",
+      "outcome": "Success",
+      "steps": 2,
+      "elapsed_ms": 0.25417500000912696
+    },
+    {
+      "case": "noisy5",
+      "mode": "Native",
+      "outcome": "DeadEnd",
+      "steps": 1,
+      "elapsed_ms": 0.1438429972040467
+    },
+    {
+      "case": "noisy5",
+      "mode": "PRISM",
+      "outcome": "Success",
+      "steps": 2,
+      "elapsed_ms": 0.20291300461394712
+    },
+    {
+      "case": "noisy5",
+      "mode": "Native",
+      "outcome": "DeadEnd",
+      "steps": 1,
+      "elapsed_ms": 0.13926099927630275
+    },
+    {
+      "case": "noisy5",
+      "mode": "PRISM",
+      "outcome": "Success",
+      "steps": 2,
+      "elapsed_ms": 0.1964759940165095
+    },
+    {
+      "case": "noisy5",
+      "mode": "Native",
+      "outcome": "DeadEnd",
+      "steps": 1,
+      "elapsed_ms": 0.13824199413647875
+    },
+    {
+      "case": "noisy5",
+      "mode": "PRISM",
+      "outcome": "Success",
+      "steps": 2,
+      "elapsed_ms": 0.1896600006148219
+    },
+    {
+      "case": "noisy5",
+      "mode": "Native",
+      "outcome": "DeadEnd",
+      "steps": 1,
+      "elapsed_ms": 0.13782300084130839
+    },
+    {
+      "case": "noisy5",
+      "mode": "PRISM",
+      "outcome": "Success",
+      "steps": 2,
+      "elapsed_ms": 0.19489199621602893
+    },
+    {
+      "case": "noisy5",
+      "mode": "Native",
+      "outcome": "DeadEnd",
+      "steps": 1,
+      "elapsed_ms": 0.23917500220704824
+    },
+    {
+      "case": "noisy5",
+      "mode": "PRISM",
+      "outcome": "Success",
+      "steps": 2,
+      "elapsed_ms": 0.3370609992998652
+    },
+    {
+      "case": "noisy5",
+      "mode": "Native",
+      "outcome": "DeadEnd",
+      "steps": 1,
+      "elapsed_ms": 0.23673400573898107
+    },
+    {
+      "case": "noisy5",
+      "mode": "PRISM",
+      "outcome": "Success",
+      "steps": 2,
+      "elapsed_ms": 0.28718600515276194
+    },
+    {
+      "case": "noisy5",
+      "mode": "Native",
+      "outcome": "DeadEnd",
+      "steps": 1,
+      "elapsed_ms": 0.18536599964136258
+    },
+    {
+      "case": "noisy5",
+      "mode": "PRISM",
+      "outcome": "Success",
+      "steps": 2,
+      "elapsed_ms": 0.25419300072826445
+    },
+    {
+      "case": "noisy5",
+      "mode": "Native",
+      "outcome": "DeadEnd",
+      "steps": 1,
+      "elapsed_ms": 0.188674996024929
+    },
+    {
+      "case": "noisy5",
+      "mode": "PRISM",
+      "outcome": "Success",
+      "steps": 2,
+      "elapsed_ms": 0.25180599914165214
+    },
+    {
+      "case": "noisy5",
+      "mode": "Native",
+      "outcome": "DeadEnd",
+      "steps": 1,
+      "elapsed_ms": 0.14295000437414274
+    },
+    {
+      "case": "noisy5",
+      "mode": "PRISM",
+      "outcome": "Success",
+      "steps": 2,
+      "elapsed_ms": 0.18662799993762746
+    },
+    {
+      "case": "noisy5",
+      "mode": "Native",
+      "outcome": "DeadEnd",
+      "steps": 1,
+      "elapsed_ms": 0.13756100088357925
+    },
+    {
+      "case": "noisy5",
+      "mode": "PRISM",
+      "outcome": "Success",
+      "steps": 2,
+      "elapsed_ms": 0.19145799888065085
+    },
+    {
+      "case": "noisy5",
+      "mode": "Native",
+      "outcome": "DeadEnd",
+      "steps": 1,
+      "elapsed_ms": 0.13847900117980316
+    },
+    {
+      "case": "noisy5",
+      "mode": "PRISM",
+      "outcome": "Success",
+      "steps": 2,
+      "elapsed_ms": 0.20724299974972382
+    },
+    {
+      "case": "noisy5",
+      "mode": "Native",
+      "outcome": "DeadEnd",
+      "steps": 1,
+      "elapsed_ms": 0.14835199544904754
+    },
+    {
+      "case": "noisy5",
+      "mode": "PRISM",
+      "outcome": "Success",
+      "steps": 2,
+      "elapsed_ms": 0.20439000218175352
+    },
+    {
+      "case": "noisy5",
+      "mode": "Native",
+      "outcome": "DeadEnd",
+      "steps": 1,
+      "elapsed_ms": 0.15171200357144699
+    },
+    {
+      "case": "noisy5",
+      "mode": "PRISM",
+      "outcome": "Success",
+      "steps": 2,
+      "elapsed_ms": 0.2022280023084022
+    },
+    {
+      "case": "noisy5",
+      "mode": "Native",
+      "outcome": "DeadEnd",
+      "steps": 1,
+      "elapsed_ms": 0.15780400281073526
+    },
+    {
+      "case": "noisy5",
+      "mode": "PRISM",
+      "outcome": "Success",
+      "steps": 2,
+      "elapsed_ms": 0.2026209986070171
+    },
+    {
+      "case": "noisy5",
+      "mode": "Native",
+      "outcome": "DeadEnd",
+      "steps": 1,
+      "elapsed_ms": 0.15594399883411825
+    },
+    {
+      "case": "noisy5",
+      "mode": "PRISM",
+      "outcome": "Success",
+      "steps": 2,
+      "elapsed_ms": 0.20327099628048018
+    },
+    {
+      "case": "noisy5",
+      "mode": "Native",
+      "outcome": "DeadEnd",
+      "steps": 1,
+      "elapsed_ms": 0.15488699864363298
+    },
+    {
+      "case": "noisy5",
+      "mode": "PRISM",
+      "outcome": "Success",
+      "steps": 2,
+      "elapsed_ms": 0.2588460047263652
+    },
+    {
+      "case": "noisy5",
+      "mode": "Native",
+      "outcome": "DeadEnd",
+      "steps": 1,
+      "elapsed_ms": 0.14457699580816552
+    },
+    {
+      "case": "noisy5",
+      "mode": "PRISM",
+      "outcome": "Success",
+      "steps": 2,
+      "elapsed_ms": 0.20821499492740259
+    },
+    {
+      "case": "noisy5",
+      "mode": "Native",
+      "outcome": "DeadEnd",
+      "steps": 1,
+      "elapsed_ms": 0.14011599705554545
+    },
+    {
+      "case": "noisy5",
+      "mode": "PRISM",
+      "outcome": "Success",
+      "steps": 2,
+      "elapsed_ms": 0.19019500177819282
+    },
+    {
+      "case": "noisy5",
+      "mode": "Native",
+      "outcome": "DeadEnd",
+      "steps": 1,
+      "elapsed_ms": 0.14788199769100174
+    },
+    {
+      "case": "noisy5",
+      "mode": "PRISM",
+      "outcome": "Success",
+      "steps": 2,
+      "elapsed_ms": 0.2226939977845177
+    },
+    {
+      "case": "noisy20",
+      "mode": "Native",
+      "outcome": "DeadEnd",
+      "steps": 1,
+      "elapsed_ms": 1.1790710050263442
+    },
+    {
+      "case": "noisy20",
+      "mode": "PRISM",
+      "outcome": "Success",
+      "steps": 2,
+      "elapsed_ms": 0.69944400456734
+    },
+    {
+      "case": "noisy20",
+      "mode": "Native",
+      "outcome": "DeadEnd",
+      "steps": 1,
+      "elapsed_ms": 0.7937310001580045
+    },
+    {
+      "case": "noisy20",
+      "mode": "PRISM",
+      "outcome": "Success",
+      "steps": 2,
+      "elapsed_ms": 0.5170689983060583
+    },
+    {
+      "case": "noisy20",
+      "mode": "Native",
+      "outcome": "DeadEnd",
+      "steps": 1,
+      "elapsed_ms": 0.789862999226898
+    },
+    {
+      "case": "noisy20",
+      "mode": "PRISM",
+      "outcome": "Success",
+      "steps": 2,
+      "elapsed_ms": 0.5671100007020868
+    },
+    {
+      "case": "noisy20",
+      "mode": "Native",
+      "outcome": "DeadEnd",
+      "steps": 1,
+      "elapsed_ms": 0.827578995085787
+    },
+    {
+      "case": "noisy20",
+      "mode": "PRISM",
+      "outcome": "Success",
+      "steps": 2,
+      "elapsed_ms": 0.6011759978719056
+    },
+    {
+      "case": "noisy20",
+      "mode": "Native",
+      "outcome": "DeadEnd",
+      "steps": 1,
+      "elapsed_ms": 0.8975189994089305
+    },
+    {
+      "case": "noisy20",
+      "mode": "PRISM",
+      "outcome": "Success",
+      "steps": 2,
+      "elapsed_ms": 0.5380400034482591
+    },
+    {
+      "case": "noisy20",
+      "mode": "Native",
+      "outcome": "DeadEnd",
+      "steps": 1,
+      "elapsed_ms": 0.8086759989964776
+    },
+    {
+      "case": "noisy20",
+      "mode": "PRISM",
+      "outcome": "Success",
+      "steps": 2,
+      "elapsed_ms": 0.5516679957509041
+    },
+    {
+      "case": "noisy20",
+      "mode": "Native",
+      "outcome": "DeadEnd",
+      "steps": 1,
+      "elapsed_ms": 0.6867139964015223
+    },
+    {
+      "case": "noisy20",
+      "mode": "PRISM",
+      "outcome": "Success",
+      "steps": 2,
+      "elapsed_ms": 0.5175170008442365
+    },
+    {
+      "case": "noisy20",
+      "mode": "Native",
+      "outcome": "DeadEnd",
+      "steps": 1,
+      "elapsed_ms": 0.8174660033546388
+    },
+    {
+      "case": "noisy20",
+      "mode": "PRISM",
+      "outcome": "Success",
+      "steps": 2,
+      "elapsed_ms": 0.5716570012737066
+    },
+    {
+      "case": "noisy20",
+      "mode": "Native",
+      "outcome": "DeadEnd",
+      "steps": 1,
+      "elapsed_ms": 0.7760419975966215
+    },
+    {
+      "case": "noisy20",
+      "mode": "PRISM",
+      "outcome": "Success",
+      "steps": 2,
+      "elapsed_ms": 0.46766199375269935
+    },
+    {
+      "case": "noisy20",
+      "mode": "Native",
+      "outcome": "DeadEnd",
+      "steps": 1,
+      "elapsed_ms": 0.9848519985098392
+    },
+    {
+      "case": "noisy20",
+      "mode": "PRISM",
+      "outcome": "Success",
+      "steps": 2,
+      "elapsed_ms": 0.7703479932388291
+    },
+    {
+      "case": "noisy20",
+      "mode": "Native",
+      "outcome": "DeadEnd",
+      "steps": 1,
+      "elapsed_ms": 0.9592780043021776
+    },
+    {
+      "case": "noisy20",
+      "mode": "PRISM",
+      "outcome": "Success",
+      "steps": 2,
+      "elapsed_ms": 0.48346399853471667
+    },
+    {
+      "case": "noisy20",
+      "mode": "Native",
+      "outcome": "DeadEnd",
+      "steps": 1,
+      "elapsed_ms": 0.7493859957321547
+    },
+    {
+      "case": "noisy20",
+      "mode": "PRISM",
+      "outcome": "Success",
+      "steps": 2,
+      "elapsed_ms": 0.5165480033610947
+    },
+    {
+      "case": "noisy20",
+      "mode": "Native",
+      "outcome": "DeadEnd",
+      "steps": 1,
+      "elapsed_ms": 0.8028360025491565
+    },
+    {
+      "case": "noisy20",
+      "mode": "PRISM",
+      "outcome": "Success",
+      "steps": 2,
+      "elapsed_ms": 0.5389619982452132
+    },
+    {
+      "case": "noisy20",
+      "mode": "Native",
+      "outcome": "DeadEnd",
+      "steps": 1,
+      "elapsed_ms": 0.7797810030751862
+    },
+    {
+      "case": "noisy20",
+      "mode": "PRISM",
+      "outcome": "Success",
+      "steps": 2,
+      "elapsed_ms": 0.9549730020808056
+    },
+    {
+      "case": "noisy20",
+      "mode": "Native",
+      "outcome": "DeadEnd",
+      "steps": 1,
+      "elapsed_ms": 1.3922229991294444
+    },
+    {
+      "case": "noisy20",
+      "mode": "PRISM",
+      "outcome": "Success",
+      "steps": 2,
+      "elapsed_ms": 0.5727679963456467
+    },
+    {
+      "case": "noisy20",
+      "mode": "Native",
+      "outcome": "DeadEnd",
+      "steps": 1,
+      "elapsed_ms": 0.8261900002253242
+    },
+    {
+      "case": "noisy20",
+      "mode": "PRISM",
+      "outcome": "Success",
+      "steps": 2,
+      "elapsed_ms": 0.574546997086145
+    },
+    {
+      "case": "noisy20",
+      "mode": "Native",
+      "outcome": "DeadEnd",
+      "steps": 1,
+      "elapsed_ms": 0.9137479937635362
+    },
+    {
+      "case": "noisy20",
+      "mode": "PRISM",
+      "outcome": "Success",
+      "steps": 2,
+      "elapsed_ms": 4.585238995787222
+    },
+    {
+      "case": "noisy20",
+      "mode": "Native",
+      "outcome": "DeadEnd",
+      "steps": 1,
+      "elapsed_ms": 0.8635209960630164
+    },
+    {
+      "case": "noisy20",
+      "mode": "PRISM",
+      "outcome": "Success",
+      "steps": 2,
+      "elapsed_ms": 0.6744510028511286
+    },
+    {
+      "case": "noisy20",
+      "mode": "Native",
+      "outcome": "DeadEnd",
+      "steps": 1,
+      "elapsed_ms": 0.9099629969568923
+    },
+    {
+      "case": "noisy20",
+      "mode": "PRISM",
+      "outcome": "Success",
+      "steps": 2,
+      "elapsed_ms": 0.6391130009433255
+    },
+    {
+      "case": "noisy20",
+      "mode": "Native",
+      "outcome": "DeadEnd",
+      "steps": 1,
+      "elapsed_ms": 1.0184280035900883
+    },
+    {
+      "case": "noisy20",
+      "mode": "PRISM",
+      "outcome": "Success",
+      "steps": 2,
+      "elapsed_ms": 0.6827969991718419
+    },
+    {
+      "case": "noisy50",
+      "mode": "Native",
+      "outcome": "DeadEnd",
+      "steps": 1,
+      "elapsed_ms": 3.6631539987865835
+    },
+    {
+      "case": "noisy50",
+      "mode": "PRISM",
+      "outcome": "Success",
+      "steps": 2,
+      "elapsed_ms": 1.8705900001805276
+    },
+    {
+      "case": "noisy50",
+      "mode": "Native",
+      "outcome": "DeadEnd",
+      "steps": 1,
+      "elapsed_ms": 3.6899440019624308
+    },
+    {
+      "case": "noisy50",
+      "mode": "PRISM",
+      "outcome": "Success",
+      "steps": 2,
+      "elapsed_ms": 1.4807499974267557
+    },
+    {
+      "case": "noisy50",
+      "mode": "Native",
+      "outcome": "DeadEnd",
+      "steps": 1,
+      "elapsed_ms": 3.922570002032444
+    },
+    {
+      "case": "noisy50",
+      "mode": "PRISM",
+      "outcome": "Success",
+      "steps": 2,
+      "elapsed_ms": 1.4687099974253215
+    },
+    {
+      "case": "noisy50",
+      "mode": "Native",
+      "outcome": "DeadEnd",
+      "steps": 1,
+      "elapsed_ms": 3.8295440026558936
+    },
+    {
+      "case": "noisy50",
+      "mode": "PRISM",
+      "outcome": "Success",
+      "steps": 2,
+      "elapsed_ms": 1.645570999244228
+    },
+    {
+      "case": "noisy50",
+      "mode": "Native",
+      "outcome": "DeadEnd",
+      "steps": 1,
+      "elapsed_ms": 3.767686997889541
+    },
+    {
+      "case": "noisy50",
+      "mode": "PRISM",
+      "outcome": "Success",
+      "steps": 2,
+      "elapsed_ms": 1.5460309950867668
+    },
+    {
+      "case": "noisy50",
+      "mode": "Native",
+      "outcome": "DeadEnd",
+      "steps": 1,
+      "elapsed_ms": 3.621880998252891
+    },
+    {
+      "case": "noisy50",
+      "mode": "PRISM",
+      "outcome": "Success",
+      "steps": 2,
+      "elapsed_ms": 1.6182840045075864
+    },
+    {
+      "case": "noisy50",
+      "mode": "Native",
+      "outcome": "DeadEnd",
+      "steps": 1,
+      "elapsed_ms": 3.730841002834495
+    },
+    {
+      "case": "noisy50",
+      "mode": "PRISM",
+      "outcome": "Success",
+      "steps": 2,
+      "elapsed_ms": 1.540867000585422
+    },
+    {
+      "case": "noisy50",
+      "mode": "Native",
+      "outcome": "DeadEnd",
+      "steps": 1,
+      "elapsed_ms": 5.465324000397231
+    },
+    {
+      "case": "noisy50",
+      "mode": "PRISM",
+      "outcome": "Success",
+      "steps": 2,
+      "elapsed_ms": 1.5521150053245947
+    },
+    {
+      "case": "noisy50",
+      "mode": "Native",
+      "outcome": "DeadEnd",
+      "steps": 1,
+      "elapsed_ms": 3.7938999957987107
+    },
+    {
+      "case": "noisy50",
+      "mode": "PRISM",
+      "outcome": "Success",
+      "steps": 2,
+      "elapsed_ms": 1.4404890025616623
+    },
+    {
+      "case": "noisy50",
+      "mode": "Native",
+      "outcome": "DeadEnd",
+      "steps": 1,
+      "elapsed_ms": 3.038492002815474
+    },
+    {
+      "case": "noisy50",
+      "mode": "PRISM",
+      "outcome": "Success",
+      "steps": 2,
+      "elapsed_ms": 1.5670580032747239
+    },
+    {
+      "case": "noisy50",
+      "mode": "Native",
+      "outcome": "DeadEnd",
+      "steps": 1,
+      "elapsed_ms": 3.6770210062968545
+    },
+    {
+      "case": "noisy50",
+      "mode": "PRISM",
+      "outcome": "Success",
+      "steps": 2,
+      "elapsed_ms": 1.3165709970053285
+    },
+    {
+      "case": "noisy50",
+      "mode": "Native",
+      "outcome": "DeadEnd",
+      "steps": 1,
+      "elapsed_ms": 3.7532999995164573
+    },
+    {
+      "case": "noisy50",
+      "mode": "PRISM",
+      "outcome": "Success",
+      "steps": 2,
+      "elapsed_ms": 1.2906880001537502
+    },
+    {
+      "case": "noisy50",
+      "mode": "Native",
+      "outcome": "DeadEnd",
+      "steps": 1,
+      "elapsed_ms": 3.282138000940904
+    },
+    {
+      "case": "noisy50",
+      "mode": "PRISM",
+      "outcome": "Success",
+      "steps": 2,
+      "elapsed_ms": 1.7079519966500811
+    },
+    {
+      "case": "noisy50",
+      "mode": "Native",
+      "outcome": "DeadEnd",
+      "steps": 1,
+      "elapsed_ms": 2.8973470034543425
+    },
+    {
+      "case": "noisy50",
+      "mode": "PRISM",
+      "outcome": "Success",
+      "steps": 2,
+      "elapsed_ms": 1.2636510000447743
+    },
+    {
+      "case": "noisy50",
+      "mode": "Native",
+      "outcome": "DeadEnd",
+      "steps": 1,
+      "elapsed_ms": 3.5135349971824326
+    },
+    {
+      "case": "noisy50",
+      "mode": "PRISM",
+      "outcome": "Success",
+      "steps": 2,
+      "elapsed_ms": 1.2080130036338232
+    },
+    {
+      "case": "noisy50",
+      "mode": "Native",
+      "outcome": "DeadEnd",
+      "steps": 1,
+      "elapsed_ms": 4.514767999353353
+    },
+    {
+      "case": "noisy50",
+      "mode": "PRISM",
+      "outcome": "Success",
+      "steps": 2,
+      "elapsed_ms": 1.3762469970970415
+    },
+    {
+      "case": "noisy50",
+      "mode": "Native",
+      "outcome": "DeadEnd",
+      "steps": 1,
+      "elapsed_ms": 2.974160001031123
+    },
+    {
+      "case": "noisy50",
+      "mode": "PRISM",
+      "outcome": "Success",
+      "steps": 2,
+      "elapsed_ms": 1.7695529968477786
+    },
+    {
+      "case": "noisy50",
+      "mode": "Native",
+      "outcome": "DeadEnd",
+      "steps": 1,
+      "elapsed_ms": 3.0097540002316236
+    },
+    {
+      "case": "noisy50",
+      "mode": "PRISM",
+      "outcome": "Success",
+      "steps": 2,
+      "elapsed_ms": 1.3465990050463006
+    },
+    {
+      "case": "noisy50",
+      "mode": "Native",
+      "outcome": "DeadEnd",
+      "steps": 1,
+      "elapsed_ms": 3.1445040003745817
+    },
+    {
+      "case": "noisy50",
+      "mode": "PRISM",
+      "outcome": "Success",
+      "steps": 2,
+      "elapsed_ms": 1.1627959975157864
+    },
+    {
+      "case": "noisy50",
+      "mode": "Native",
+      "outcome": "DeadEnd",
+      "steps": 1,
+      "elapsed_ms": 3.1717769961687736
+    },
+    {
+      "case": "noisy50",
+      "mode": "PRISM",
+      "outcome": "Success",
+      "steps": 2,
+      "elapsed_ms": 1.4418450009543449
+    },
+    {
+      "case": "conversation2",
+      "mode": "Native",
+      "outcome": "Success",
+      "steps": 2,
+      "elapsed_ms": 0.3859150019707158
+    },
+    {
+      "case": "conversation2",
+      "mode": "PRISM",
+      "outcome": "Success",
+      "steps": 2,
+      "elapsed_ms": 0.9798099999898113
+    },
+    {
+      "case": "conversation2",
+      "mode": "Native",
+      "outcome": "Success",
+      "steps": 2,
+      "elapsed_ms": 0.1463250009692274
+    },
+    {
+      "case": "conversation2",
+      "mode": "PRISM",
+      "outcome": "Success",
+      "steps": 2,
+      "elapsed_ms": 0.8872489997884259
+    },
+    {
+      "case": "conversation2",
+      "mode": "Native",
+      "outcome": "Success",
+      "steps": 2,
+      "elapsed_ms": 0.1447950053261593
+    },
+    {
+      "case": "conversation2",
+      "mode": "PRISM",
+      "outcome": "Success",
+      "steps": 2,
+      "elapsed_ms": 0.9789620016817935
+    },
+    {
+      "case": "conversation2",
+      "mode": "Native",
+      "outcome": "Success",
+      "steps": 2,
+      "elapsed_ms": 0.1492590017733164
+    },
+    {
+      "case": "conversation2",
+      "mode": "PRISM",
+      "outcome": "Success",
+      "steps": 2,
+      "elapsed_ms": 0.9002880033222027
+    },
+    {
+      "case": "conversation2",
+      "mode": "Native",
+      "outcome": "Success",
+      "steps": 2,
+      "elapsed_ms": 0.13979600043967366
+    },
+    {
+      "case": "conversation2",
+      "mode": "PRISM",
+      "outcome": "Success",
+      "steps": 2,
+      "elapsed_ms": 0.839803004055284
+    },
+    {
+      "case": "conversationDeep",
+      "mode": "Native",
+      "outcome": "DeadEnd",
+      "steps": 3,
+      "elapsed_ms": 0.6305939969024621
+    },
+    {
+      "case": "conversationDeep",
+      "mode": "PRISM",
+      "outcome": "Success",
+      "steps": 8,
+      "elapsed_ms": 3.761769003176596
+    },
+    {
+      "case": "conversationDeep",
+      "mode": "Native",
+      "outcome": "DeadEnd",
+      "steps": 3,
+      "elapsed_ms": 0.3741190012078732
+    },
+    {
+      "case": "conversationDeep",
+      "mode": "PRISM",
+      "outcome": "Success",
+      "steps": 8,
+      "elapsed_ms": 3.8255079998634756
+    },
+    {
+      "case": "conversationDeep",
+      "mode": "Native",
+      "outcome": "DeadEnd",
+      "steps": 3,
+      "elapsed_ms": 0.3602949946071021
+    },
+    {
+      "case": "conversationDeep",
+      "mode": "PRISM",
+      "outcome": "Success",
+      "steps": 8,
+      "elapsed_ms": 3.462043998297304
+    },
+    {
+      "case": "conversationDeep",
+      "mode": "Native",
+      "outcome": "DeadEnd",
+      "steps": 3,
+      "elapsed_ms": 0.4846599986194633
+    },
+    {
+      "case": "conversationDeep",
+      "mode": "PRISM",
+      "outcome": "Success",
+      "steps": 8,
+      "elapsed_ms": 3.865108999889344
+    },
+    {
+      "case": "conversationDeep",
+      "mode": "Native",
+      "outcome": "DeadEnd",
+      "steps": 3,
+      "elapsed_ms": 0.3720800013979897
+    },
+    {
+      "case": "conversationDeep",
+      "mode": "PRISM",
+      "outcome": "Success",
+      "steps": 8,
+      "elapsed_ms": 3.8994899950921535
+    },
+    {
+      "case": "Send-Greeting",
+      "mode": "Native",
+      "outcome": "Success",
+      "steps": 1,
+      "elapsed_ms": 0.07648499740753323
+    },
+    {
+      "case": "Send-Greeting",
+      "mode": "PRISM",
+      "outcome": "Success",
+      "steps": 1,
+      "elapsed_ms": 0.4213530046399683
+    },
+    {
+      "case": "Send-Greeting",
+      "mode": "Native",
+      "outcome": "Success",
+      "steps": 1,
+      "elapsed_ms": 0.07651399937458336
+    },
+    {
+      "case": "Send-Greeting",
+      "mode": "PRISM",
+      "outcome": "Success",
+      "steps": 1,
+      "elapsed_ms": 0.45247200614539906
+    },
+    {
+      "case": "Send-Greeting",
+      "mode": "Native",
+      "outcome": "Success",
+      "steps": 1,
+      "elapsed_ms": 0.08110500493785366
+    },
+    {
+      "case": "Send-Greeting",
+      "mode": "PRISM",
+      "outcome": "Success",
+      "steps": 1,
+      "elapsed_ms": 0.4602109984261915
+    },
+    {
+      "case": "Receive-User-Response",
+      "mode": "Native",
+      "outcome": "Success",
+      "steps": 2,
+      "elapsed_ms": 0.15296399942599237
+    },
+    {
+      "case": "Receive-User-Response",
+      "mode": "PRISM",
+      "outcome": "Success",
+      "steps": 2,
+      "elapsed_ms": 1.3649699976667762
+    },
+    {
+      "case": "Receive-User-Response",
+      "mode": "Native",
+      "outcome": "Success",
+      "steps": 2,
+      "elapsed_ms": 0.1886099998955615
+    },
+    {
+      "case": "Receive-User-Response",
+      "mode": "PRISM",
+      "outcome": "Success",
+      "steps": 2,
+      "elapsed_ms": 0.8977719990070909
+    },
+    {
+      "case": "Receive-User-Response",
+      "mode": "Native",
+      "outcome": "Success",
+      "steps": 2,
+      "elapsed_ms": 0.14200399891706184
+    },
+    {
+      "case": "Receive-User-Response",
+      "mode": "PRISM",
+      "outcome": "Success",
+      "steps": 2,
+      "elapsed_ms": 0.8602529997006059
+    },
+    {
+      "case": "Understand-Initial-Mood",
+      "mode": "Native",
+      "outcome": "DeadEnd",
+      "steps": 3,
+      "elapsed_ms": 0.3592970024328679
+    },
+    {
+      "case": "Understand-Initial-Mood",
+      "mode": "PRISM",
+      "outcome": "Success",
+      "steps": 3,
+      "elapsed_ms": 1.4967360039008781
+    },
+    {
+      "case": "Understand-Initial-Mood",
+      "mode": "Native",
+      "outcome": "DeadEnd",
+      "steps": 3,
+      "elapsed_ms": 0.39727600233163685
+    },
+    {
+      "case": "Understand-Initial-Mood",
+      "mode": "PRISM",
+      "outcome": "Success",
+      "steps": 3,
+      "elapsed_ms": 1.5799840039107949
+    },
+    {
+      "case": "Understand-Initial-Mood",
+      "mode": "Native",
+      "outcome": "DeadEnd",
+      "steps": 3,
+      "elapsed_ms": 0.34923299972433597
+    },
+    {
+      "case": "Understand-Initial-Mood",
+      "mode": "PRISM",
+      "outcome": "Success",
+      "steps": 3,
+      "elapsed_ms": 1.3079440032015555
+    },
+    {
+      "case": "Understand-Initial-Context",
+      "mode": "Native",
+      "outcome": "DeadEnd",
+      "steps": 3,
+      "elapsed_ms": 0.340433995006606
+    },
+    {
+      "case": "Understand-Initial-Context",
+      "mode": "PRISM",
+      "outcome": "Success",
+      "steps": 3,
+      "elapsed_ms": 1.3857820013072342
+    },
+    {
+      "case": "Understand-Initial-Context",
+      "mode": "Native",
+      "outcome": "DeadEnd",
+      "steps": 3,
+      "elapsed_ms": 0.3803959989454597
+    },
+    {
+      "case": "Understand-Initial-Context",
+      "mode": "PRISM",
+      "outcome": "Success",
+      "steps": 3,
+      "elapsed_ms": 1.2627539981622249
+    },
+    {
+      "case": "Understand-Initial-Context",
+      "mode": "Native",
+      "outcome": "DeadEnd",
+      "steps": 3,
+      "elapsed_ms": 0.3504109990899451
+    },
+    {
+      "case": "Understand-Initial-Context",
+      "mode": "PRISM",
+      "outcome": "Success",
+      "steps": 3,
+      "elapsed_ms": 1.763855994795449
+    },
+    {
+      "case": "Explore-Mood-Details",
+      "mode": "Native",
+      "outcome": "DeadEnd",
+      "steps": 3,
+      "elapsed_ms": 0.4773620021296665
+    },
+    {
+      "case": "Explore-Mood-Details",
+      "mode": "PRISM",
+      "outcome": "Success",
+      "steps": 4,
+      "elapsed_ms": 1.769105001585558
+    },
+    {
+      "case": "Explore-Mood-Details",
+      "mode": "Native",
+      "outcome": "DeadEnd",
+      "steps": 3,
+      "elapsed_ms": 0.35164799919584766
+    },
+    {
+      "case": "Explore-Mood-Details",
+      "mode": "PRISM",
+      "outcome": "Success",
+      "steps": 4,
+      "elapsed_ms": 1.7831130026024766
+    },
+    {
+      "case": "Explore-Mood-Details",
+      "mode": "Native",
+      "outcome": "DeadEnd",
+      "steps": 3,
+      "elapsed_ms": 0.33118999999715015
+    },
+    {
+      "case": "Explore-Mood-Details",
+      "mode": "PRISM",
+      "outcome": "Success",
+      "steps": 4,
+      "elapsed_ms": 2.231177997600753
+    },
+    {
+      "case": "Ask-Daily-Activities",
+      "mode": "Native",
+      "outcome": "DeadEnd",
+      "steps": 3,
+      "elapsed_ms": 0.4852900019614026
+    },
+    {
+      "case": "Ask-Daily-Activities",
+      "mode": "PRISM",
+      "outcome": "Success",
+      "steps": 4,
+      "elapsed_ms": 1.6701779968570918
+    },
+    {
+      "case": "Ask-Daily-Activities",
+      "mode": "Native",
+      "outcome": "DeadEnd",
+      "steps": 3,
+      "elapsed_ms": 0.33573200198588893
+    },
+    {
+      "case": "Ask-Daily-Activities",
+      "mode": "PRISM",
+      "outcome": "Success",
+      "steps": 4,
+      "elapsed_ms": 1.9557600026018918
+    },
+    {
+      "case": "Ask-Daily-Activities",
+      "mode": "Native",
+      "outcome": "DeadEnd",
+      "steps": 3,
+      "elapsed_ms": 0.34005400084424764
+    },
+    {
+      "case": "Ask-Daily-Activities",
+      "mode": "PRISM",
+      "outcome": "Success",
+      "steps": 4,
+      "elapsed_ms": 2.4506150002707727
+    },
+    {
+      "case": "Learn-Activity-Details",
+      "mode": "Native",
+      "outcome": "DeadEnd",
+      "steps": 3,
+      "elapsed_ms": 0.33709999843267724
+    },
+    {
+      "case": "Learn-Activity-Details",
+      "mode": "PRISM",
+      "outcome": "Success",
+      "steps": 5,
+      "elapsed_ms": 2.1750610030721873
+    },
+    {
+      "case": "Learn-Activity-Details",
+      "mode": "Native",
+      "outcome": "DeadEnd",
+      "steps": 3,
+      "elapsed_ms": 0.4123780017835088
+    },
+    {
+      "case": "Learn-Activity-Details",
+      "mode": "PRISM",
+      "outcome": "Success",
+      "steps": 5,
+      "elapsed_ms": 2.398554999672342
+    },
+    {
+      "case": "Learn-Activity-Details",
+      "mode": "Native",
+      "outcome": "DeadEnd",
+      "steps": 3,
+      "elapsed_ms": 0.5073470019851811
+    },
+    {
+      "case": "Learn-Activity-Details",
+      "mode": "PRISM",
+      "outcome": "Success",
+      "steps": 5,
+      "elapsed_ms": 2.568802003224846
+    },
+    {
+      "case": "Understand-Hobby-Preferences",
+      "mode": "Native",
+      "outcome": "DeadEnd",
+      "steps": 3,
+      "elapsed_ms": 1.78753199725179
+    },
+    {
+      "case": "Understand-Hobby-Preferences",
+      "mode": "PRISM",
+      "outcome": "Success",
+      "steps": 6,
+      "elapsed_ms": 3.058545000385493
+    },
+    {
+      "case": "Understand-Hobby-Preferences",
+      "mode": "Native",
+      "outcome": "DeadEnd",
+      "steps": 3,
+      "elapsed_ms": 0.34278700331924483
+    },
+    {
+      "case": "Understand-Hobby-Preferences",
+      "mode": "PRISM",
+      "outcome": "Success",
+      "steps": 6,
+      "elapsed_ms": 2.614372002426535
+    },
+    {
+      "case": "Understand-Hobby-Preferences",
+      "mode": "Native",
+      "outcome": "DeadEnd",
+      "steps": 3,
+      "elapsed_ms": 0.3275620038039051
+    },
+    {
+      "case": "Understand-Hobby-Preferences",
+      "mode": "PRISM",
+      "outcome": "Success",
+      "steps": 6,
+      "elapsed_ms": 3.2094470006995834
+    },
+    {
+      "case": "Understand-Future-Goals",
+      "mode": "Native",
+      "outcome": "DeadEnd",
+      "steps": 3,
+      "elapsed_ms": 0.36434100184123963
+    },
+    {
+      "case": "Understand-Future-Goals",
+      "mode": "PRISM",
+      "outcome": "Success",
+      "steps": 6,
+      "elapsed_ms": 2.639881000504829
+    },
+    {
+      "case": "Understand-Future-Goals",
+      "mode": "Native",
+      "outcome": "DeadEnd",
+      "steps": 3,
+      "elapsed_ms": 0.3476089987088926
+    },
+    {
+      "case": "Understand-Future-Goals",
+      "mode": "PRISM",
+      "outcome": "Success",
+      "steps": 6,
+      "elapsed_ms": 3.386121003131848
+    },
+    {
+      "case": "Understand-Future-Goals",
+      "mode": "Native",
+      "outcome": "DeadEnd",
+      "steps": 3,
+      "elapsed_ms": 0.4992359972675331
+    },
+    {
+      "case": "Understand-Future-Goals",
+      "mode": "PRISM",
+      "outcome": "Success",
+      "steps": 6,
+      "elapsed_ms": 2.632556999742519
+    },
+    {
+      "case": "Summarize-User-Preferences",
+      "mode": "Native",
+      "outcome": "DeadEnd",
+      "steps": 3,
+      "elapsed_ms": 0.40662500396138057
+    },
+    {
+      "case": "Summarize-User-Preferences",
+      "mode": "PRISM",
+      "outcome": "Success",
+      "steps": 7,
+      "elapsed_ms": 3.4959510012413375
+    },
+    {
+      "case": "Summarize-User-Preferences",
+      "mode": "Native",
+      "outcome": "DeadEnd",
+      "steps": 3,
+      "elapsed_ms": 0.36936399555997923
+    },
+    {
+      "case": "Summarize-User-Preferences",
+      "mode": "PRISM",
+      "outcome": "Success",
+      "steps": 7,
+      "elapsed_ms": 3.087570999923628
+    },
+    {
+      "case": "Summarize-User-Preferences",
+      "mode": "Native",
+      "outcome": "DeadEnd",
+      "steps": 3,
+      "elapsed_ms": 0.3484780027065426
+    },
+    {
+      "case": "Summarize-User-Preferences",
+      "mode": "PRISM",
+      "outcome": "Success",
+      "steps": 7,
+      "elapsed_ms": 3.435115999309346
+    },
+    {
+      "case": "Understand-User-Interests",
+      "mode": "Native",
+      "outcome": "DeadEnd",
+      "steps": 3,
+      "elapsed_ms": 0.36457699752645567
+    },
+    {
+      "case": "Understand-User-Interests",
+      "mode": "PRISM",
+      "outcome": "Success",
+      "steps": 8,
+      "elapsed_ms": 3.4193850005976856
+    },
+    {
+      "case": "Understand-User-Interests",
+      "mode": "Native",
+      "outcome": "DeadEnd",
+      "steps": 3,
+      "elapsed_ms": 0.3135919978376478
+    },
+    {
+      "case": "Understand-User-Interests",
+      "mode": "PRISM",
+      "outcome": "Success",
+      "steps": 8,
+      "elapsed_ms": 5.903479002881795
+    },
+    {
+      "case": "Understand-User-Interests",
+      "mode": "Native",
+      "outcome": "DeadEnd",
+      "steps": 3,
+      "elapsed_ms": 0.3477080026641488
+    },
+    {
+      "case": "Understand-User-Interests",
+      "mode": "PRISM",
+      "outcome": "Success",
+      "steps": 8,
+      "elapsed_ms": 4.7359009986394085
+    },
+    {
+      "case": "Ask-Recent-Events",
+      "mode": "Native",
+      "outcome": "DeadEnd",
+      "steps": 3,
+      "elapsed_ms": 0.3221459992346354
+    },
+    {
+      "case": "Ask-Recent-Events",
+      "mode": "PRISM",
+      "outcome": "Success",
+      "steps": 9,
+      "elapsed_ms": 4.376474003947806
+    },
+    {
+      "case": "Ask-Recent-Events",
+      "mode": "Native",
+      "outcome": "DeadEnd",
+      "steps": 3,
+      "elapsed_ms": 0.44864099618280306
+    },
+    {
+      "case": "Ask-Recent-Events",
+      "mode": "PRISM",
+      "outcome": "Success",
+      "steps": 9,
+      "elapsed_ms": 4.10607700177934
+    },
+    {
+      "case": "Ask-Recent-Events",
+      "mode": "Native",
+      "outcome": "DeadEnd",
+      "steps": 3,
+      "elapsed_ms": 0.35600800038082525
+    },
+    {
+      "case": "Ask-Recent-Events",
+      "mode": "PRISM",
+      "outcome": "Success",
+      "steps": 9,
+      "elapsed_ms": 4.41094800044084
+    },
+    {
+      "case": "Learn-Recent-Event-Details",
+      "mode": "Native",
+      "outcome": "DeadEnd",
+      "steps": 3,
+      "elapsed_ms": 0.31485900399275124
+    },
+    {
+      "case": "Learn-Recent-Event-Details",
+      "mode": "PRISM",
+      "outcome": "Success",
+      "steps": 10,
+      "elapsed_ms": 4.676388001826126
+    },
+    {
+      "case": "Learn-Recent-Event-Details",
+      "mode": "Native",
+      "outcome": "DeadEnd",
+      "steps": 3,
+      "elapsed_ms": 0.3441740045673214
+    },
+    {
+      "case": "Learn-Recent-Event-Details",
+      "mode": "PRISM",
+      "outcome": "Success",
+      "steps": 10,
+      "elapsed_ms": 4.325706999225076
+    },
+    {
+      "case": "Learn-Recent-Event-Details",
+      "mode": "Native",
+      "outcome": "DeadEnd",
+      "steps": 3,
+      "elapsed_ms": 0.3384849987924099
+    },
+    {
+      "case": "Learn-Recent-Event-Details",
+      "mode": "PRISM",
+      "outcome": "Success",
+      "steps": 10,
+      "elapsed_ms": 4.791368999576662
+    },
+    {
+      "case": "Understand-Event-Impact",
+      "mode": "Native",
+      "outcome": "DeadEnd",
+      "steps": 3,
+      "elapsed_ms": 0.3443909954512492
+    },
+    {
+      "case": "Understand-Event-Impact",
+      "mode": "PRISM",
+      "outcome": "Success",
+      "steps": 11,
+      "elapsed_ms": 8.936231999541633
+    },
+    {
+      "case": "Understand-Event-Impact",
+      "mode": "Native",
+      "outcome": "DeadEnd",
+      "steps": 3,
+      "elapsed_ms": 0.44845200318377465
+    },
+    {
+      "case": "Understand-Event-Impact",
+      "mode": "PRISM",
+      "outcome": "Success",
+      "steps": 11,
+      "elapsed_ms": 5.01453600008972
+    },
+    {
+      "case": "Understand-Event-Impact",
+      "mode": "Native",
+      "outcome": "DeadEnd",
+      "steps": 3,
+      "elapsed_ms": 0.33957199775613844
+    },
+    {
+      "case": "Understand-Event-Impact",
+      "mode": "PRISM",
+      "outcome": "Success",
+      "steps": 11,
+      "elapsed_ms": 5.1426639984129
+    },
+    {
+      "case": "Explore-Event-Emotions",
+      "mode": "Native",
+      "outcome": "DeadEnd",
+      "steps": 3,
+      "elapsed_ms": 0.354263000190258
+    },
+    {
+      "case": "Explore-Event-Emotions",
+      "mode": "PRISM",
+      "outcome": "Success",
+      "steps": 12,
+      "elapsed_ms": 5.703303002519533
+    },
+    {
+      "case": "Explore-Event-Emotions",
+      "mode": "Native",
+      "outcome": "DeadEnd",
+      "steps": 3,
+      "elapsed_ms": 0.31840700103202835
+    },
+    {
+      "case": "Explore-Event-Emotions",
+      "mode": "PRISM",
+      "outcome": "Success",
+      "steps": 12,
+      "elapsed_ms": 5.577180003456306
+    },
+    {
+      "case": "Explore-Event-Emotions",
+      "mode": "Native",
+      "outcome": "DeadEnd",
+      "steps": 3,
+      "elapsed_ms": 0.3477469945210032
+    },
+    {
+      "case": "Explore-Event-Emotions",
+      "mode": "PRISM",
+      "outcome": "Success",
+      "steps": 12,
+      "elapsed_ms": 5.524645996047184
+    },
+    {
+      "case": "Understand-Event-Significance",
+      "mode": "Native",
+      "outcome": "DeadEnd",
+      "steps": 3,
+      "elapsed_ms": 0.38943300023674965
+    },
+    {
+      "case": "Understand-Event-Significance",
+      "mode": "PRISM",
+      "outcome": "Success",
+      "steps": 13,
+      "elapsed_ms": 5.8812790011870675
+    },
+    {
+      "case": "Understand-Event-Significance",
+      "mode": "Native",
+      "outcome": "DeadEnd",
+      "steps": 3,
+      "elapsed_ms": 0.4079529971932061
+    },
+    {
+      "case": "Understand-Event-Significance",
+      "mode": "PRISM",
+      "outcome": "Success",
+      "steps": 13,
+      "elapsed_ms": 7.688837999012321
+    },
+    {
+      "case": "Understand-Event-Significance",
+      "mode": "Native",
+      "outcome": "DeadEnd",
+      "steps": 3,
+      "elapsed_ms": 0.3365319935255684
+    },
+    {
+      "case": "Understand-Event-Significance",
+      "mode": "PRISM",
+      "outcome": "Success",
+      "steps": 13,
+      "elapsed_ms": 6.770562002202496
+    },
+    {
+      "case": "Propose-Related-Topics",
+      "mode": "Native",
+      "outcome": "DeadEnd",
+      "steps": 3,
+      "elapsed_ms": 0.3268250002292916
+    },
+    {
+      "case": "Propose-Related-Topics",
+      "mode": "PRISM",
+      "outcome": "Success",
+      "steps": 14,
+      "elapsed_ms": 7.120292997569777
+    },
+    {
+      "case": "Propose-Related-Topics",
+      "mode": "Native",
+      "outcome": "DeadEnd",
+      "steps": 3,
+      "elapsed_ms": 0.3330049948999658
+    },
+    {
+      "case": "Propose-Related-Topics",
+      "mode": "PRISM",
+      "outcome": "Success",
+      "steps": 14,
+      "elapsed_ms": 6.851145997643471
+    },
+    {
+      "case": "Propose-Related-Topics",
+      "mode": "Native",
+      "outcome": "DeadEnd",
+      "steps": 3,
+      "elapsed_ms": 0.34990299900528044
+    },
+    {
+      "case": "Propose-Related-Topics",
+      "mode": "PRISM",
+      "outcome": "Success",
+      "steps": 14,
+      "elapsed_ms": 6.5440510006737895
+    },
+    {
+      "case": "Receive-Topic-Choice",
+      "mode": "Native",
+      "outcome": "DeadEnd",
+      "steps": 3,
+      "elapsed_ms": 0.34546000097179785
+    },
+    {
+      "case": "Receive-Topic-Choice",
+      "mode": "PRISM",
+      "outcome": "Success",
+      "steps": 15,
+      "elapsed_ms": 8.877503001713194
+    },
+    {
+      "case": "Receive-Topic-Choice",
+      "mode": "Native",
+      "outcome": "DeadEnd",
+      "steps": 3,
+      "elapsed_ms": 0.3337310045026243
+    },
+    {
+      "case": "Receive-Topic-Choice",
+      "mode": "PRISM",
+      "outcome": "Success",
+      "steps": 15,
+      "elapsed_ms": 7.133450002584141
+    },
+    {
+      "case": "Receive-Topic-Choice",
+      "mode": "Native",
+      "outcome": "DeadEnd",
+      "steps": 3,
+      "elapsed_ms": 0.5157830019015819
+    },
+    {
+      "case": "Receive-Topic-Choice",
+      "mode": "PRISM",
+      "outcome": "Success",
+      "steps": 15,
+      "elapsed_ms": 6.8687409948324785
+    },
+    {
+      "case": "Discuss-Chosen-Topic",
+      "mode": "Native",
+      "outcome": "DeadEnd",
+      "steps": 3,
+      "elapsed_ms": 0.39287500112550333
+    },
+    {
+      "case": "Discuss-Chosen-Topic",
+      "mode": "PRISM",
+      "outcome": "Budget",
+      "steps": 15,
+      "elapsed_ms": 7.309653999982402
+    },
+    {
+      "case": "Discuss-Chosen-Topic",
+      "mode": "Native",
+      "outcome": "DeadEnd",
+      "steps": 3,
+      "elapsed_ms": 0.44598600652534515
+    },
+    {
+      "case": "Discuss-Chosen-Topic",
+      "mode": "PRISM",
+      "outcome": "Budget",
+      "steps": 15,
+      "elapsed_ms": 7.077711998135783
+    },
+    {
+      "case": "Discuss-Chosen-Topic",
+      "mode": "Native",
+      "outcome": "DeadEnd",
+      "steps": 3,
+      "elapsed_ms": 0.35418800689512864
+    },
+    {
+      "case": "Discuss-Chosen-Topic",
+      "mode": "PRISM",
+      "outcome": "Budget",
+      "steps": 15,
+      "elapsed_ms": 8.516196001437493
+    },
+    {
+      "case": "Off-Topic-Discussion",
+      "mode": "Native",
+      "outcome": "Success",
+      "steps": 3,
+      "elapsed_ms": 0.32678100251359865
+    },
+    {
+      "case": "Off-Topic-Discussion",
+      "mode": "PRISM",
+      "outcome": "Success",
+      "steps": 3,
+      "elapsed_ms": 1.4277299997047521
+    },
+    {
+      "case": "Off-Topic-Discussion",
+      "mode": "Native",
+      "outcome": "Success",
+      "steps": 3,
+      "elapsed_ms": 0.366265005141031
+    },
+    {
+      "case": "Off-Topic-Discussion",
+      "mode": "PRISM",
+      "outcome": "Success",
+      "steps": 3,
+      "elapsed_ms": 1.5100660020834766
+    },
+    {
+      "case": "Off-Topic-Discussion",
+      "mode": "Native",
+      "outcome": "Success",
+      "steps": 3,
+      "elapsed_ms": 0.39097900298656896
+    },
+    {
+      "case": "Off-Topic-Discussion",
+      "mode": "PRISM",
+      "outcome": "Success",
+      "steps": 3,
+      "elapsed_ms": 1.4826389960944653
+    },
+    {
+      "case": "Irrelevant-Topic",
+      "mode": "Native",
+      "outcome": "DeadEnd",
+      "steps": 3,
+      "elapsed_ms": 0.34461700124666095
+    },
+    {
+      "case": "Irrelevant-Topic",
+      "mode": "PRISM",
+      "outcome": "Success",
+      "steps": 7,
+      "elapsed_ms": 3.079362999415025
+    },
+    {
+      "case": "Irrelevant-Topic",
+      "mode": "Native",
+      "outcome": "DeadEnd",
+      "steps": 3,
+      "elapsed_ms": 0.3606039972510189
+    },
+    {
+      "case": "Irrelevant-Topic",
+      "mode": "PRISM",
+      "outcome": "Success",
+      "steps": 7,
+      "elapsed_ms": 3.5911669983761385
+    },
+    {
+      "case": "Irrelevant-Topic",
+      "mode": "Native",
+      "outcome": "DeadEnd",
+      "steps": 3,
+      "elapsed_ms": 0.32135499350260943
+    },
+    {
+      "case": "Irrelevant-Topic",
+      "mode": "PRISM",
+      "outcome": "Success",
+      "steps": 7,
+      "elapsed_ms": 3.155779995722696
+    },
+    {
+      "case": "reverseDeep",
+      "mode": "Native",
+      "outcome": "Success",
+      "steps": 9,
+      "elapsed_ms": 1.774113996361848
+    },
+    {
+      "case": "reverseDeep",
+      "mode": "PRISM",
+      "outcome": "Success",
+      "steps": 8,
+      "elapsed_ms": 3.549488006683532
+    },
+    {
+      "case": "reverseDeep",
+      "mode": "Native",
+      "outcome": "Success",
+      "steps": 9,
+      "elapsed_ms": 1.4792530055274256
+    },
+    {
+      "case": "reverseDeep",
+      "mode": "PRISM",
+      "outcome": "Success",
+      "steps": 8,
+      "elapsed_ms": 3.6251729979994707
+    },
+    {
+      "case": "reverseDeep",
+      "mode": "Native",
+      "outcome": "Success",
+      "steps": 9,
+      "elapsed_ms": 1.0905769959208556
+    },
+    {
+      "case": "reverseDeep",
+      "mode": "PRISM",
+      "outcome": "Success",
+      "steps": 8,
+      "elapsed_ms": 3.938852001738269
+    },
+    {
+      "case": "reverseDeep",
+      "mode": "Native",
+      "outcome": "Success",
+      "steps": 9,
+      "elapsed_ms": 1.0183999984292313
+    },
+    {
+      "case": "reverseDeep",
+      "mode": "PRISM",
+      "outcome": "Success",
+      "steps": 8,
+      "elapsed_ms": 3.901675998349674
+    },
+    {
+      "case": "reverseDeep",
+      "mode": "Native",
+      "outcome": "Success",
+      "steps": 9,
+      "elapsed_ms": 1.3388039951678365
+    },
+    {
+      "case": "reverseDeep",
+      "mode": "PRISM",
+      "outcome": "Success",
+      "steps": 8,
+      "elapsed_ms": 3.503942003590055
+    },
+    {
+      "case": "reverseOffTopic",
+      "mode": "Native",
+      "outcome": "Budget",
+      "steps": 15,
+      "elapsed_ms": 1.5236039980663918
+    },
+    {
+      "case": "reverseOffTopic",
+      "mode": "PRISM",
+      "outcome": "Success",
+      "steps": 3,
+      "elapsed_ms": 1.9098220000159927
+    },
+    {
+      "case": "reverseOffTopic",
+      "mode": "Native",
+      "outcome": "Budget",
+      "steps": 15,
+      "elapsed_ms": 1.4791969952057116
+    },
+    {
+      "case": "reverseOffTopic",
+      "mode": "PRISM",
+      "outcome": "Success",
+      "steps": 3,
+      "elapsed_ms": 1.3732549996348098
+    },
+    {
+      "case": "reverseOffTopic",
+      "mode": "Native",
+      "outcome": "Budget",
+      "steps": 15,
+      "elapsed_ms": 1.5751430037198588
+    },
+    {
+      "case": "reverseOffTopic",
+      "mode": "PRISM",
+      "outcome": "Success",
+      "steps": 3,
+      "elapsed_ms": 1.5239940039464273
+    },
+    {
+      "case": "reverseOffTopic",
+      "mode": "Native",
+      "outcome": "Budget",
+      "steps": 15,
+      "elapsed_ms": 1.5782350019435398
+    },
+    {
+      "case": "reverseOffTopic",
+      "mode": "PRISM",
+      "outcome": "Success",
+      "steps": 3,
+      "elapsed_ms": 1.316239999141544
+    },
+    {
+      "case": "reverseOffTopic",
+      "mode": "Native",
+      "outcome": "Budget",
+      "steps": 15,
+      "elapsed_ms": 1.536404000944458
+    },
+    {
+      "case": "reverseOffTopic",
+      "mode": "PRISM",
+      "outcome": "Success",
+      "steps": 3,
+      "elapsed_ms": 1.826690997404512
+    }
+  ]
+}
