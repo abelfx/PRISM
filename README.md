@@ -5,6 +5,12 @@
 
 For current implementation progress and results, see [Documentation Map](#7-documentation-map) below — this README covers architecture and setup only.
 
+An opt-in second-backend prototype now controls action choice in the real
+PeTTa-OpenPSI planner. It is a bounded goal-reachability selector over
+OpenPsi-generated successors, not a replacement for OpenPsi or a claim of
+feature parity with the PLN integration. See
+[OpenPsi integration](docs/openpsi-integration.md) for its test and limits.
+
 ---
 
 ## 1. Overview & Problem Statement
