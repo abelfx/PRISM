@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>PRISM technical approach</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --page: #ffffff; --ink: #19212b; --muted: #536170; --line: #a7b3bf;
+      --backend: #e8f2ee; --backend-edge: #2f7358;
+      --control: #eaf0fa; --control-edge: #355f99;
+      --optional: #f8f0e2; --optional-edge: #9a6b21;
+      --panel: #ffffff;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; padding: 28px; background: var(--page); color: var(--ink); font: 16px/1.45 system-ui, -apple-system, "Segoe UI", sans-serif; }
+    main { max-width: 1200px; margin: 0 auto; }
+    h1 { margin: 0 0 4px; font-size: 29px; font-weight: 700; letter-spacing: -.025em; }
+    .subtitle { margin: 0 0 18px; color: var(--muted); font-size: 16px; }
+    svg { display: block; width: 100%; height: auto; background: var(--panel); border-radius: 14px; }
+    svg text { fill: var(--ink); font-family: system-ui, -apple-system, "Segoe UI", sans-serif; }
+    svg .lane { fill: var(--muted); font-size: 16px; font-weight: 700; letter-spacing: .08em; }
+    svg .title { font-size: 21px; font-weight: 700; }
+    svg .body { font-size: 16px; }
+    svg .small { font-size: 14px; fill: var(--muted); }
+    svg .neural { font-size: 17px; font-weight: 700; fill: var(--control-edge); }
+    svg .input { fill: var(--panel); stroke: var(--line); stroke-width: 2; }
+    svg .backend { fill: var(--backend); stroke: var(--backend-edge); stroke-width: 2; }
+    svg .control { fill: var(--control); stroke: var(--control-edge); stroke-width: 2; }
+    svg .optional { fill: var(--optional); stroke: var(--optional-edge); stroke-width: 2; stroke-dasharray: 7 5; }
+    svg .arrow { fill: none; stroke: var(--line); stroke-width: 3; marker-end: url(#arrow); }
+    svg .optional-arrow { fill: none; stroke: var(--optional-edge); stroke-width: 2.5; stroke-dasharray: 7 5; marker-end: url(#arrow-optional); }
+    svg .divider { stroke: var(--line); stroke-width: 1.5; stroke-dasharray: 5 7; }
+    .caption { margin: 14px 3px 0; color: var(--muted); font-size: 14px; }
+    @media print {
+      :root { color-scheme: light; }
+      body { padding: 0; background: white; }
+      svg { border-radius: 0; }
+      .caption { color: #333; }
+    }
+  </style>
+</head>
+<body>
+<main>
+  <h1>PRISM: control without replacing the backend</h1>
+  <p class="subtitle">A shared search loop, with backend-specific candidate generation, application, and verification</p>
+  <svg viewBox="0 0 1200 940" role="img" aria-labelledby="diagram-title diagram-desc">
+    <title id="diagram-title">PRISM technical architecture</title>
+    <desc id="diagram-desc">The backend exposes candidate sources and owns operation semantics. PRISM filters and scores candidates, manages exploration, and optionally requests strategic subgoals. Selected operations return to the backend for application and verification. Results feed the next search decision.</desc>
+    <defs>
+      <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto">
+        <path d="M 1 1 L 9 5 L 1 9 Z" fill="var(--line)"/>
+      </marker>
+      <marker id="arrow-optional" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto">
+        <path d="M 1 1 L 9 5 L 1 9 Z" fill="var(--optional-edge)"/>
+      </marker>
+    </defs>
+
+    <rect class="input" x="260" y="40" width="680" height="78" rx="12"/>
+    <text class="title" x="600" y="75" text-anchor="middle">Objective + current backend state</text>
+    <text class="small" x="600" y="101" text-anchor="middle">Query, goal, or search objective; facts, action state, or candidate population</text>
+    <path class="arrow" d="M 440 118 L 305 212"/>
+
+    <text class="lane" x="80" y="199">BACKEND · OWNS OPERATIONS</text>
+    <text class="lane" x="690" y="199">PRISM · OWNS EXPLORATION</text>
+    <path class="divider" d="M 600 195 L 600 862"/>
+
+    <rect class="backend" x="70" y="222" width="460" height="133" rx="12"/>
+    <text class="title" x="96" y="257">Expose candidate source</text>
+    <text class="body" x="96" y="287">PLN tasks and beliefs; OpenPsi applicable actions</text>
+    <text class="body" x="96" y="315">MOSES: program populations and fitness</text>
+    <text class="small" x="96" y="339">Backend defines its own structures and constraints</text>
+
+    <path class="arrow" d="M 530 289 L 676 289"/>
+    <rect class="control" x="690" y="222" width="440" height="133" rx="12"/>
+    <text class="title" x="716" y="257">Stage 0 · prepare candidates</text>
+    <text class="body" x="716" y="287">Optional retrieval or filtering, adapter-specific</text>
+    <text class="body" x="716" y="315">PLN: indexed, unification-aware retrieval</text>
+    <text class="small" x="716" y="339">May run before or during candidate generation</text>
+
+    <path class="arrow" d="M 910 355 L 910 393"/>
+    <rect class="control" x="690" y="405" width="440" height="109" rx="12"/>
+    <text class="title" x="716" y="441">Tier 1 · fast scoring policy</text>
+    <text class="neural" x="716" y="470">Trained neural network policy</text>
+    <text class="body" x="716" y="497">Symbolic heuristics as baseline and fallback</text>
+
+    <path class="arrow" d="M 910 514 L 910 551"/>
+    <rect class="control" x="690" y="564" width="440" height="148" rx="12"/>
+    <text class="title" x="716" y="599">Search manager</text>
+    <text class="body" x="716" y="628">Frontier, alternatives, visited states, budget</text>
+    <text class="body" x="716" y="656">PLN: best-first / bidirectional where supported</text>
+    <text class="body" x="716" y="684">OpenPsi: planning; MOSES: population policy</text>
+
+    <path class="arrow" d="M 690 638 L 544 638"/>
+    <rect class="backend" x="70" y="564" width="460" height="148" rx="12"/>
+    <text class="title" x="96" y="599">Apply selected operation</text>
+    <text class="body" x="96" y="628">PLN rules / PLN.Apply: conclusion, STV, evidence</text>
+    <text class="body" x="96" y="656">OpenPsi: successor state and action execution</text>
+    <text class="body" x="96" y="684">Backend verifies whether the objective is met</text>
+
+    <path class="arrow" d="M 300 712 L 300 742"/>
+    <rect class="backend" x="70" y="755" width="460" height="86" rx="12"/>
+    <text class="title" x="96" y="790">Verified result or updated state</text>
+    <text class="body" x="96" y="819">Success, failure, or new choices for the next step</text>
+
+    <rect class="optional" x="690" y="755" width="440" height="86" rx="12"/>
+    <text class="title" x="716" y="790">Tier 2 · optional strategic help</text>
+    <text class="body" x="716" y="819">On stall: propose waypoint; backend must verify</text>
+    <path class="optional-arrow" d="M 1070 712 L 1070 742"/>
+    <path class="optional-arrow" d="M 750 755 L 750 724"/>
+
+    <path class="arrow" d="M 530 798 L 625 798 L 625 700 L 677 700"/>
+    <text class="small" x="544" y="878">Verified outcomes return to the search manager; repeat within budget</text>
+  </svg>
+  <p class="caption">Proposed PRISM architecture: shared control with backend-specific adapters and search policies. Tier 2 is invoked only when strategic guidance is needed; all selected operations and suggested subgoals remain subject to backend execution and verification.</p>
+</main>
+</body>
+</html>

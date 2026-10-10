@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>PRISM matched evaluation design</title>
+  <style>
+    :root { color-scheme: light; }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: #fff; color: #18233a; font-family: Arial, Helvetica, sans-serif; }
+    main { width: min(1200px, 100%); margin: 0 auto; padding: 28px 32px 18px; }
+    h1 { margin: 0 0 4px; font-size: 27px; line-height: 1.2; }
+    p { margin: 0 0 12px; color: #536174; font-size: 15px; }
+    svg { display: block; width: 100%; height: auto; }
+    svg text { font-family: Arial, Helvetica, sans-serif; fill: #18233a; }
+    svg .label { font-size: 18px; font-weight: 700; }
+    svg .body { font-size: 16px; }
+    svg .small { font-size: 14px; fill: #536174; }
+    svg .section { font-size: 14px; font-weight: 700; fill: #365d9d; letter-spacing: 1.5px; }
+    svg .band { fill: #eef2f8; stroke: #6a84af; stroke-width: 2; }
+    svg .method { fill: #f5f7fb; stroke: #aebbd0; stroke-width: 1.5; }
+    svg .verify { fill: #e8f4ed; stroke: #4a9167; stroke-width: 2; }
+    svg .output { fill: #f7f2e8; stroke: #aa8847; stroke-width: 2; }
+    svg .edge { fill: none; stroke: #8392a7; stroke-width: 2.5; marker-end: url(#arrow); }
+    @media print { main { width: 100%; padding: 0; } }
+  </style>
+</head>
+<body>
+<main>
+  <h1>One evaluation, matched across control policies</h1>
+  <p>The backend and task stay fixed; only the control method changes.</p>
+  <svg viewBox="0 0 1136 710" role="img" aria-labelledby="title desc">
+    <title id="title">Matched PRISM evaluation design</title>
+    <desc id="desc">The same tasks, rules, budgets, and fresh states feed five control methods: native component control, ECAN-guided control, symbolic PRISM, neural PRISM, and ECAN plus PRISM. Every method uses the same backend verifier, then reports success, time, search work, and failures.</desc>
+    <defs>
+      <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto"><path d="M 1 1 L 9 5 L 1 9 Z" fill="#8392a7"/></marker>
+    </defs>
+
+    <text class="section" x="568" y="35" text-anchor="middle">CONTROLLED INPUT</text>
+    <rect class="band" x="88" y="54" width="960" height="81" rx="12"/>
+    <text class="label" x="568" y="89" text-anchor="middle">Same tasks · backend rules · budgets · independently initialized state</text>
+    <text class="small" x="568" y="116" text-anchor="middle">Reachable and unreachable tasks; report cold and warm cost separately</text>
+
+    <path class="edge" d="M 568 135 L 568 174"/>
+    <text class="section" x="568" y="203" text-anchor="middle">COMPARE CONTROL METHODS</text>
+
+    <rect class="method" x="33" y="225" width="206" height="93" rx="10"/>
+    <text class="label" x="136" y="259" text-anchor="middle">Native control</text>
+    <text class="small" x="136" y="288" text-anchor="middle">component's own policy</text>
+
+    <rect class="method" x="249" y="225" width="206" height="93" rx="10"/>
+    <text class="label" x="352" y="259" text-anchor="middle">ECAN-guided</text>
+    <text class="small" x="352" y="288" text-anchor="middle">attention-based priority</text>
+
+    <rect class="method" x="465" y="225" width="206" height="93" rx="10"/>
+    <text class="label" x="568" y="259" text-anchor="middle">PRISM symbolic</text>
+    <text class="small" x="568" y="288" text-anchor="middle">structural policy</text>
+
+    <rect class="method" x="681" y="225" width="206" height="93" rx="10"/>
+    <text class="label" x="784" y="259" text-anchor="middle">PRISM neural</text>
+    <text class="small" x="784" y="288" text-anchor="middle">trained policy</text>
+
+    <rect class="method" x="897" y="225" width="206" height="93" rx="10"/>
+    <text class="label" x="1000" y="259" text-anchor="middle">ECAN + PRISM</text>
+    <text class="small" x="1000" y="288" text-anchor="middle">complementary signals</text>
+
+    <path d="M 136 318 L 136 369 M 352 318 L 352 369 M 568 318 L 568 369 M 784 318 L 784 369 M 1000 318 L 1000 369 M 136 369 L 1000 369" fill="none" stroke="#8392a7" stroke-width="2"/>
+    <path class="edge" d="M 568 369 L 568 414"/>
+
+    <rect class="verify" x="278" y="429" width="580" height="88" rx="12"/>
+    <text class="label" x="568" y="464" text-anchor="middle">Same backend execution and verification</text>
+    <text class="small" x="568" y="494" text-anchor="middle">PLN proof · OpenPsi transition · backend-appropriate outcome</text>
+
+    <path class="edge" d="M 568 517 L 568 554"/>
+    <rect class="output" x="158" y="569" width="820" height="105" rx="12"/>
+    <text class="label" x="568" y="603" text-anchor="middle">Report matched outcomes</text>
+    <text class="body" x="568" y="634" text-anchor="middle">Verified success · time to result · expansions · control overhead · failure types</text>
+    <text class="small" x="568" y="657" text-anchor="middle">Separate results by backend, task difficulty, and budget</text>
+  </svg>
+</main>
+</body>
+</html>

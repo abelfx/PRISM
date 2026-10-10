@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>PRISM ranking and search management</title>
+  <style>
+    :root { color-scheme: light; }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: #fff; color: #18233a; font-family: Arial, Helvetica, sans-serif; }
+    main { width: min(1200px, 100%); margin: 0 auto; padding: 28px 32px 18px; }
+    h1 { margin: 0 0 4px; font-size: 27px; line-height: 1.2; }
+    p { margin: 0 0 12px; color: #536174; font-size: 15px; }
+    svg { display: block; width: 100%; height: auto; }
+    svg text { font-family: Arial, Helvetica, sans-serif; fill: #18233a; }
+    svg .label { font-size: 19px; font-weight: 700; }
+    svg .body { font-size: 16px; }
+    svg .small { font-size: 14px; fill: #536174; }
+    svg .step { font-size: 15px; font-weight: 700; fill: #365d9d; }
+    svg .edge { fill: none; stroke: #8392a7; stroke-width: 3; marker-end: url(#arrow); }
+    svg .return { fill: none; stroke: #b87924; stroke-width: 3; stroke-dasharray: 8 7; marker-end: url(#arrow-amber); }
+    svg .node { fill: #edf3fb; stroke: #6687b8; stroke-width: 2; }
+    svg .success { fill: #e8f4ed; stroke: #4a9167; stroke-width: 2; }
+    svg .dead { fill: #fbefef; stroke: #bb6868; stroke-width: 2; }
+    svg .note { fill: #f5f7fa; stroke: #d4dbe5; stroke-width: 1.5; }
+    @media print { main { width: 100%; padding: 0; } }
+  </style>
+</head>
+<body>
+<main>
+  <h1>How ranking becomes search</h1>
+  <p>Illustrative branching task: the backend supplies and validates every transition.</p>
+  <svg viewBox="0 0 1136 610" role="img" aria-labelledby="title desc">
+    <title id="title">Tier 1 ranking versus search management</title>
+    <desc id="desc">From Start, Tier 1 ranks A above B. The search manager tries A first, learns it is a dead end, retains B, and then explores B to C to Goal. The backend validates each transition.</desc>
+    <defs>
+      <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto"><path d="M 1 1 L 9 5 L 1 9 Z" fill="#8392a7"/></marker>
+      <marker id="arrow-amber" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto"><path d="M 1 1 L 9 5 L 1 9 Z" fill="#b87924"/></marker>
+    </defs>
+
+    <rect class="note" x="35" y="16" width="500" height="67" rx="10"/>
+    <text class="step" x="55" y="43">TIER 1 · SCORES THE NEXT CHOICES</text>
+    <text class="body" x="55" y="68">A looks stronger now; B remains worth keeping.</text>
+
+    <rect class="note" x="601" y="16" width="500" height="67" rx="10"/>
+    <text class="step" x="621" y="43">SEARCH MANAGER · REMEMBERS AND DECIDES</text>
+    <text class="body" x="621" y="68">Try A, record failure, return to B, then stop at goal.</text>
+
+    <rect class="node" x="40" y="244" width="150" height="82" rx="12"/>
+    <text class="label" x="115" y="278" text-anchor="middle">Start</text>
+    <text class="small" x="115" y="305" text-anchor="middle">two choices</text>
+
+    <path class="edge" d="M 190 270 C 270 270 263 178 350 178"/>
+    <path class="edge" d="M 190 308 C 270 308 263 409 350 409"/>
+
+    <rect class="node" x="365" y="133" width="170" height="90" rx="12"/>
+    <text class="label" x="450" y="167" text-anchor="middle">Choice A</text>
+    <text class="small" x="450" y="196" text-anchor="middle">higher Tier 1 score</text>
+
+    <rect class="node" x="365" y="364" width="170" height="90" rx="12"/>
+    <text class="label" x="450" y="398" text-anchor="middle">Choice B</text>
+    <text class="small" x="450" y="427" text-anchor="middle">lower Tier 1 score</text>
+
+    <path class="edge" d="M 535 178 L 670 178"/>
+    <rect class="dead" x="684" y="133" width="174" height="90" rx="12"/>
+    <text class="label" x="771" y="167" text-anchor="middle">Dead end</text>
+    <text class="small" x="771" y="196" text-anchor="middle">no route to goal</text>
+
+    <path class="return" d="M 771 223 C 774 302 620 313 543 383"/>
+    <text class="small" x="647" y="293" text-anchor="middle">return to saved alternative</text>
+
+    <path class="edge" d="M 535 409 L 670 409"/>
+    <rect class="node" x="684" y="364" width="174" height="90" rx="12"/>
+    <text class="label" x="771" y="398" text-anchor="middle">Choice C</text>
+    <text class="small" x="771" y="427" text-anchor="middle">continue from B</text>
+
+    <path class="edge" d="M 858 409 L 946 409"/>
+    <rect class="success" x="960" y="364" width="150" height="90" rx="12"/>
+    <text class="label" x="1035" y="398" text-anchor="middle">Goal</text>
+    <text class="small" x="1035" y="427" text-anchor="middle">verified</text>
+
+    <line x1="35" y1="510" x2="1101" y2="510" stroke="#d4dbe5" stroke-width="1.5"/>
+    <text class="body" x="568" y="550" text-anchor="middle">Tier 1 determines what looks promising; the manager retains alternatives across steps.</text>
+    <text class="small" x="568" y="579" text-anchor="middle">Neither changes which operations the backend considers valid.</text>
+  </svg>
+</main>
+</body>
+</html>

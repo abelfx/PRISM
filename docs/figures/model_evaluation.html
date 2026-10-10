@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>PRISM Tier 1 v2 — Week 11 Evaluation</title>
+  <style>
+    :root { color-scheme: dark; --bg:#0d1117; --panel:#161b22; --line:#30363d; --text:#e6edf3; --muted:#8b949e; --blue:#58a6ff; --green:#3fb950; --amber:#d29922; --red:#f85149; }
+    * { box-sizing:border-box; }
+    body { margin:0; background:var(--bg); color:var(--text); font:14px/1.45 ui-sans-serif,system-ui,sans-serif; }
+    main { max-width:1180px; margin:auto; padding:32px 24px 60px; }
+    h1 { margin:0; font-size:28px; } h2 { margin:32px 0 14px; font-size:20px; } h3 { margin:0 0 12px; font-size:15px; }
+    .sub { color:var(--muted); margin:6px 0 22px; }
+    .grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:16px; }
+    .stats { display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); gap:12px; }
+    .card,.stat,.callout { background:var(--panel); border:1px solid var(--line); border-radius:10px; padding:18px; }
+    .stat b { display:block; font-size:22px; color:var(--blue); } .stat span,.caption { color:var(--muted); font-size:12px; }
+    .callout { border-left:4px solid var(--amber); margin:18px 0; } .callout strong { display:block; margin-bottom:5px; color:#f2cc60; }
+    .good { border-left-color:var(--green); } .good strong { color:#56d364; }
+    svg { display:block; width:100%; height:285px; overflow:visible; }
+    .legend { display:flex; gap:18px; color:var(--muted); font-size:12px; margin-top:8px; }
+    .dot { width:9px; height:9px; border-radius:50%; display:inline-block; margin-right:6px; }
+    table { width:100%; border-collapse:collapse; } th,td { text-align:left; padding:9px 10px; border-bottom:1px solid var(--line); } th { color:var(--muted); font-size:12px; } td.num { text-align:right; font-variant-numeric:tabular-nums; }
+    .bar-row { display:grid; grid-template-columns:150px 1fr 58px; gap:10px; align-items:center; margin:11px 0; }
+    .track { height:12px; background:#21262d; border-radius:6px; overflow:hidden; } .bar { height:100%; background:var(--blue); }
+    .matrix { display:grid; grid-template-columns:repeat(2,1fr); gap:8px; text-align:center; } .matrix div { background:#21262d; padding:18px; border-radius:8px; } .matrix b { font-size:24px; display:block; }
+    code { color:#79c0ff; } footer { margin-top:30px; color:var(--muted); font-size:12px; }
+    @media(max-width:850px){ .grid,.stats{grid-template-columns:1fr}.stats{grid-template-columns:repeat(2,1fr)} }
+  </style>
+</head>
+<body><main>
+  <h1>Tier 1 v2 training evaluation</h1>
+  <p class="sub">PRISM Week 11 · learned embeddings + 128/64 ReLU MLP · 29 September 2026</p>
+
+  <div class="callout"><strong>Perfect scores are not proof of broad generalization</strong>The held-out runs reuse synthetic templates and naming conventions, while Tier 1 v1 already ranks every eligible decision perfectly. This report establishes convergence and within-corpus parity—not superiority over v1 or transfer to unrelated knowledge graphs.</div>
+
+  <section class="stats">
+    <div class="stat"><b>784</b><span>Total candidates</span></div>
+    <div class="stat"><b>569 / 215</b><span>Train / held-out</span></div>
+    <div class="stat"><b>100%</b><span>Held-out accuracy</span></div>
+    <div class="stat"><b>1.000</b><span>Held-out ROC-AUC</span></div>
+    <div class="stat"><b>0.121 ms</b><span>Median inference</span></div>
+  </section>
+
+  <h2>Learning curves</h2>
+  <section class="grid">
+    <div class="card"><h3>Binary log loss by epoch</h3><svg id="loss"></svg><div class="legend"><span><i class="dot" style="background:var(--blue)"></i>Training loss</span><span><i class="dot" style="background:var(--amber)"></i>Validation loss</span></div><p class="caption">X-axis: epoch · Y-axis: log loss. Lower is better.</p></div>
+    <div class="card"><h3>Accuracy by epoch</h3><svg id="accuracy"></svg><div class="legend"><span><i class="dot" style="background:var(--blue)"></i>Training accuracy</span><span><i class="dot" style="background:var(--green)"></i>Validation accuracy</span></div><p class="caption">X-axis: epoch · Y-axis: accuracy (%). Both reach 100% at epoch 37.</p></div>
+  </section>
+
+  <div class="callout good"><strong>No conventional curve evidence of overfitting</strong>Validation loss falls from 0.603535 to 0.0000468 while training loss falls from 0.612553 to 0.0000449. The final gap is only +0.00000188 and validation accuracy never declines after reaching 100%. The more important risk is that the dataset is too easy and templated.</div>
+
+  <h2>Held-out evaluation</h2>
+  <section class="grid">
+    <div class="card"><h3>Classification and calibration metrics</h3><div id="metrics"></div><p class="caption">215 held-out candidates: 139 proof-path positives and 76 dead-end negatives.</p></div>
+    <div class="card"><h3>Confusion matrix</h3><div class="matrix"><div><b style="color:var(--green)">139</b>True positive</div><div><b>0</b>False positive</div><div><b>0</b>False negative</div><div><b style="color:var(--green)">76</b>True negative</div></div><h3 style="margin-top:20px">Probability quality</h3><table><tr><th>Metric</th><th>Held-out</th></tr><tr><td>Log loss</td><td class="num">0.000047</td></tr><tr><td>Brier score</td><td class="num">&lt;0.000001</td></tr><tr><td>10-bin ECE</td><td class="num">0.000047</td></tr></table></div>
+  </section>
+
+  <h2>Ranking and robustness checks</h2>
+  <section class="grid">
+    <div class="card"><h3>v1 versus v2 shortlist quality</h3><table><tr><th>Metric</th><th>v1</th><th>v2</th></tr><tr><td>Top-1 hit rate</td><td class="num">100%</td><td class="num">100%</td></tr><tr><td>Top-3 hit rate</td><td class="num">100%</td><td class="num">100%</td></tr><tr><td>Mean reciprocal rank</td><td class="num">1.000</td><td class="num">1.000</td></tr></table><p class="caption">43 eligible held-out ranking decisions. v2 achieves parity, not improvement.</p></div>
+    <div class="card"><h3>Queue-position ablation</h3><table><tr><th>Metric</th><th>Full model</th><th>No queue rank</th></tr><tr><td>Accuracy</td><td class="num">100%</td><td class="num">100%</td></tr><tr><td>ROC-AUC</td><td class="num">1.000</td><td class="num">1.000</td></tr><tr><td>Top-1 hit rate</td><td class="num">100%</td><td class="num">100%</td></tr><tr><td>MRR</td><td class="num">1.000</td><td class="num">1.000</td></tr></table><p class="caption">Neutralizing the v1-derived queue-position feature does not reduce performance.</p></div>
+  </section>
+
+  <h2>Grouped four-fold cross-validation</h2>
+  <section class="grid">
+    <div class="card"><h3>Validation log loss ×10⁴</h3><svg id="folds"></svg><p class="caption">Each fold holds out four complete search runs. All folds have 100% accuracy, ROC-AUC, top-1 hit rate, and MRR.</p></div>
+    <div class="card"><h3>Training algorithm</h3><table><tr><th>Component</th><th>Choice</th></tr><tr><td>Model</td><td>Learned embeddings + nonlinear MLP</td></tr><tr><td>Layers</td><td>Dense 128 ReLU → Dense 64 ReLU</td></tr><tr><td>Objective</td><td>Class-balanced binary cross-entropy</td></tr><tr><td>Optimizer</td><td>Full-batch Adam, lr 0.003</td></tr><tr><td>Regularization</td><td>L2 weight decay 1e-5</td></tr><tr><td>Selection</td><td>Lowest validation log loss</td></tr><tr><td>Early stopping</td><td>Patience 20; not triggered</td></tr></table><p class="caption">This is a shallow neural network, not logistic regression.</p></div>
+  </section>
+
+  <h2>Bottom line</h2>
+  <div class="callout"><strong>Stress-test verdict: no v2 performance boost was demonstrated</strong>Across baseline, renamed, unseen-predicate and external-KG ranking, v2 only ties v1. On 100 adversarial frontiers where v1's endpoint-overlap heuristic is deliberately wrong, both v1 and v2 score 0% top-1. The learned model has reproduced the training distribution but has not learned a stronger general search policy.</div>
+
+  <h2>Out-of-distribution stress tests</h2>
+  <section class="grid">
+    <div class="card"><h3>Top-1 proof-path hit rate: v1 vs v2</h3><svg id="stressRanking"></svg><p class="caption">X-axis: stress family · Y-axis: top-1 hit rate (%). There is no family where v2 is strictly better.</p></div>
+    <div class="card"><h3>v2 absolute classification accuracy</h3><svg id="stressClass"></svg><p class="caption">X-axis: stress family · Y-axis: candidate accuracy (%). Ranking can remain perfect while probability classification becomes unusable.</p></div>
+  </section>
+  <section class="grid" style="margin-top:16px">
+    <div class="card"><h3>Clean validation after training-label corruption</h3><svg id="noise"></svg><p class="caption">X-axis: flipped training labels (%) · Y-axis: clean held-out accuracy (%). Accuracy is resilient through 20%, but calibration/log loss worsens steadily.</p></div>
+    <div class="card"><h3>Failure details</h3><table><tr><th>Stress family</th><th>v2 result</th><th>Meaning</th></tr><tr><td>Unseen atom vocabulary</td><td>58.1% accuracy; 35.3% recall</td><td>OOV collapse causes 90 false negatives</td></tr><tr><td>Unseen predicate + atoms</td><td>89.3% accuracy</td><td>19 FN and 4 FP despite ranking parity</td></tr><tr><td>3 external KGs</td><td>0% positive recall</td><td>All 9 proof-path candidates classified negative</td></tr><tr><td>100 v1-failure frontiers</td><td>0% top-1; 33.3% accuracy</td><td>v2 repeats v1's ranking failure</td></tr><tr><td>30% label noise</td><td>95.3% accuracy; ECE 0.318</td><td>Ranking survives, confidence becomes poor</td></tr></table></div>
+  </section>
+
+  <div class="callout good"><strong>What the evidence supports</strong>The optimizer is stable, the in-template task is learned, latency passes, and moderate label noise does not immediately destroy ranking on the same easy template distribution.</div>
+  <div class="callout"><strong>Engineering decision</strong>Keep v1 as the default. The present mean-token MLP cannot distinguish graph roles reliably after vocabulary shift and does not repair the frontiers v1 gets wrong. A real v2 improvement requires role-aware/graph structural features and new training traces containing actual v1 mistakes.</div>
+  <footer>Sources: <code>week11_tier1_v2.json</code> and <code>week11_tier1_v2_stress.json</code> · checkpoint SHA-256 <code>9205b3d642ca94022040361981b8933bd902fb413fbe3ea494fd7f5cef02fd36</code></footer>
+</main>
+<script>
+const E=[1,5,10,15,20,25,30,35,37,40,45,50,60,70,80,90,100,110,120];
+const TL=[.612553,.471769,.333668,.217077,.128114,.065652,.033593,.015894,.010724,.005458,.0019,.000867,.000335,.000182,.000115,.0000819,.0000636,.0000521,.0000449];
+const VL=[.603535,.440329,.293134,.174719,.106014,.060869,.032937,.01502,.010036,.005196,.001902,.000885,.00034,.000188,.000121,.0000858,.0000662,.0000545,.0000468];
+const TA=[91.56,92.44,92.27,93.32,97.54,98.42,98.95,99.47,100,100,100,100,100,100,100,100,100,100,100];
+const VA=[93.49,98.14,98.14,97.67,98.14,98.6,98.6,99.53,100,100,100,100,100,100,100,100,100,100,100];
+function lineChart(id,series,min,max){const s=document.getElementById(id),W=520,H=250,p=38; s.setAttribute('viewBox',`0 0 ${W} ${H}`); let html=`<line x1="${p}" y1="${H-p}" x2="${W-10}" y2="${H-p}" stroke="#30363d"/><line x1="${p}" y1="10" x2="${p}" y2="${H-p}" stroke="#30363d"/>`; [0,.25,.5,.75,1].forEach(t=>{let y=H-p-t*(H-p-10),v=(min+t*(max-min));html+=`<line x1="${p}" y1="${y}" x2="${W-10}" y2="${y}" stroke="#21262d"/><text x="2" y="${y+4}" fill="#8b949e" font-size="10">${v<.01?v.toExponential(1):v.toFixed(1)}</text>`}); series.forEach(o=>{const pts=o.d.map((v,i)=>`${p+i*(W-p-12)/(E.length-1)},${H-p-(v-min)/(max-min)*(H-p-10)}`).join(' ');html+=`<polyline points="${pts}" fill="none" stroke="${o.c}" stroke-width="2.5"/>`}); html+=`<text x="${p}" y="${H-8}" fill="#8b949e" font-size="10">1</text><text x="${W-32}" y="${H-8}" fill="#8b949e" font-size="10">120</text>`;s.innerHTML=html}
+lineChart('loss',[{d:TL,c:'#58a6ff'},{d:VL,c:'#d29922'}],0,.65); lineChart('accuracy',[{d:TA,c:'#58a6ff'},{d:VA,c:'#3fb950'}],90,100);
+const metrics=[['Accuracy',100],['Balanced accuracy',100],['Precision',100],['Recall',100],['Specificity',100],['F1',100],['ROC-AUC',100],['Average precision',100]];document.getElementById('metrics').innerHTML=metrics.map(([n,v])=>`<div class="bar-row"><span>${n}</span><div class="track"><div class="bar" style="width:${v}%"></div></div><b>${v}%</b></div>`).join('');
+function bars(){const s=document.getElementById('folds'),vals=[2.54,1.67,1.73,2.25],W=520,H=250,p=38,bw=70; s.setAttribute('viewBox',`0 0 ${W} ${H}`);let h=`<line x1="${p}" y1="${H-p}" x2="${W-10}" y2="${H-p}" stroke="#30363d"/>`;vals.forEach((v,i)=>{let x=70+i*110,y=H-p-v/3*(H-p-20);h+=`<rect x="${x}" y="${y}" width="${bw}" height="${H-p-y}" rx="5" fill="#58a6ff"/><text x="${x+bw/2}" y="${y-7}" text-anchor="middle" fill="#e6edf3" font-size="12">${v}</text><text x="${x+bw/2}" y="${H-10}" text-anchor="middle" fill="#8b949e" font-size="11">Fold ${i+1}</text>`});s.innerHTML=h}bars();
+function grouped(id,labels,a,b,names){const s=document.getElementById(id),W=520,H=250,p=42,max=100; s.setAttribute('viewBox',`0 0 ${W} ${H}`);let h=`<line x1="${p}" y1="${H-p}" x2="${W-8}" y2="${H-p}" stroke="#30363d"/>`;[0,25,50,75,100].forEach(v=>{let y=H-p-v/max*(H-p-18);h+=`<line x1="${p}" y1="${y}" x2="${W-8}" y2="${y}" stroke="#21262d"/><text x="8" y="${y+4}" fill="#8b949e" font-size="10">${v}</text>`});const step=(W-p-12)/labels.length;labels.forEach((l,i)=>{let x=p+i*step+8;[a[i],b&&b[i]].filter(v=>v!==null&&v!==undefined).forEach((v,j)=>{let y=H-p-v/max*(H-p-18),bw=b?step*.3:step*.55;h+=`<rect x="${x+j*(bw+3)}" y="${y}" width="${bw}" height="${H-p-y}" rx="3" fill="${j?'#d29922':'#58a6ff'}"/>`});h+=`<text x="${x+step*.3}" y="${H-11}" text-anchor="middle" fill="#8b949e" font-size="9">${l}</text>`});h+=`<text x="${W-145}" y="16" fill="#58a6ff" font-size="10">${names[0]}</text>${b?`<text x="${W-65}" y="16" fill="#d29922" font-size="10">${names[1]}</text>`:''}`;s.innerHTML=h}
+grouped('stressRanking',['Baseline','OOV atoms','OOV pred.','External KG','Adversarial'],[100,100,100,100,0],[100,100,100,100,0],['v1','v2']);
+grouped('stressClass',['Baseline','OOV atoms','OOV pred.','External KG','Adversarial'],[100,58.14,89.30,86.96,33.33],null,['v2 accuracy']);
+grouped('noise',['0','5','10','20','30'],[100,99.53,99.53,100,95.35],null,['clean accuracy']);
+</script></body></html>
