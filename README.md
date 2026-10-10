@@ -1,197 +1,99 @@
 # PRISM — Programmable Reduction & Inference Search Manager
 
-> **Learned Inference Control Layer for Probabilistic Logic Networks (PLN) in OpenCog Hyperon**
-> **Host Environment:** PeTTa (SWI-Prolog + Janus Python FFI) & `trueagi-io/PLN` (`lib_pln.metta`)
+PRISM studies **how to allocate search effort** when a Hyperon component can generate more valid next steps than it can afford to explore. A component defines legal operations and their outcomes; PRISM filters, ranks, schedules, and measures the exploration of those operations under a budget.
 
-For current implementation progress and results, see [Documentation Map](#7-documentation-map) below — this README covers architecture and setup only.
+**This main branch implements the PLN reference integration.** OpenPsi integration and learned Tier 1 v2 work are on experimental branches and are not presented here as runnable main-branch features. The broader project aims for reusable search control, but cross-component generality remains a research goal rather than a claim demonstrated by this branch alone.
 
----
+## Why PRISM exists
 
-## 1. Overview & Problem Statement
+PLN derives conclusions from uncertain premises, carrying truth values and evidence through each rule application. Its rules say what follows from selected premises; they do not make every potentially useful path cheap to discover. In a branching knowledge base, a confidence-only task priority can spend a limited search budget on high-confidence but goal-irrelevant work.
 
-In OpenCog Hyperon, **Probabilistic Logic Networks (PLN)** serves as the core logic engine responsible for deriving new knowledge from stored facts while propagating truth values (strength and confidence).
+PRISM adds control around that process without replacing PLN's logic:
 
-While PLN's inference rules (deduction, induction, abduction, revision) and truth-value formulas are mathematically well-specified, its **inference search** currently lacks guidance:
-- At each step in a derivation, PLN blindly enumerates eligible rule-premise combinations.
-- Binary inference rules create a combinatorial Cartesian product over the premise pool.
-- Task selection in [`PLN.Derive`](../PeTTa/repos/PLN/lib_pln.metta) historically evaluated candidates solely on raw confidence (`$c`), remaining completely blind to the query goal until search concluded.
-- Consequently, search quickly stalls on shallow or low-value paths, making multi-hop reasoning over large knowledge graphs computationally intractable.
+- **Stage 0 — premise preparation:** A concept-based index narrows candidate beliefs before expensive rule matching. It is not a general AtomSpace-wide unification index.
+- **Tier 1 — fast candidate selection:** A deterministic v1 heuristic combines structural goal overlap, confidence, and a depth discount. The current code does **not** use a trained neural policy.
+- **Search manager:** Best-first and bidirectional agendas manage open candidates, visited states, alternatives, step budgets, and stopping conditions. This is separate from scoring one candidate: a score cannot remember a failed branch or decide when to return to another path.
+- **Tier 2 — optional strategy:** A mock or configured LLM can suggest an intermediate subgoal after a stall. A suggestion must still be established through PLN; it is not inserted as a fabricated belief.
 
-**PRISM resolves this by introducing a staged, learned inference-control layer.** It acts as an intelligent advisor standing beside PLN: observing candidate moves, scoring them by estimated usefulness and goal relevance, and prioritizing the search frontier — without ever modifying PLN's inference rules or truth-value arithmetic. Soundness is guaranteed by construction, not by testing alone: PRISM never touches the code path that computes a conclusion's truth value, only the order in which legal candidates are tried.
+PRISM changes which steps are explored and when. It does not calculate PLN truth values. Explicit search asks the real PLN.Apply primitive in lib_pln.metta to perform one-step inference, and accepted conclusions retain PLN's truth values and evidence stamps. Search filtering can still miss a valid route, so **proof soundness and search completeness are different properties**.
 
----
+## What is implemented on main
 
-## 2. System Architecture
+The sibling PeTTa/repos/PLN checkout contains the MeTTa-side goal-aware priority and premise-filter hooks around PLN.Derive. The PRISM package contains the Python scorer, concept index, cache, explicit search agendas, Tier 2 subgoal handling, PeTTa bridge, tracing, and independent proof-replay checks. The built-in PLN derivation loop remains in MeTTa; PRISM's explicit best-first/bidirectional agenda is mainly Python.
 
-PRISM replaces naive per-candidate LLM calls with a staged, three-part architecture — a cheap pre-filter, a fast scorer that runs on every step, and an expensive strategic reasoner invoked only when the fast path stalls:
+The repository evaluates chain, diamond, tree, semantic-gap, and supplied knowledge-graph tasks. Paired unguided/guided sweeps, a four-way Stage 0/Tier 1 ablation, proof soundness checks, and PLN regressions are available. Performance is workload- and budget-dependent; the recorded results are evidence for the tested domains, not a guarantee that every query or larger knowledge graph improves.
 
-```
-AtomSpace Knowledge Base (Tasks & Beliefs)
-   │
-   ▼
-[ Stage 0: Indexed Premise Pre-Filter ] (stage0/index.py)
-   │ Unification & concept overlap filter against active candidate & goal
-   ▼
-[ Candidate Frontier Generator ] (PLN.Derive, lib_pln.metta)
-   │ Enumerates legally applicable (rule, premise) pairs
-   ▼
-[ Tier 1: Fast Policy / Heuristic Scorer ] (tier1/heuristic_v1.py, < 0.05ms)
-   │ v1: Symbolic structural overlap + confidence + depth geometric discount
-   │ v2: Lightweight MLP / embedding ranker (trained on traces)
-   ▼
-[ Score Memoization Cache ] (core/cache.py)
-   │ Prevents O(N²) FFI calls during queue pruning
-   ▼
-[ Priority Queue Selection ] (BestCandidate PriorityRankGoal)
-   │
-   ├─► [ Normal Progress ] ──────────────┐
-   │                                      ▼
-   └─► [ Search Stalled? ] ────► [ Tier 2: Strategic LLM Reasoner ]
-         (Low scores for k steps)       Decomposes goal into subgoals (JSON)
-                                           │
-                                           ▼
-                                  [ PLN Truth-Value Execution ]
-                                  Authoritative, 100% sound PLN formulas
-                                           │
-                                           ▼
-                              Derived Conclusion & Valid STV
-```
+Experimental OpenPsi planning and learned-v2 policy work may be developed on other branches. **There are no OpenPsi or learned-v2 commands in this branch's runner.** A future shared controller interface and additional backend adapters, such as MOSES, are proposals rather than main-branch integrations.
 
-1. **Stage 0 (Indexed Premise Pre-Filter):** Indexes beliefs by concept and link patterns to prevent combinatorial Cartesian products before MeTTa evaluation.
-2. **Tier 1 (Fast Policy / Heuristic Scorer):** Operates on every task selection step (< 0.05ms target latency). v1 uses structural concept overlap, confidence, and geometric derivation depth decay ($\delta \cdot \gamma^{depth}$); v2 employs a learned model trained on proof traces.
-3. **Tier 2 (Strategic LLM Reasoner):** Invoked sparingly, only when search stalls (≥5 consecutive low-scoring steps) or reaches deep thresholds, proposing structured intermediate subgoals.
-4. **Score Memoization Cache:** Caches `(sentence, goal) → score` mappings to eliminate redundant FFI crossings during queue pruning.
+## Repository layout
 
-The full mathematical specification (cost formulas, training objectives, stall-detection conditions) lives in the Implementation Specification — see §7.
-
----
-
-## 3. Real Codebase Integration (`trueagi-io/PLN`)
-
-PRISM is grounded directly in the live `trueagi-io/PLN` implementation. In the
-development workspace, PeTTa is normally a sibling checkout at
-`../PeTTa`, with PLN at `../PeTTa/repos/PLN/lib_pln.metta`. Set `PETTA_HOME`
-when using another checkout. This table is the fast reference for exactly what
-PRISM touches — for the full reasoning behind each change, see the
-Implementation Specification:
-
-| Target Function | Location | Original Behavior | PRISM Modification |
-|---|---|---|---|
-| `PriorityRank` | `lib_pln.metta` | Returns raw confidence `$c` | Replaced by curried `PriorityRankGoal`, goal-aware scoring via `prism-score`, falls back to `$c` on missing goal or scorer failure |
-| `PriorityRankNeg` | `lib_pln.metta` | Negated raw confidence | Replaced by `PriorityRankNegGoal`, identical goal-aware/fallback treatment |
-| Belief filtering | `lib_pln.metta` | Unconditional `(superpose $Beliefs)` | Filters candidate premises via Stage 0 `prism-filter-beliefs` |
-| `LimitSize` | `lib_pln.metta` | Repeatedly evicts lowest-priority item | Goal-aware variant, trims queues in pure MeTTa, cached scores avoid repeated FFI crossings |
-| `PLN.Derive` | `lib_pln.metta` | 6-argument recursive loop | 7-argument goal-aware overload added; legacy 6-argument overload preserved unchanged |
-| `PLN.Query` | `lib_pln.metta` | Discarded `$term` during derivation | Forwards `$term` as `$Goal` directly into the 7-arg `PLN.Derive` |
-
-**Invariant this table exists to protect:** every row above is either a new addition or a drop-in-compatible replacement. No existing call site, rule, or truth-value formula in `lib_pln.metta` is modified in a way that changes behavior when `$Goal` is absent.
-
----
-
-## 4. Repository Layout
-
-```
+~~~text
 prism/
-├── README.md                          # This file
-├── pyproject.toml                     # Package and pytest configuration
-├── requirements.txt                  # Editable development/test install
-│
-├── src/prism/                         # Installable runtime package
-│   ├── core/                          # Configuration, cache and scorer entry points
-│   ├── stage0/                        # Indexed premise filtering
-│   ├── tier1/                         # Fast symbolic heuristic
-│   ├── tier2/                         # Strategic waypoint guidance
-│   ├── search/                        # Forward, backward and bidirectional search
-│   ├── adapters/petta/                # PeTTa/PLN runtime and Prolog bridges
-│   ├── observability/                 # Proof tracing and diagnostics
-│   └── verification/                  # Independent PLN proof replay and soundness checks
-│
-├── benchmarks/                        # Evaluation code; never imported by runtime
-│   ├── run_benchmark.py               # CLI benchmark driver
-│   ├── domains/                       # Problem domain generators (chains, diamonds, trees)
-│   ├── utils/                         # Metrics collection & FFI profiling
-│   ├── metta/                         # Raw MeTTa benchmark scripts
-│   └── results/reference/             # Curated empirical evidence
-│
-├── tests/
-│   ├── unit/                          # Python tests
-│   └── integration/                   # MeTTa integration tests
-│
-├── docs/
-│   ├── architecture.md                # Ownership and dependency rules
-│   ├── milestones/                    # Week-by-week acceptance records
-│   └── papers/                        # Proposal and implementation specification
-│
-└── scripts/check.sh                   # Local regression entry point
-```
+├── run.sh                     Tests and benchmark entry point
+├── src/prism/
+│   ├── core/                  Configuration, scoring bridge, cache and safety
+│   ├── stage0/                PLN premise index
+│   ├── tier1/                 Fast structural v1 heuristic
+│   ├── tier2/                 Optional stall and subgoal guidance
+│   ├── search/                Best-first and bidirectional agendas
+│   ├── adapters/petta/        PeTTa bridge to real PLN rules
+│   ├── observability/         Search traces
+│   └── verification/          PLN proof replay and soundness checks
+├── tests/                     Python and direct MeTTa tests
+├── benchmarks/                Paired experiments and reference results
+├── docs/papers/               Original PLN-focused proposal/specification
+└── artifacts/                 Locally generated benchmark outputs
+~~~
 
-For layer ownership, invariants, and where new work should go, see
-[`docs/architecture.md`](docs/architecture.md).
+The PLN rules, truth-value formulas, and MeTTa hooks are in the sibling **PeTTa/repos/PLN** checkout, not copied into this package.
 
----
+## Set up
 
-## 5. Design Guarantees
+For the complete evaluator suite, use Python **3.12** and SWI-Prolog with PeTTa's Janus Python bridge. The package metadata permits older Python, but the current bidirectional benchmark uses Python 3.12 f-string syntax. The expected full-workspace layout is:
 
-These hold regardless of implementation progress — they are architectural commitments, not results to be verified week by week:
+~~~text
+<workspace>/
+├── prism/
+├── PeTTa/
+│   └── repos/PLN/
+├── kgadexp.metta                 Optional small-KG input
+├── kg.metta                      External-KG input
+├── wordnet_stv_clean.metta       External-KG input
+└── output_prolog_ready.metta     External-KG input
+~~~
 
-- **Soundness by construction:** PRISM never computes or influences a truth value. Every conclusion PLN reaches is computed entirely by PLN's own unmodified formulas, regardless of which tier proposed the candidate.
-- **Graceful degradation:** a missing goal, a malformed sentence, or a scorer/FFI failure always falls back to PLN's original confidence-only behavior — never a crash, never a silent wrong answer.
-- **Backward compatibility:** every existing call site, rule, and example that doesn't pass a goal continues to behave exactly as it did before PRISM existed.
-
----
-
-## 6. How to Run
-
-### Install for development
-
-```bash
-cd <prism-repo>
+~~~bash
+cd <workspace>/prism
 python3 -m venv .venv
 . .venv/bin/activate
-python -m pip install -r requirements.txt
-```
+python3 -m pip install -r requirements.txt
+./run.sh doctor
+~~~
 
-### Unit tests
-```bash
-cd <prism-repo>
-python3 -m pytest
-```
+The Python tests need the package/test dependencies. Direct MeTTa checks and PLN benchmarks also require the sibling PeTTa/PLN checkout; KG benchmarks need their listed workspace data files. PETTA_HOME can select a different PeTTa checkout for PLN-specific commands.
 
-### MeTTa integration tests
-```bash
-cd <workspace-root>/PeTTa
-PYTHONPATH=../prism/src sh run.sh ../prism/tests/integration/test_fallback.metta
-PYTHONPATH=../prism/src sh run.sh ../prism/tests/integration/test_prism_hook.metta
-```
+## Run tests and benchmarks
 
-### Synthetic benchmark sweeps
-```bash
-cd <prism-repo>
+From prism/:
 
-# Unguided baseline
-python3 -m benchmarks.run_benchmark --depths 5 8 10 --distractors 0 10 25 50 --repeats 2 --max-steps 80
+~~~bash
+./run.sh help                  # List all commands and their purpose
+./run.sh test                  # Python, direct MeTTa and seven PLN rule tests
+./run.sh test-pln-examples     # Six additional upstream PLN examples
+./run.sh bench-ffi             # Measure cached and uncached FFI overhead
+./run.sh bench-chain           # Compare unguided PLN and PRISM on chains
+./run.sh bench-ablation        # Isolate Stage 0, Tier 1 and full PRISM
+./run.sh bench-kg              # Run the supplied small-KG pilot
+./run.sh bench-all             # All offline suites; can take many minutes
+~~~
 
-# PRISM-guided
-python3 -m benchmarks.run_benchmark --guided --depths 5 8 10 --distractors 0 10 25 50 --repeats 2 --max-steps 80 --output artifacts/<name>.json
-```
+Each command is explained by a short comment inside [run.sh](run.sh). The launcher works from other directories when called by path. New JSON and logs go to **artifacts/evaluator-runs/**, not the curated benchmarks/results/reference/ files. Set PRISM_RESULTS_DIR to write elsewhere or PRISM_PYTHON to choose a Python executable.
 
-### Full PLN regression suite
-```bash
-cd <workspace-root>/PeTTa
-for f in ./repos/PLN/ruletests/*.metta; do sh run.sh "$f" | grep "should"; done
-```
+The optional live provider check is ./run.sh bench-tier2-live and requires OPENROUTER_API_KEY; it is excluded from bench-all. The broad upstream PLN test script currently includes a failing Direct.metta example, so this runner uses the seven pinned rule tests and six working examples.
 
----
+## Evidence and documentation
 
-## 7. Documentation Map
-
-This project's documentation is split by purpose — each document below covers a different concern, so results and status are never duplicated here:
-
-| Document | Covers |
-|---|---|
-| `docs/papers/PRISM_PLN_Inference_Control_Proposal_final.pdf` | The what and why — problem, gaps, AGI relevance and proposed solution |
-| `docs/papers/PRISM_Implementation_Specification.md` | The how — file-level changes, formulas and training objectives |
-| `docs/milestones/milestone_week*.md` | Per-week deliverables, gates and measured results |
-| `docs/architecture.md` | Runtime ownership, dependency direction and artifact policy |
-| `benchmarks/README.md` | Benchmark commands, baselines and result interpretation |
-| `tests/README.md` | Test coverage and integration commands |
+- [Benchmark guide](benchmarks/README.md): workloads, historical numbers, and interpretation. Use run.sh for current reruns rather than older commands that write into reference paths.
+- [Test guide](tests/README.md): Python and direct MeTTa coverage.
+- [Implementation specification](docs/papers/PRISM_Implementation_Specification.md): PLN-focused design and formulas; proposals in it are not automatically implemented on main.
+- [Original PLN proposal](docs/papers/PRISM_PLN_Inference_Control_Proposal_final.pdf): historical project framing.
